@@ -51,3 +51,7 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+# Alternative local port for testing
+port: 5001
+
