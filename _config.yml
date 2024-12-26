@@ -29,13 +29,13 @@ github_username: Bouse-w
 
 # Build settings
 # default settings
-theme: minima
+# theme: minima
+# plugins:
+# - jekyll-feed
+remote_theme: pages-themes/dinky@v0.2.0
 plugins:
-- jekyll-feed
-#remote_theme: pages-themes/dinky@v0.2.0
-#plugins:
-#- jekyll-feed 
-#- jekyll-remote-theme
+- jekyll-feed 
+- jekyll-remote-theme
 
 
 # Exclude from processing.
