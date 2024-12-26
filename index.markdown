@@ -4,7 +4,6 @@
 
 layout: home
 title: "HomePage"
-permalink: /index/
 ---
 
 HomePage of BouseBlog. Here we set out to do something interesting together.
