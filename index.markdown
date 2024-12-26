@@ -3,4 +3,10 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
+title: "HomePage"
+permalink: /index/
 ---
+
+HomePage of BouseBlog. Here we set out to do something interesting together.
+
+
