@@ -6,7 +6,7 @@ layout: home
 title: "HomePage"
 ---
 
-This repository is set for BouseBlog SEPRATALLY.
-HomePage of BouseBlog. Here we set out to do something interesting together.
-
+<div align="center"><font size=3>HomePage of BouseBlog. </font></div>
+<br>
+<div align="center">From here we set out to do something interesting together.</div>
 
