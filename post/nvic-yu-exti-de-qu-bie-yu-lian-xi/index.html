@@ -1,0 +1,226 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NVIC 与 EXTI 的区别与联系 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="NVIC 与 EXTI 的区别与联系 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+GPT 3.5
+
+
+当涉及到 STM32F103 固件库中的 NVIC（Nested Vectored Interrupt Controller）和 EXTI（External Interrupt）时，它们有以下区别
+
+功能和作用
+
+NV..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              NVIC 与 EXTI 的区别与联系
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <blockquote>
+<p><strong>GPT 3.5</strong></p>
+<ul>
+<li>
+<p>当涉及到 STM32F103 固件库中的 NVIC（Nested Vectored Interrupt Controller）和 EXTI（External Interrupt）时，它们有以下区别</p>
+<ul>
+<li>功能和作用
+<ul>
+<li>NVIC 是一个用于处理多种中断的硬件模块，它负责管理中断优先级和中断嵌套（Nested）。</li>
+<li>EXTI 用于处理外部中断，它负责监测和处理来自外部引脚的电平或边沿变化触发的中断。</li>
+</ul>
+</li>
+<li>地位和结构
+<ul>
+<li>NVIC 属于 STM32F103 系列微控制器的核心内核组件之一。它是中央处理单元（CPU）内的一部分，用于管理和控制中断。NVIC 具有优先级级别和向量表，并支持嵌套中断的处理。</li>
+<li>EXTI 是 STM32F103 固件库中的外围组件之一。它是专门用于处理特定外部引脚上的中断触发事件的模块。</li>
+</ul>
+</li>
+<li>中断管理
+<ul>
+<li>NVIC管理器负责中断的优先级分配和中断处理的嵌套。通过配置NVIC寄存器，可以控制哪些中断可嵌套、中断的优先级以及中断向量表的位置等</li>
+<li>EXTI用于接收和处理外部中断。它监视特定引脚上的电平或边沿变化，并触发相应的中断请求，然后由NVIC将其分配给适当的中断处理程序。</li>
+</ul>
+</li>
+<li>配置和使用
+<ul>
+<li>在使用 NVIC 之前，首先需要根据应用程序的要求，对中断优先级进行配置和初始化。这包括设置中断向量表、中断优先级和使能中断的相关寄存器等。</li>
+<li>EXTI需要配置外部引脚以及相关的触发方式（电平触发或边沿触发）。当外部引脚发生变化时，会触发相应的中断请求，并由NVIC控制相应中断的处理。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>总结：NVIC负责控制和管理中断的优先级和嵌套，而EXTI用于处理特定外部引脚上的中断触发事件。它们在STM32F103固件库中具有不同的功能和作用，并一起协同工作以实现中断处理的功能。</p>
+</li>
+</ul>
+</blockquote>
+<p><font color=green>非常好的先验知识：</font><a href="https://zhuanlan.zhihu.com/p/495420600">浅析微架构、指令集？ - 知乎 (zhihu.com)</a></p>
+<p><code>NVIC</code> 是 <code>Cortex-M3</code> 内核处理器微架构的一部分，<code>Cortex-M3</code> 基于 <code>ARMv7-M</code> 指令集，由 ARM 公司设计。</p>
+<p><code>EXTI</code> 是 <code>STM32</code> 系列 <code>MCU</code> 的一个片上外设，由芯片公司设计制造。</p>
+<p><code>Cortex-M3</code> 微架构示意图，红色线框中是 <code>NVIC</code></p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/cm3.png" alt="Cortex-M3 微架构示意图" style="zoom:70%;">
+</div>
+<p><code>STM32F</code> 系列 <code>MCU</code> 总线架构图，红色线框中是 <code>Cortex-M3</code> 内核处理器，注意蓝色线框中的 <code>EXTI</code></p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/STM32内部架构.png" alt="STM32内部架构" style="zoom:60%;">
+</div>
+<p>建议搞懂微架构和指令集的区别，弄明白 <code>Cortex-M3</code> 和 <code>ARMv7-M</code> 的关系。</p>
+<p><code>EXTI</code> 作为一个很好用的外设，具体的使用方法可以去参考官方的手册。</p>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/notes-for-the-sel4-microkernel-an-introduction/">
+              <h3 class="post-title">
+                Notes for The seL4 Microkernel - An Introduction
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

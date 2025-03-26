@@ -1,0 +1,297 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JAVA-WebService实验完成笔记 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="JAVA-WebService实验完成笔记 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="本项目基于 Java-WebServices 实现了一个分布式待办事项管理系统。下面对一些技术要点作出记录和分析，对一些 bug 和未完成的实现作出说明。
+
+Web Services 体系结构
+
+
+	
+	图自 NWPU.SE.ssd8 实验..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              JAVA-WebService实验完成笔记
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>本项目基于 <code>Java-WebServices</code> 实现了一个分布式待办事项管理系统。下面对一些技术要点作出记录和分析，对一些 <code>bug</code> 和未完成的实现作出说明。</p>
+<ul>
+<li>Web Services 体系结构</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/WebService体系结构.png" alt="automatic-scalability" width=50%>
+	<figcaption><font size=1>图自 NWPU.SE.ssd8 实验四题目说明文档</font></figcaption>
+</div>
+<p>我们源码实现过程中，只关心 <code>WSDL</code> 相关的部分即可。基于 <code>XML</code> 的<code>SOAP</code> 报文由 <code>JAVA</code> 自动生成。详见下面 <code>WireShark</code> 的抓包情况。</p>
+<ul>
+<li>项目源文件目录结构与说明</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/srcTree.png" alt="automatic-scalability" width=50%>
+	<figcaption><font size=1>图自我的 eclipse 工程目录树</font></figcaption>
+</div>
+<pre><code>* `package client`
+	* `Interface ListImp`
+		* 客户端服务接口文件。声明了远程服务的 `API`。
+		* 使用 `@WebService(...)` **配置服务**，声明了 `Web Service` 的名字和目标命名空间等，详见源代码。
+		* 使用 `@SOAPBinding(...)` **配置 `SOAP` 绑定风格**，指定如何在 `SOAP` 消息中表示方法的调用和响应。本项目中使用了 `RPC` 风格的绑定，以使远程方法调用和响应格式类似于本地方法调用，详见源代码。
+	* `Class ListImpService`
+		* 客户端服务代理源文件。定义一个与客户端直接交互，并转发请求参数到服务端的代理类。
+		* 使用 `@WebServiceClient(...)`，在客户端为服务端点配置注解。指定服务的名称、目标命名空间、`WSDL` 的位置，以便客户端能与相应的 `Web Service` 通信，详见源代码。
+		* 此类是对 `Service` 类的扩展。
+	* `Class WebClient`
+		* 客户端交互服务启动文件，向用户展示功能菜单并获取用户调用参数。
+			* 此文件中创建了 `ListImpService` 的对象以转发用户操作和调用参数，详见源代码。
+* `package service`
+	* `Class ListImp`
+		* 服务端最重要的服务实现文件。
+		* 使用了线程安全的 `Vector` 容器存储用户和待办事件，详见源代码。
+		* 使用 `SOAPBinding(...)` 配置 `SOAP` 绑定风格为 `RPC` 风格，详见源代码。
+	* `Interface ListInterface`
+		* 服务端描述服务的接口文件。在 `ListImp` 类中被实现。
+	* `Class TodoList`
+		* 待办事项类。和 `User` 类是**多对一关联**关系。
+	* `Class User`
+		* 客户类。和 `TodoList` 类是**一对多关联**关系。
+	* `Class WebServer`
+		* 客户端服务启动文件。
+		* 调用 `Endpoint.pubish (...)` 函数发布远程服务。
+</code></pre>
+<ul>
+<li>实际运行情况
+<ul>
+<li>在 <code>localhost:8888</code> 端口启动 <code>WebServer</code>，在浏览器上查看 <code>WSDL</code> 响应。</li>
+</ul>
+</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/terminal.png" alt="automatic-scalability" width=90%>
+	<figcaption><font size=1>终端响应</font></figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/webWSDL.png" alt="automatic-scalability">
+	<figcaption><font size=1>网页响应</font></figcaption>
+</div>
+<pre><code>* 启动 `WebClient`，发送一条指令及参数，使用 `WireShark` 抓包查看 `JAVA` 构造的 `SOAP` 报文。
+</code></pre>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/register.png" alt="automatic-scalability" width=40%>
+	<figcaption><font size=1>注册行为</font></figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/soapXML.png" alt="automatic-scalability" width=90%>
+	<figcaption><font size=1>网络包</font></figcaption>
+</div>
+<p>可以看到，客户端 <code>JAVA</code> 代码根据调用选项和调用参数自动构建了 <code>XML</code> 格式的 <code>SOAP</code> 报文，并当作一个 <code>HTTP</code> 的 <code>POST</code> 请求发送出去，随后也受到了服务端的响应。</p>
+<ul>
+<li>一点问题说明
+<ul>
+<li>调用参数传递自定义的对象没有成功实现。</li>
+<li>经理论学习和 <code>WireShark</code> 抓包验证可以得知：<code>Web</code> 服务被定义为可以通过 <code>SOAP</code> 从网络进行访问，并由服务描述表示。而 <code>SOAP</code> 的报文格式是基于 <code>XML</code> 文档描述语言，所以想要使用 <code>SOAP</code> 传递字节流（序列化后的对象）是不可行的，除非对字节流使用 <code>base64</code> 编码再套一层，见：<a href="https://blog.csdn.net/yestotofu/article/details/6012957">在WebService上传递字节流|CSDN|blog.csdn.net</a>。这样搞太麻烦，不如直接传递简单的基本类型数据如字符串、整型等。</li>
+<li>当强行使用对象作为调用参数传递时，客户端直接报告 <code>HTTP 500</code> 错误。见下图。</li>
+</ul>
+</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/对象报错.png" alt="automatic-scalability" width=90%>
+	<figcaption><font size=1>传递对象报错</font></figcaption>
+</div>
+<ul>
+<li>部分关键代码</li>
+</ul>
+<pre><code class="language-java">/**
+* Class WebClient
+*/
+
+package client;
+...
+
+String request = keyboard.readLine();
+
+if (request.startsWith (&quot;register&quot;)) {
+String[] arg = new String[5];
+System.out.println(&quot;Input user's name:&quot;);
+arg[3] = in.readLine();
+System.out.println(&quot;Input user's password:&quot;);
+arg[4] = in.readLine();
+
+System.out.println(webClient.register(new Request (0, arg[3], arg[4], &quot;&quot;, null, null ,0)));
+}
+...
+</code></pre>
+<pre><code class="language-java">/**
+* Interface ListImp
+*/
+
+package client;
+...
+
+@WebService(name = &quot;ListImp&quot;, targetNamespace = &quot;http://service/&quot;)
+@SOAPBinding(style = SOAPBinding.Style.RPC)
+public interface ListImp {
+@WebMethod
+@WebResult(partName = &quot;return&quot;)
+public String register(Request request) ;
+...
+}
+</code></pre>
+<p>至少目前它不能帮我自动序列化，就算实现了序列化，也不能用 <code>XML</code> 格式传字节流内容。最后只能做了版本回退，仅传递较简单的基本类型参数。</p>
+<p>本文档后续也许还会再完善，更新内容会放在我的博客（如果有更新的话）。</p>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/hpc-qi-mo-fu-xi/">
+              <h3 class="post-title">
+                HPC 期末复习
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

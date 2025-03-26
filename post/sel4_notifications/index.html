@@ -1,0 +1,281 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_Notifications | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_Notifications | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Notifications
+部分文段做了微小增删使句子通顺。
+Background
+
+Notifications allow p..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_Notifications
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/notifications"><code>seL4</code> Docs/Tutorials/Notifications</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="background">Background</h2>
+<blockquote>
+<p>Notifications allow processes to send asynchronous signals to each other, and are primarily used for interrupt handling and to synchronize access to shared data buffers.</p>
+</blockquote>
+<p>通知允许进程间发送非同步信号，主要用于中断处理和共享内存访问同步。</p>
+<p><code>seL4</code> 是支持共享内存的，通过将共享内存页的 <code>capability</code> 映射到对方进程的 <code>VSpace</code> 中实现：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/notifications/sel4_sharing_memory.JPG" alt="automatic-scalability" width=80%>
+	<figcaption >
+        <font size=2>seL4 实现共享内存</font>
+    </figcaption>
+</div>
+<h3 id="notifications-objects">Notifications objects</h3>
+<blockquote>
+<p>A notification object consists of a data word, which acts as an array of binary semaphores, and a queue of TCBs waiting for notifications.</p>
+</blockquote>
+<p>一个 <code>notification object</code> 由一个数据字组成，<code>notification object</code> 可以当作一个二值信号量数组，和一个等待通知的进程的队列。</p>
+<p>这可以和 <code>FreeRTOS</code> 的事件机制作比较：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/notifications/free_rtos_event.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>FreeRTOS 事件机制</font>
+        <br>
+        <font size=2>截图自《FreeRTOS 内核实现与应用开发实战指南——基于 STM32》.P314
+    </figcaption>
+</div>
+<blockquote>
+<p>Notification objects can be in three states:</p>
+<ul>
+<li>Waiting - there are TCBs queued on this notification waiting for it to be signalled.</li>
+<li>Active - TCBs have signalled data on this notification,</li>
+<li>Idle - no TCBs are queued and no TCBs have signalled this object since it was last set to idle.</li>
+</ul>
+</blockquote>
+<p><code>Notification</code> 对象可以有 <code>3</code> 种状态：等待——有线程阻塞在其上等待事件发生，活跃——有线程向它发送了事件发生的通知，空闲——既没有等待，也没有活跃</p>
+<h3 id="signaling">Signaling</h3>
+<blockquote>
+<p>When a task signals a notification object (using <code>seL4_Signal</code>), what occurs depends on the state of the object:</p>
+<ul>
+<li>Idle - the data word is set to the badge of the capability used to send the signal, and the object is converted to active.</li>
+<li>Active - the badge of the capability used to signal the notification object is bitwise-orred with the notifications data word.</li>
+<li>Waiting - the head of the queue of TCBs is woken and the badge sent to that TCB. If the queue is empty, the notification object is transitioned to idle.</li>
+</ul>
+</blockquote>
+<h3 id="waiting">Waiting</h3>
+<blockquote>
+<p>Tasks can wait on a notification object using <code>seL4_Wait</code>, which does the following:</p>
+<ul>
+<li>Idle - the TCB is queued, and the notification transitioned to waiting.</li>
+<li>Active - the TCB receives the data word, the data word is reset to 0 and the notification transitioned to idle,</li>
+<li>Waiting - the TCB is appended to the queue.</li>
+</ul>
+</blockquote>
+<h3 id="polling">Polling</h3>
+<blockquote>
+<p>Notification objects can also be polled with <code>seL4_Poll</code>, which is a non-blocking version of <code>seL4_Wait</code> that returns immediately regardless of the state.</p>
+</blockquote>
+<p><code>Ntification</code> 机制可以视作一个简单的 <code>IPC</code>，进程间仅允许传递默认的“通知”消息，消息发送和接收都是阻塞式的。实际上，<code>seL4_Signal</code> 和 <code>seL_Wait</code> 与 <code>seL4_Send</code> 和 <code>seL4_Recv</code> 的实际实现大致相同。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/notifications/sel4_signal.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>seL4_Signal 的实现：没有消息，只有“通知”</font>
+    </figcaption>
+</div>
+<p><code>seL4_Wait</code> 允许调用者以 <code>badge</code> 记录通知的发送者。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/notifications/sel4_wait.JPG" alt="automatic-scalability" width=80%>
+	<figcaption >
+        <font size=2>seL4_Wait 的实现：和 seL4_Recv 完全相同</font>
+    </figcaption>
+</div>
+<h2 id="interrupts-and-ipc">Interrupts and IPC</h2>
+<blockquote>
+<p>Notification objects can be used to receive signals of interrupt delivery, and can also be bound to TCBs such that signals and IPC can be received by the same thread.</p>
+</blockquote>
+<h2 id="exercise">Exercise</h2>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/notifications/final_result.JPG" alt="automatic-scalability" width=60%>
+	<figcaption >
+        <font size=2>Final result</font>
+    </figcaption>
+</div>
+<p><code>Notification</code> 机制可以和共享内存机制配合使用，这样无需内核中转通信数据，和使用 <code>IPC</code> 相比各有优劣。</p>
+<h2 id="one-more-thing-or-more">One more thing (or more?)</h2>
+<ul>
+<li>Create a counting semaphore implementation using notification objects.</li>
+<li>Create a bounded-buffer producer consumer with a buffer size greater than 1.</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#notifications-objects">Notifications objects</a></li>
+<li><a href="#signaling">Signaling</a></li>
+<li><a href="#waiting">Waiting</a></li>
+<li><a href="#polling">Polling</a></li>
+</ul>
+</li>
+<li><a href="#interrupts-and-ipc">Interrupts and IPC</a></li>
+<li><a href="#exercise">Exercise</a></li>
+<li><a href="#one-more-thing-or-more">One more thing (or more?)</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_mapping/">
+              <h3 class="post-title">
+                seL4_Mapping
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

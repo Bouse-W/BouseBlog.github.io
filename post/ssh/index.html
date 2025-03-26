@@ -1,0 +1,301 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SSH | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="SSH | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+
+SSH 协议和 OPENSSH
+
+SSH 即 Secure Shell（安全外壳协议），一种建立在应用层上的网络安全协议，通过加密和认证机制，实现安全的远程访问和文件传输
+注：对应地，TCP 协议是一种传输层协议
+OPENSSH 是 S..." />
+    <meta name="keywords" content="Network" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              SSH
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/D1lJ5JKZ8Q/" class="post-tag">
+                  # Network
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <ul>
+<li>
+<h4 id="ssh-协议和-openssh">SSH 协议和 OPENSSH</h4>
+<ul>
+<li>SSH 即 Secure Shell（安全外壳协议），一种建立在<strong>应用层</strong>上的网络安全协议，通过<strong>加密</strong>和<strong>认证</strong>机制，实现安全的远程访问和文件传输<br>
+<strong><font size=2>注：对应地，TCP 协议是一种传输层协议</font></strong></li>
+<li>OPENSSH 是 SSH 协议的免费开源实现，提供了 Server 端后台程序和 Client 端操作工具，用来加密远程控件和文件传输过程中的数据。</li>
+<li>当 SSH 应用于 sftp，scp，stelnet 时，默认占用 22 端口</li>
+</ul>
+</li>
+<li>
+<h4 id="ssh-连接的建立">SSH 连接的建立</h4>
+</li>
+</ul>
+<ol>
+<li>
+<h5 id="在-client-和-server-之间建立联系">在 Client 和 Server 之间建立联系</h5>
+<ol>
+<li>Client 和 Server 间建立 TCP 连接（三次握手）<br>
+<strong><font size=2>注：SSH 是应用层协议，它的传输层协议是 TCP，所以在 SSH 登录之前必定会有 TCP 连接</font></strong></li>
+<li>SSH 版本协商
+<ol>
+<li>SSH 目前存在 1.x 和 2.x 版本，且<strong>互不兼容</strong>，2.x 相较于 1.x 而言，在结构上做了扩展，支持更多认证方法和密钥交换方法，提高了服务能力。</li>
+<li>Client 和 Server 通过协商确定要使用的 SSH 版本</li>
+</ol>
+</li>
+<li>加密算法协商
+<ol>
+<li>SSH支持多种加密算法，双方根据各自支持的算法，协商出<strong>密钥交换算法：产生会话密钥（<a href="#3">Session Key</a>）</strong>，<strong>加密算法：用于数据信息加密</strong>，<strong>公钥算法：用于进行数字签名和认证</strong>，<strong>HMAC算法：用于数据完整性保护</strong>。</li>
+</ol>
+</li>
+<li>密钥交换
+<ol>
+<li>Server 将自己的 <a href="#1">Public Host Key</a> 和其他一些参数发给 Client</li>
+<li>Client 检查收到的的 Public Host Key 确定这台服务器是否是自己准备连接的目标，防止连错<br>
+<strong><font size=2>注：Client 端在本地保存一个 'known_hosts' 文件，存储已知服务器的 Key。若一台服务器此前从未被连接过，则在文件中没有它的信息，征得用户同意后会将它的 Key 存入此文件并继续下面过程</font></strong></li>
+<li>Client 和 Server 动态生成共享的会话密钥（Session Key）和会话 ID，最终成功建立加密通道</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<h5 id="对-client-身份鉴权">对 Client 身份鉴权</h5>
+<ol>
+<li>
+<h6 id="基于口令">基于口令</h6>
+<ol>
+<li>Client 通过用户名和密码的方式进行认证</li>
+</ol>
+</li>
+</ol>
+<div align="cnter"><image src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/SSH-基于口令鉴权.png"></div>
+<p><strong><font size=2>注 1：Client 会将登陆信息暴露在网络中，易遭受 <a href="#2">“中间人攻击”</a></font></strong><br>
+<strong><font size=2>注 2：无法对 Server 的公钥进行验证，所以通常在第一次登陆时，会出现提示：The authenticity of host 'xxxxx.com (xx.xx.xxx.xx)' can't be established./// RSA key fingerprint is xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx./// Are you sure you want to continue connecting (yes/no)?</font></strong><br>
+<strong><font size=2>注 3：RSA 算法生成的 Key 有 1024 位，太长而不便于直接比较，故对 Key 哈希（hash）生成一个 fingerprint 来比较更方便</font></strong></p>
+<ol>
+<li>
+<h6 id="基于密钥免密登陆">基于密钥（免密登陆）</h6>
+<ol>
+<li>SSH 连接之前，Client 生成公钥 / 私钥对，并将公钥发给 Server，保存在文件 'authorized_keys'中</li>
+<li>SSH 连接时，Client 携带公钥信息向 Server 发出登陆请求</li>
+<li>Server 接收请求后，在 'authorized_keys' 中查找收到的公钥信息，若比对成功（Key Exchange Success），则 Server 使用公钥加密一段随机字串，发送给 Client，进行身份质询（Challenge）</li>
+<li>Client 用私钥解密随机字串，再用 Session Key 和其他加密算法对随机字串再加密，并发送给 Server，与此同时，Server 用同样的密钥和算法计算随机字串的加密结果，最终和 Client 回包中的加密结果作对比，若一致，则允许登陆。</li>
+</ol>
+</li>
+</ol>
+<div align="center"><img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/SSH基于密钥免密连接.png"></div>
+<p><strong><font size=2>注：基于密钥的免密登陆方式，应用到 github 等托管网站服务器与本地客户端之间便实现了对代码文件免密的 push 和 pull 等操作</font></strong></p>
+</li>
+</ol>
+<ul>
+<li>
+<p><strong><div id=1>Host Key</strong>：主机密钥，由 SSH 自行生成，分为 Public Host Key 和 Private Host Key，主要用于 SSH 通信中，Client 检查 Server 是否是目标主机</div></p>
+</li>
+<li>
+<p><strong><div id=2>中间人攻击</strong>：Man-in-the-MiddleAttack，又称 “MITM攻击”，指攻击者与通讯的两端分别创建独立的联系，并交换其从两端所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制，攻击者可以拦截并修改通讯双方的通话内容</div></p>
+<div align="center"><img alt="中间人攻击口令登陆" src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/中间人攻击图示.png" width="80%"></div>
+</li>
+<li>
+<p>各种链接方式中对中间人攻击的防范</p>
+<ul>
+<li>SSH <strong>使用密钥免密登陆</strong>，或在口令登陆中根据 <strong>fingerprint</strong> 请求确认</li>
+<li>SSL协议可以验证参与通讯的一方或双方使用的证书是否是由权威的受信 任的数字证书认证机构颁发，并且能执行双向身份认证</li>
+<li>HTTPS 中可以通过 CA 来进行公证（SSH 的 public key 和 private key 都是自己生成的，没法公证）</li>
+</ul>
+</li>
+<li>
+<p><strong><div id=3>Session Key</strong>：Session Key 用于通讯过程中对消息和数据进行加密解密，通信过程中，两端使用相同的 Key 加 / 解密信息，因而被称作 “<a href="#4">对称加密</a>”</div></p>
+<ul>
+<li>生成 Session Key 的大致过程</li>
+</ul>
+<div align="center"><img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/Session-Key-的生成.png" width="60%"></div>
+</li>
+<li>
+<p><strong><div id=4>对称加密</strong>：对称加密算法使用同一个密钥对数据进行加 / 解密。SSH连接建立过程中生成的会话密钥就是对称密钥，由 Client 和 Server 基于共享的部分信息和各自的私有数据，使用密钥交换算法分别生成。<strong>因为对称加密算法加 / 解密的速度很快，所以适用于传输大量数据的场景。SSH 通信过程中，数据传输部分即使用对称加密</strong></p>
+<div align="center"><img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/对称加密.png" width="45%"></div>
+</li>
+<li>
+<p><strong>非对称加密</strong>：非对称加密的发送和接收需要使用一对关联的 SSH 密钥，即公钥和私钥。私钥由生成的一方自己保管，公钥可以发送给请求通信的其他任何人。发送方用收到的公钥对自己的通信内容进行加密，只有接收方可以使用私钥进行解密获取通信内容。<strong>非对称加密的私钥不需要暴露在网络中，安全性大大增加，但是加解密的速度比对称密钥慢得多</strong></p>
+<div align="center"><img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/非对称加密.png" width="45%"></div></li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#ssh-%E5%8D%8F%E8%AE%AE%E5%92%8C-openssh">SSH 协议和 OPENSSH</a></li>
+<li><a href="#ssh-%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%BB%BA%E7%AB%8B">SSH 连接的建立</a>
+<ul>
+<li><a href="#%E5%9C%A8-client-%E5%92%8C-server-%E4%B9%8B%E9%97%B4%E5%BB%BA%E7%AB%8B%E8%81%94%E7%B3%BB">在 Client 和 Server 之间建立联系</a></li>
+<li><a href="#%E5%AF%B9-client-%E8%BA%AB%E4%BB%BD%E9%89%B4%E6%9D%83">对 Client 身份鉴权</a>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E5%8F%A3%E4%BB%A4">基于口令</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E%E5%AF%86%E9%92%A5%E5%85%8D%E5%AF%86%E7%99%BB%E9%99%86">基于密钥（免密登陆）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sjtu_chcorelab_1_solutions/">
+              <h3 class="post-title">
+                SJTU_chCoreLab_1_solutions
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

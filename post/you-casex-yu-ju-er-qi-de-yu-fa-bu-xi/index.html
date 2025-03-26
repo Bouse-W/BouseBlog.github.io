@@ -1,0 +1,374 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>由 casex 语句而起的语法补习 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="由 casex 语句而起的语法补习 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="casex 和 casez 语句的使用
+引用自 IEEE standard Verilog hardware description language - IEEE Std 1364-2001
+
+The length of all the ..." />
+    <meta name="keywords" content="Verilog" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              由 casex 语句而起的语法补习
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/WydVhsUdGH/" class="post-tag">
+                  # Verilog
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h5 id="casex-和-casez-语句的使用"><code>casex</code> 和 <code>casez</code> 语句的使用</h5>
+<p>引用自 <em>IEEE standard Verilog hardware description language - IEEE Std 1364-2001</em></p>
+<blockquote>
+<p><em>The length of all the case item expressions, as well as the case expression in the parentheses, shall<br>
+be made equal to the length of the longest case expression and case item expression.</em></p>
+</blockquote>
+<blockquote>
+<p><em><strong>NOTE The default length of x and z is same as the default length of an integer. (32 bits)</strong></em></p>
+</blockquote>
+<blockquote>
+<p><em><strong>casez</strong> statments treat high-impedance values (z) as don t-cares, and <strong>casex</strong> statments treat both high-impedance and unknown (x) values as don t-cares.</em></p>
+</blockquote>
+<blockquote>
+<p><em>Don't-care values (z values for casez, z and x values for casex) in any bit of either the case expression or the case items shall <strong>not be considered</strong> during the comparison.</em></p>
+</blockquote>
+<blockquote>
+<p><em>A constant expression can be used for case expression. The value of the constant expression shall be compared against case item expressions.</em></p>
+</blockquote>
+<p>最后一条是说 <code>case</code> 的判断条件使用常量，<code>case</code> 的结果分支使用变量。一个逆用花活。</p>
+<p>IEEE 标准文档给出了如下伪代码以说明 <code>casex</code> 的特性。</p>
+<img src="/.../casex伪代码">
+<p>我将 <code>x</code> 理解为不参与比较和运算，<code>x</code> 与任意值 <code>&amp;</code> 运算，结果为 <code>x</code>。</p>
+<p>因此对示例伪代码中认为应执行 <code>stat2</code> 持有疑问。</p>
+<p>我试图以下述代码进行验证。</p>
+<ul>
+<li>Version 1</li>
+</ul>
+<pre><code class="language-verilog">module casex_test_top (
+	reg [7:0] r,
+	reg [7:0] mask,
+	output [2:0] out
+);
+
+	initial begin
+		mask = 8'bx0x0x0x0;
+		r = 8'b01100110;
+	end
+		
+	always @ * begin
+		casex (r ^ mask)
+			8'b001100xx: out = 3'b001;
+			8'b1100xx00: out = 3'b010;
+			8'b00xx0111: out = 3'b011;
+			8'bxx010100: out = 3'b100;
+			default: out = 3'b000;
+		endcase
+	end
+endmodule
+</code></pre>
+<ul>
+<li>Version2</li>
+</ul>
+<pre><code class="language-verilog">module casex_test_top (
+	output [2:0] out
+);
+
+	reg [7:0] r;
+	reg [7:0] mask;
+
+	initial begin
+		mask = 8'bx0x0x0x0;
+		r = 8'b01100110;
+	end
+
+	always @ * begin
+		casex (r ^ mask)
+			8'b001100xx: out = 3'b001;
+			8'b1100xx00: out = 3'b010;
+			8'b00xx0111: out = 3'b011;
+			8'bxx010100: out = 3'b100;
+			default: out = 3'b000;
+		endcase
+	end
+endmodule
+</code></pre>
+<ul>
+<li>Version3</li>
+</ul>
+<pre><code class="language-verilog">module casex_test_top (
+	output [2:0] out
+);
+
+	reg [7:0] r = 8'b01100110;
+	reg [7:0] mask = 8'bx0x0x0x0;
+
+	always @ * begin
+		casex (r ^ mask)
+			8'b001100xx: out = 3'b001;
+			8'b1100xx00: out = 3'b010;
+			8'b00xx0111: out = 3'b011;
+			8'bxx010100: out = 3'b100;
+			default: out = 3'b000;
+		endcase
+	end
+endmodule
+</code></pre>
+<p>这么一写就欢乐了，三个版本都是错的。拿 <code>verilator</code> 模拟的时候哪哪都报错。我知道我对过程赋值和连续赋值分不清，对 <code>reg</code> 变量和 <code>wire</code> 变量胡乱用，但我仍然对完成实验怀有热切的愿望。</p>
+<ul>
+<li>Version4</li>
+</ul>
+<pre><code class="language-verilog">module casex_test_top (
+	input [7:0] r,
+	output reg [2:0] out
+);
+
+	reg [7:0] mask = 8'b0z0z0z0z;
+
+	always @ (r)
+	begin
+		casez (r ^ mask)
+			8'b001100zz: out &lt;= 3'b001;
+			8'b1100zz00: out &lt;= 3'b010;
+			8'b00zz0111: out &lt;= 3'b011;
+			8'bzz010100: out &lt;= 3'b100;
+			default: out &lt;= 3'b000;
+		endcase
+	end
+endmodule
+</code></pre>
+<p>编译成功了，发现 <code>verilator</code> 对 <code>x</code>、<code>z</code>、<code>?</code> 的处理受编译参数 <code>--x-assign &lt;mode&gt;</code> 影响。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>--x-assign 0</th>
+<th>--x-assign 1</th>
+<th>--x-assign fast</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>z</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>?</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h5 id="关于-verilog-中的-x-z">关于 verilog 中的 <code>x</code>、<code>z</code>、<code>?</code></h5>
+<h6 id="verilog-标准给出的定义">verilog  标准给出的定义</h6>
+<h6 id="verilator-的处理">verilator 的处理</h6>
+<p>一些可能相关的编译参数</p>
+<pre><code class="language-bash">--x-assign fast
+</code></pre>
+<p>引自 <a href="https://veripool.org/guide/latest/exe_verilator.html">verilator arguments|Verilator|veripool.org</a></p>
+<blockquote>
+<p><em>Controls the two-state value that is substituted when an explicit X value is encountered in the source</em>.<br>
+<em>&quot;–x-assign fast&quot;, the default, converts all Xs to whatever is best for performance</em>.</p>
+</blockquote>
+<p><code>--x-assign</code> 中的 <code>fast</code> 参数允许 <code>verilator</code> 以最优性能为目的自行选择将 <code>x</code> 初始化为何值。</p>
+<br>
+<pre><code class="language-bash"> --x-initial fast
+</code></pre>
+<p>引自 <a href="https://veripool.org/guide/latest/exe_verilator.html">verilator arguments|Verilator|veripool.org</a></p>
+<blockquote>
+<p><em><code>--x-initial fast</code> is best for performance, and initializes all variables to a state Verilator determines is optimal.</em><br>
+<em>This may <strong>allow further code optimizations</strong>, but will <strong>likely hide any code bugs relating to missing resets</strong>.</em></p>
+</blockquote>
+<p><code>--x-initial</code> 中的 <code>fast</code> 参数效果同上，允许 <code>verilator</code> 自主选择性能最优的初始化值，可以达到更好的编译优化效果，但也会隐藏由不正确的初始化代码引发的 bug。</p>
+<h5 id="阻塞赋值和非阻塞赋值">阻塞赋值和非阻塞赋值</h5>
+<p>使用阻塞赋值（<code>=</code>）可能会引发意想不到的情况，直接体现为综合出的逻辑电路与预期不一致。在 <code>always</code> 过程语句块中，考虑到电路逻辑的并发性，应尽量使用非阻塞赋值（<code>&lt;=</code>）。</p>
+<h5 id="寄存器型变量">寄存器型变量</h5>
+<p>输出信号一般定义为 <code>reg</code> 型变量。为什么？</p>
+<p><code>reg</code> 型变量有何特点？</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#casex-%E5%92%8C-casez-%E8%AF%AD%E5%8F%A5%E7%9A%84%E4%BD%BF%E7%94%A8"><code>casex</code> 和 <code>casez</code> 语句的使用</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E-verilog-%E4%B8%AD%E7%9A%84-x-z">关于 verilog 中的 <code>x</code>、<code>z</code>、<code>?</code></a>
+<ul>
+<li><a href="#verilog-%E6%A0%87%E5%87%86%E7%BB%99%E5%87%BA%E7%9A%84%E5%AE%9A%E4%B9%89">verilog  标准给出的定义</a></li>
+<li><a href="#verilator-%E7%9A%84%E5%A4%84%E7%90%86">verilator 的处理</a></li>
+</ul>
+</li>
+<li><a href="#%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC">阻塞赋值和非阻塞赋值</a></li>
+<li><a href="#%E5%AF%84%E5%AD%98%E5%99%A8%E5%9E%8B%E5%8F%98%E9%87%8F">寄存器型变量</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/yi-tiao-ctags-ming-ling/">
+              <h3 class="post-title">
+                一条 ctags 命令
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

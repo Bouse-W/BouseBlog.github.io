@@ -1,0 +1,344 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notes for Makefile in nvboard examples | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Notes for Makefile in nvboard examples | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="引人称赞的 nvboard project
+引人称赞的 verilator
+nvboard 项目的 example 目录给出了一个流水灯例程并提供了 Makefile：调用 verilator 构建可执行文件并接入 NVBoard。下面对 ..." />
+    <meta name="keywords" content="ysyx" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Notes for Makefile in nvboard examples
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/370MZUuJlW/" class="post-tag">
+                  # ysyx
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><font size=4><strong>引人称赞的 <a href="https://github.com/NJU-ProjectN/nvboard">nvboard project</a></strong></font></p>
+<p><font size=4><strong>引人称赞的 <a href="https://veripool.org">verilator</a></strong></font></p>
+<p><code>nvboard</code> 项目的 <code>example</code> 目录给出了一个流水灯例程并提供了 <code>Makefile</code>：调用 <code>verilator </code>构建可执行文件并接入 <code>NVBoard</code>。下面对 <code>Makefile</code> 的重要部分作简要分析。</p>
+<p>是重要部分做简要解析（胡言乱语</p>
+<pre><code class="language-Makefile"># 每次编译新项目并接入 nvboard，需要修改第一条 PROJNAME，其余无需修改
+# 可以适当修改此 Makefile，取消接入 nvboard
+
+PROJNAME = my_project
+TOPNAME = $(PROJNAME)_top
+INC_PATH ?=
+NXDC_FILES = ./constr/$(PROJNAME).nxdc
+
+BUILD_DIR = ./build/$(PROJNAME)
+OBJ_DIR = $(BUILD_DIR)/obj_dir
+
+VERILATOR = verilator
+VERILATOR_CFLAGS += -cc --build --trace -j 0 -Wall \\
+					-MMD -O3 --x-assign fast --x-initial fast --noassert
+</code></pre>
+<ol>
+<li><code>PROJNAME</code> 项目名称。</li>
+<li><code>TOPAME</code> 最终生成的顶层测试模块名。
+<ul>
+<li>verilator 根据用户编写的描述逻辑电路的 <code>.v</code> 源文件和描述测试逻辑的 <code>.cpp</code> 源文件自动生成<strong>构建顶层测试模块</strong>的源文件。根据执行参数编译生成顶层测试模块。</li>
+</ul>
+</li>
+<li><code>INC_PATH</code> 包含文件路径。
+<ul>
+<li><code>?=</code>条件赋值操作符，仅当变量未在其他任何地方显式赋值时才将右值赋给变量 <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></li>
+</ul>
+</li>
+<li><code>NXDC_FILES</code> 约束文件路径，约束文件用于接入 <code>nvboard</code>。</li>
+<li><code>BUILD_DIR</code> 构建过程的中间文件目录和结果文件存放路径。
+<ul>
+<li>结果文件就是最终的可执行文件。这么说是不是有点太细碎了。</li>
+</ul>
+</li>
+<li><code>OBJ_DIR</code> 构建过程的中间文件存放路径。
+<ul>
+<li><strong>中间文件</strong>主要是：<code>verilator</code> 自动生成的 <code>.cpp</code>、<code>.h</code>、<code>.mk</code>文件，编译中产生的 <code>.o</code>、<code>.d</code>、<code>.a</code> 文件。</li>
+</ul>
+</li>
+<li><code>VERILATOR</code> verilator 安装路径。</li>
+<li><code>VERILATOR_CFLAGS</code> verilator 执行参数。
+<ul>
+<li>具体的 verilator 执行参数及其作用请参见 <a href="https://veripool.org/guide/latest/exe_verilator.html">verilator Arguments</a></li>
+</ul>
+</li>
+</ol>
+<pre><code class="language-Makefile">BIN = $(BUILD_DIR)/$(TOPNAME)
+default: $(BIN)
+
+$(shell mkdir -p $(BUILD_DIR))
+</code></pre>
+<ol>
+<li><code>default</code> 默认 <code>make</code> 目标</li>
+<li>完整地来看 <code>BIN</code> 的值，可以发现 <code>verilator</code> 在构建时，在根 <code>build</code> 目录下为每个项目创建了子目录，避免文件混乱。</li>
+</ol>
+<pre><code class="language-Makefile"># constraint file
+SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
+$(SRC_AUTO_BIND): $(NXDC_FILES)
+	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
+</code></pre>
+<ol>
+<li><code>SRC_AUTO_BIND</code> <code>auto_bind.cpp</code> 的存放路径。此文件中定义了一个同名函数，将用户编写的电路模块的管脚绑定到 <code>nvboard</code> 。</li>
+<li>下面两行命令：执行一个 <code>python</code>脚本，读取并<strong>解析约束文件</strong>，<strong>自动生成 <code>auto_bind.cpp</code></strong>。很经典的 Makefile 写法，下面会有介绍。</li>
+</ol>
+<pre><code class="language-Makefile"># source files, &quot;vpath&quot; is limited
+VSRCS = $(shell find $(abspath ./vsrc/$(PROJNAME)) -name &quot;*.v&quot;)
+CSRCS = $(shell find $(abspath ./csrc/$(PROJNAME)) -name &quot;*.c&quot; -or -name &quot;*.cc&quot; -or -name &quot;*.cpp&quot;)
+CSRCS += $(SRC_AUTO_BIND)
+</code></pre>
+<ol>
+<li><code>VSRCS</code> 用户编写的 <code>.v</code> 文件路径。</li>
+<li><code>CSRCS</code> 用户编写的 <code>.c</code> 文件路径。可以看到，绑定管脚用的 <code>auto_bind.cpp</code> 本该是用户自己写的，<code>python</code> 帮我们减轻了负担。</li>
+</ol>
+<pre><code class="language-Makefile"># rules for NVBOARD
+include $(NVBOARD_HOME)/scripts/nvboard.mk
+</code></pre>
+<ol>
+<li><code>include &lt;file_name.mk&gt;</code> 将其他 Makefile 包含进来，并在此处展开。<code>Makefile</code> 文件有多种命名方式，后缀为 <code>.mk</code> 就是其中一种。</li>
+<li><code>nvboard.mk</code> 定义了 <strong><code>nvboard</code> 静态库</strong>的构建规则。
+<ul>
+<li><code>nvboard</code> 项目本质是一大包 C++ 源文件，为用户提供了 <code>nvboard.mk</code> 来自动化编译生成 <code>nvboard</code> 静态库。</li>
+<li>为了将自己编写的电路模块接入 <code>nvboard</code>，用户在<strong>编写 <code>.cpp</code> 测试文件时</strong>调用 <code>nvboard</code> 提供的 <code>API</code>，在<strong>编译生成可执行文件时</strong>向编译器指定链接参数，链接 <code>nvboard</code> 静态库和一些图形库。最终生成一个可执行文件，运行时可以正常实现测试逻辑并绘制 <code>nvboard</code> 的图形响应界面。这就是“接入 <code>nvboard</code>”的实质。</li>
+</ul>
+</li>
+</ol>
+<pre><code class="language-Makefile"># rules for verilator
+INCFLAGS = $(addprefix -I , $(INC_PATH))
+CFLAGS += $(INCFLAGS) -DTOP_NAME=&quot;&quot;V$(TOPNAME)&quot;&quot;
+LDFLAGS += -lSDL2 -lSDL2_image
+</code></pre>
+<ol>
+<li>
+<p><code> -I &lt;dir&gt;</code> directory to search for includes <sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+<ul>
+<li>注意 <code>addprefix</code> 的用法。<code>addprefix -I ...</code>，<code>-I </code> 后面空格不能丢，它是所添前缀的一部分。如果空格丢了 <code>-I</code> 就和后面参数贴贴，参数就废了，指定没有好果汁🥤吃。</li>
+</ul>
+</li>
+<li>
+<p><code>-D&lt;var&gt;[=&lt;value&gt;]</code> set preprocessor define <sup class="footnote-ref"><a href="#fn2" id="fnref2:1">[2:1]</a></sup></p>
+<ul>
+<li>
+<p>这是一个编译器的花活。指定编译器在<strong>预处理时</strong>把源文件里的字符 <code>var</code> 都替换成 <code>value</code>。都开始编译了还在用这种方式给源文件传参，非常的新鲜，非常的 🐮。</p>
+<ul>
+<li><code>nvboard</code> 例程里的 <code>main.cpp</code> 开头就用 <code>TOP_NAME</code> 定义了一个静态全局变量表示顶层模块。<code>Makefile</code>里写的 <code>-D</code> 参数登时就用上了。</li>
+</ul>
+<pre><code class="language-c">static TOP_NAME dut;
+// 编译器预处理后应该是这样，Vtop 是 verilator 自动生成的类，表示顶层模块
+static Vtop dut;
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><code>-l&lt;lib-name&gt;</code> <code>g++</code> 的编译参数，用于指出要链接的<strong>静态库</strong>的名称，不用带后缀。等价于直接使用带后缀的静态库名（Win 下是 <code>.lib</code>，Linux 下是 <code>.a</code>）<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>。<code>g++</code> 既然能这么用，<code>gcc</code> 估计也差不多。</p>
+<ul>
+<li>接入 <code>nvboard</code> 要使用 <code>SDL2</code> 库，用于绘制界面。所以这里写了 <code>-lSDL2</code> 和 <code>-lSDL2_image</code>。</li>
+</ul>
+</li>
+</ol>
+<pre><code class="language-Makefile">$(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
+	@rm -rf $(OBJ_DIR)
+	$(VERILATOR) $(VERILATOR_CFLAGS) \\
+		--top-module $(TOPNAME) $^ \\
+		$(addprefix -CFLAGS , $(CFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \\
+		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN)) \\
+</code></pre>
+<ol>
+<li>第一行，非常经典的 Makefile 写法，冒号左边是目标文件，冒号右边是构建目标文件的“依赖”。
+<ul>
+<li>构建左边目标文件之前，<strong>必须先准备好右边</strong>的文件：使用 <code>$</code> 将目标路径展开后，发现文件不存在则按其规则当场构建（如果有构建规则的话，比如 <code>$(NVBOARD_ARCHIVE)</code>），文件存在则需要的时候直接调用就行（比如 <code>$(VSRCS)</code>、<code>$(CSRCS)</code>）。总之得先搞定右边。</li>
+</ul>
+</li>
+<li>下面两条完全展开后都是 <code>bash</code> 命令。
+<ul>
+<li><code>@rm ...</code> <code>rm</code> 命令，清空已建立的编译目录。</li>
+<li><code>$(VERILATOR) ...</code> 调用 <code>verilator</code>，根据执行参数编译生成可执行文件。</li>
+</ul>
+</li>
+</ol>
+<p>重点内容至此基本完结，后面有一些 <code>Makefile</code> 里的通用写法如用  <code>.PHONY</code> 声明目标，这篇里就先不讲。</p>
+<h5 id="references">References</h5>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>https://www.gnu.org/software/make/manual/make.html#Rules . GNU make <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>https://veripool.org/guide/latest/exe_verilator.html . verilator Arguments <a href="#fnref2" class="footnote-backref">↩︎</a> <a href="#fnref2:1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>https://blog.csdn.net/wohu1104/article/details/110789570 . GCC 编译 C(C++)静态链接库（gcc -L、gcc -l）和动态链接库（gcc -fPIC -shared）的创建和使用 <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/notes-for-cuda-c-programming-guide/">
+              <h3 class="post-title">
+                Notes for CUDA C++ Programming Guide
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

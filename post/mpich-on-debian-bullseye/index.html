@@ -1,0 +1,244 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mpich on Debian-Bullseye | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Mpich on Debian-Bullseye | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="基于我的 python3.11 镜像，配置安装 mpich3.3.1 的镜像。
+具体操作参考了 基于docker的MPI安装 | CSDN | blog.csdn.net。原作大神是先运行了一个 Centos 的容器，在容器中完成工具下载、..." />
+    <meta name="keywords" content="Dockerfiles,HPC" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Mpich on Debian-Bullseye
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/8Uii00ncTo/" class="post-tag">
+                  # Dockerfiles
+                </a>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/FtDeh3RFRO/" class="post-tag">
+                  # HPC
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>基于我的 python3.11 镜像，配置安装 mpich3.3.1 的镜像。</p>
+<p>具体操作参考了 <a href="https://blog.csdn.net/weixin_50674454/article/details/124770487">基于docker的MPI安装 | CSDN | blog.csdn.net</a>。原作大神是先运行了一个 <code>Centos</code> 的容器，在容器中完成工具下载、文件修改、建立目录等，再把容器打包成镜像。这样也挺好，我改成用 <code>Dockerfile</code> 构建是想把镜像文件弄精简点，不要搞太多层。</p>
+<p>这里用到的 <code>python311_base</code> 镜像也是我自己构建的，<code>Dockerfile</code> 可见<a href="http://rerevolution.cn/2023/12/18/python3-11-on-debianbullseye/">另一篇文章</a>。麻烦的话直接 <code>FROM</code> 一个别的官方系统镜像（比如一个比较完整的 <code>Debian</code>）也可。</p>
+<pre><code class="language-Dockerfile"># 弄个一个完整的 debian 应该也可以
+#FROM debian:stable
+
+FROM python311_base:v1
+
+RUN chmod 777 //tmp
+# 安装工具和创建工作区目录
+RUN apt-get -y update 
+    &amp;&amp; apt-get -y install openssh-server \
+    &amp;&amp; apt-get -y install nano \
+    &amp;&amp; apt-get -y install net-tools \
+    &amp;&amp; apt-get -y install gcc \
+    &amp;&amp; apt-get -y install g++ \
+    &amp;&amp; apt-get -y install sudo \
+    &amp;&amp; apt-get -y install passwd \
+    &amp;&amp; apt-get -y install make \
+    &amp;&amp; apt-get -y install nfs-kernel-server \
+    &amp;&amp; mkdir -p /home/mpi/workspace/
+
+# 避免 wget 等复杂操作
+COPY mpich-3.3.1.tar.gz /home/mpi/mpich-3.3.1.tar.gz
+
+# 编译安装 mpich
+RUN cd /home/mpi \
+    &amp;&amp; tar -xzvf mpich-3.3.1.tar.gz \
+    &amp;&amp; cd mpich-3.3.1/ \
+    &amp;&amp; ./configure --disable-fortran \
+    &amp;&amp; make \
+    &amp;&amp; make install
+
+# 配置 ssh
+RUN  mkdir -p /var/run/sshd \
+    &amp;&amp; /bin/echo -e &quot;y\n&quot; | ssh-keygen -q -t rsa -b 2048 -f /etc/ssh/ssh_host_rsa_key -N '' \
+    &amp;&amp; /bin/echo -e &quot;y\n&quot; | ssh-keygen -q -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N '' \
+    &amp;&amp; /bin/echo -e &quot;y\n&quot; | ssh-keygen -t dsa -f /etc/ssh/ssh_host_ed25519_key -N '' \
+    &amp;&amp; chmod 660 /etc/ssh/ssh_host_rsa_key /etc/ssh/ssh_host_ecdsa_key /etc/ssh/ssh_host_ed25519_key
+
+COPY sshd_config /etc/ssh/sshd_config
+
+# 设置本地用户和密码。
+RUN /bin/echo -e &quot;123456\n123456\n\n\n\n\n\ny\n&quot; | adduser localuser \
+    &amp;&amp; usermod -aG root localuser \
+    &amp;&amp; rm /home/mpi/mpich-3.3.1.tar.gz \
+    &amp;&amp; apt-get autoremove \
+    &amp;&amp; apt-get clean
+
+# 镜像中不安装 vim，在外部手动更改 bashrc 后复制过去，保证最简安装。
+COPY .bashrc /home/localuser/.bashrc
+</code></pre>
+<h3 id="关于-mpich-311targz">关于 mpich-3.1.1.tar.gz</h3>
+<p>下载地址：<a href="https://www.mpich.org/static/downloads/3.3.1/">Index of /static/downloads/3.3.1 (mpich.org)</a></p>
+<h3 id="关于-bashrc-和-sshd_config">关于 .bashrc 和 sshd_config</h3>
+<p>采用了一个笨办法：使用 <code>docker cp</code> 命令从基础镜像中复制出目标文件并修改，构建镜像时使用 <code>COPY</code> 命令放回原处即可。修改内容请见 <a href="https://blog.csdn.net/weixin_50674454/article/details/124770487">基于docker的MPI安装 | CSDN | blog.csdn.net</a>。</p>
+<h3 id="关于-copy-命令">关于 COPY 命令</h3>
+<p>方便起见，所有准备复制到镜像中的文件应当都和 <code>Dockerfile</code> 放在同一目录，这样可以直接用文件名访问而不必操心访问路径。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%85%B3%E4%BA%8E-mpich-311targz">关于 mpich-3.1.1.tar.gz</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E-bashrc-%E5%92%8C-sshd_config">关于 .bashrc 和 sshd_config</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E-copy-%E5%91%BD%E4%BB%A4">关于 COPY 命令</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/matlab-zhong-san-chong-fang-fa-hui-zhi-xin-hao-de-fu-pin-te-xing-qu-xian/">
+              <h3 class="post-title">
+                Matlab 中三种方法绘制信号的幅频特性曲线
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

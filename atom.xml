@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://bouse-w.github.io/BouseBlog.github.io/</id>
+    <title>BouseBlog</title>
+    <updated>2025-03-26T06:59:16.348Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://bouse-w.github.io/BouseBlog.github.io/"/>
+    <link rel="self" href="https://bouse-w.github.io/BouseBlog.github.io/atom.xml"/>
+    <subtitle>让我们重新开始</subtitle>
+    <logo>https://bouse-w.github.io/BouseBlog.github.io/images/avatar.png</logo>
+    <icon>https://bouse-w.github.io/BouseBlog.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2025, BouseBlog</rights>
+    <entry>
+        <title type="html"><![CDATA[Events_in_CAmkES]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/events_in_camkes/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/events_in_camkes/">
+        </link>
+        <updated>2025-03-25T06:59:01.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Introdution_to_CAmkES]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/introdution_to_camkes/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/introdution_to_camkes/">
+        </link>
+        <updated>2025-03-24T03:16:52.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Hello_CAmkES]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/hello_cankes/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/hello_cankes/">
+        </link>
+        <updated>2025-03-21T04:43:46.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4 Libraries_Timer]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4-libraries_timer/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4-libraries_timer/">
+        </link>
+        <updated>2025-03-20T17:19:20.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_C-Libraries_tutorials_seL4 Libraries_Processes_ELF-loading]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_c-libraries_tutorials_sel4-libraries_processes_elf-loading/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_c-libraries_tutorials_sel4-libraries_processes_elf-loading/">
+        </link>
+        <updated>2025-03-18T16:14:51.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_C-Libraries_tutorial-seL4 Libraries_IPC]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_c-libraries_tutorial-sel4-libraries_ipc/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_c-libraries_tutorial-sel4-libraries_ipc/">
+        </link>
+        <updated>2025-03-18T16:13:47.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_C-Libraries_tutorials-Initialisation_and_thread]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_clibraries_tutorials-initialisation_and_thread/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_clibraries_tutorials-initialisation_and_thread/">
+        </link>
+        <updated>2025-03-18T16:12:59.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_Untyped]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_untyped/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_untyped/">
+        </link>
+        <updated>2025-03-18T15:50:29.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_Threads]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_threads/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_threads/">
+        </link>
+        <updated>2025-03-18T15:50:17.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_Setting up your machine]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_setting-up-your-machine/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_setting-up-your-machine/">
+        </link>
+        <updated>2025-03-18T15:50:01.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_Notifications]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_notifications/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_notifications/">
+        </link>
+        <updated>2025-03-18T15:49:47.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_Mapping]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_mapping/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_mapping/">
+        </link>
+        <updated>2025-03-18T15:49:32.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_IPC]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_ipc/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_ipc/">
+        </link>
+        <updated>2025-03-18T15:49:17.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_Interrupts]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_interrupts/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_interrupts/">
+        </link>
+        <updated>2025-03-18T15:48:44.000Z</updated>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[seL4_Hello, world]]></title>
+        <id>https://bouse-w.github.io/BouseBlog.github.io/post/sel4_hello-world/</id>
+        <link href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_hello-world/">
+        </link>
+        <updated>2025-03-18T15:48:26.000Z</updated>
+    </entry>
+</feed>

@@ -1,0 +1,329 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4 Libraries_Timer | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4 Libraries_Timer | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Libraries: Timer Tutorial
+部分文段做了微小增删使句子通顺。
+Exercises
+Allocate a notification ob..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4 Libraries_Timer
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-21
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/libraries-4">seL4 Libraries: Timer Tutorial</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="exercises">Exercises</h2>
+<h3 id="allocate-a-notification-object">Allocate a notification object</h3>
+<p><code>int vka_alloc_notification(vka_t * vka, vka_object_t * result);</code> 用于创建一个 <code>notification</code> 结构体，新建结构体的地址保存在 <code>@param result</code>。</p>
+<p>有点莫名其妙，因为此函数的使用是这样的：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/vka_alloc_notification使用范例.JPG" alt="automatic-scalability" width=75%>
+	<figcaption >
+        <font size=2>vka_alloc_notification() 的使用范例</font>
+    </figcaption>
+</div>
+<p>先新建了一个 <code>vka_object_t</code> 对象，或者说对象已经建立好了。</p>
+<p>然后向 <code>vka_alloc_notification()</code> 传递了对象的地址。所以函数内部大概只是初始化一些对象的属性，没有新建对象。</p>
+<h3 id="initialise-the-timer">Initialise the timer</h3>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/新建timer范例.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>新建 timer 的范例</font>
+    </figcaption>
+</div>
+<p>孩子们，我没看懂，这些 <code>API</code> 之前没出现过。</p>
+<p>上图中的操作用来新建一个 <code>timer</code> 对象：</p>
+<p>首先新建了一个 <code>ps_io_ops_t</code> 结构体对象，看一下它的定义：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/ps_io_ops_t定义.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>定义——ps_io_ops_t</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/ps_io_ops定义.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>定义——ps_io_ops</font>
+    </figcaption>
+</div>
+<p><code>ps_io_ops</code> 用来管理所有特殊的（平台支持的，非通用的）<code>IO</code> 操作。可以看到 <code>io_port</code>、<code>dma</code> 和 <code>irq</code> 等都在其列。</p>
+<p>之后调用 <code>sel4platsupport_new_malloc_ops</code> 为 <code>ps_io_ops</code> 初始化了 <code>malloc</code> 操作管理器？看一下 <code>ssel4platsupport_new_malloc_ops</code> 的声明：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/sel4platsupport_new_malloc_ops声明.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>声明——sel4platsupport_new_malloc_ops</font>
+    </figcaption>
+</div>
+<p>后面都是相似的操作，初始化了一些“操作管理器”？WTF？？</p>
+<p>之后是一个设置 <code>IRQ</code> 接口的重要操作：调用 <code>sel4platsupport_new_mini_irq_ops</code> 给 <code>ps_io_ops</code> 初始化一个 <code>IRQ</code> 接口？？看一下函数声明：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/sel4platsupport_new_mini_irq_ops声明.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>声明——sel4platsupport_new_mini_irq_ops</font>
+    </figcaption>
+</div>
+<p><code>sel4platsupport_new_mini_irq_ops</code> 新建了一个“小号”的 <code>IRQ</code> 接口，并将它赋值给 <code>ps_io_ops</code> 的成员变量。</p>
+<p>所谓“小号”是指该接口只管理一个 <code>notification</code>（大概也就对应一种中断）。</p>
+<p>最后是新建 <code>timer</code> 对象并获取 <code>timer IRQ</code> 的灵魂步骤：调用 <code>ltimer_default_init</code>，看一下函数原型：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/ltimer_default_init声明.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>声明——ltimer_default_init声明</font>
+    </figcaption>
+</div>
+<p>大概可以理解为：每当 <code>ltimer_event_t</code> 类型的事件发生时，就触发 <code>@param callback</code> 指向的回调函数进行处理。这个回调函数的指针可以为 <code>NULL</code>，大概意味着不作处理。</p>
+<p>“<code>ltimer_event_t</code> 类型的事件发生”大概可以理解为 <code>timer</code> 定时中断的发生，中断信号就由 <code>@param ops</code> 中的 <code>ps_irq_opt_t</code> 类型成员变量管理。</p>
+<p>看一下 <code>ltimer_event_t</code> 的定义：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/ltimer_evnet_t定义.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>定义——ltimer_evnet_t</font>
+    </figcaption>
+</div>
+<p>枚举了“时间（定时）耗尽”和“计数溢出”两个量。孩子们，这就是一些简单 <code>timer</code> 的用途。</p>
+<h3 id="use-the-timer">Use the timer</h3>
+<p>孩子们，初始化好一个 <code>timer</code> 后，我们可以开始使用它：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/使用timer计时.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>使用 timer 计时</font>
+    </figcaption>
+</div>
+<p>调用 <code>ltimer_set_timeout</code> 使用 <code>timer</code> 的周期定时功能，看一下函数原型：</p>
+<pre><code class="language-c">static inline int ltimer_set_timeout(ltimer_t *timer, uint64_t nanoseconds, timeout_type_t type);
+</code></pre>
+<p>信息很少，没什么用，该函数的作用就是开启目标 <code>timer</code> 的周期定时功能。但入口参数值得注意：</p>
+<p><code>@param timer</code> 目标 <code>timer</code> 的指针</p>
+<p><code>@param nanoseconds</code> 定时周期，以纳秒计，每周期为 <code>1 ms</code>。实际调用中使用了一个宏定义，看一下具体定义：</p>
+<pre><code class="language-c">/*
+ * file:
+ * seL4-tutorials-manifest/projects/util_libs/libutils/include/utils/time.h
+ * */
+/* nanoseconds */
+#define NS_IN_US        SEL4_TIME_UINT_TYPE(1000)
+#define NS_IN_MS        (NS_IN_US * US_IN_MS)
+#define NS_IN_S         (NS_IN_US * US_IN_S)
+#define NS_IN_MINUTE    (NS_IN_US * US_IN_MINUTE)   /* =6e10 &gt; 2^32 (=4e9) */
+</code></pre>
+<p><code>@param type</code> 定时类型。实际调用中也使用了宏定义，看一下具体定义：</p>
+<pre><code class="language-c">/*
+ * file: 
+ * seL4-tutorials-manifest/projects/util_libs/libplatsupport/include/platsupport/ltimer.h
+ * */
+typedef enum {
+    TIMEOUT_PERIODIC,
+    TIMEOUT_ABSOLUTE,
+    TIMEOUT_RELATIVE
+} timeout_type_t;
+</code></pre>
+<p>大概可以理解为：周期性定时、一次性定时和相对次数定时？？</p>
+<h3 id="handle-the-interrupt">Handle the interrupt</h3>
+<blockquote>
+<p>In order to receive more interrupts, you need to handle the interrupt in the driver and acknowledge the irq.</p>
+</blockquote>
+<p><code>seL4</code> 中同一种 <code>irq</code> 不能叠加，一次 <code>irq</code> 得到响应前会关闭同种 <code>irq</code>。</p>
+<p>调用 <code>seL4_Wait</code> 等待一个 <code>notification</code>。</p>
+<p><code>int sel4platsupport_irq_handle(ps_irq_ops_t * irq_ops, ntfn_id_t ntfn_id, seL4_Word handle_mask);</code> 用于处理一个 <code>ps_io_ops_t</code> 结构体管理的 <code>irq</code>。</p>
+<p>孩子们，我猜测这个函数唯一的作用是响应中断，但不执行任何任务函数，其目的是解除对此种中断的禁用，允许同种中断再次发生，看一下函数原型：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/sel4platsupport_irq_handle原型.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>声明——sel4platsupport_irq_handle</font>
+    </figcaption>
+</div>
+<p>声明中也说这个函数最适合用于用户需要多次重用绑定在目标中断上的 <code>notification</code> 的场景。</p>
+<p>看一下 <code>quiz</code> 中的实际调用：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic4/sel4platsupport_irq_handle实际调用.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>实际调用</font>
+    </figcaption>
+</div>
+<p>调用 <code>sel4platsupport_irq_handle</code> 迅速响应中断后继续定时计数。</p>
+<h3 id="destroy-the-timer">Destroy the timer</h3>
+<p><code>static inline void ltimer_destroy(ltimer_t * timer);</code> 用于销毁定时器对象。</p>
+<h3 id="comprehensive-process">Comprehensive process</h3>
+<ol>
+<li>在 <code>main</code> 线程中新建一个子线程，加载运行目标 <code>ELF</code> 文件 <code>client</code>。</li>
+<li>在 <code>main</code> 线程中新建一个 <code>timer</code> 定时器，并配置好 <code>timer</code> 的定时 <code>irq</code>（定时中断）</li>
+<li><code>client</code> 线程向 <code>main</code> 线程发送消息，消息名为 <code>MSG_DATA</code>，消息内容为 <code>0x2</code>，这是要求 <code>main</code> 线程定时等待的时长（单位为 <code>s</code>，在 <code>main</code> 线程中决定）</li>
+<li><code>main</code> 接收消息后，启动 <code>timer</code> 的周期性定时功能，根据消息内容隐式设置定时时长——<code>timer</code> 只能周期性触发定时中断，<code>main</code> 在一个 <code>while</code> 循环中记录中断次数并自行计算当前等待的时长，时长满足后跳出循环，是为“指定时长的定时等待”。</li>
+<li><code>main</code> 定时结束，获取当前定时时长并发送给 <code>client</code>，销毁 <code>timer</code>，任务结束。</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#exercises">Exercises</a>
+<ul>
+<li><a href="#allocate-a-notification-object">Allocate a notification object</a></li>
+<li><a href="#initialise-the-timer">Initialise the timer</a></li>
+<li><a href="#use-the-timer">Use the timer</a></li>
+<li><a href="#handle-the-interrupt">Handle the interrupt</a></li>
+<li><a href="#destroy-the-timer">Destroy the timer</a></li>
+<li><a href="#comprehensive-process">Comprehensive process</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_c-libraries_tutorials_sel4-libraries_processes_elf-loading/">
+              <h3 class="post-title">
+                seL4_C-Libraries_tutorials_seL4 Libraries_Processes_ELF-loading
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,295 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_Setting up your machine | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_Setting up your machine | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+Prerequisite
+
+Ubuntu 22.04 LTS (jammy) 
+Raspberry Pi 4B
+32GB SD card
+参考教程 seL4 Docs/Tutorials/Setting up..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_Setting up your machine
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<h2 id="prerequisite">Prerequisite</h2>
+<ol>
+<li><code>Ubuntu 22.04 LTS (jammy) </code></li>
+<li>Raspberry Pi 4B</li>
+<li>32GB SD card</li>
+<li>参考教程 <a href="https://docs.sel4.systems/Tutorials/setting-up.html">seL4 Docs/Tutorials/Setting up your machine</a></li>
+</ol>
+<h2 id="googles-repo-tool注意事项">Google’s Repo tool（注意事项）</h2>
+<ol>
+<li>
+<p>替换 <code>repo</code> 源为清华镜像源</p>
+<pre><code class="language-shell"># 备份 .bashrc
+cp ~/.bashrc ~/.bashrc_bac
+
+# 编辑 .bashrc（可以使用 vim），在 .bashrc 最后一行添加
+export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
+
+# 在 bash 中执行
+source ~/.bashrc
+</code></pre>
+</li>
+</ol>
+<h2 id="docker注意事项">Docker（注意事项）</h2>
+<ol>
+<li>
+<p>安装 <code>Docker</code></p>
+<ol>
+<li>
+<p>建议先给 <code>Ubuntu</code> 切换国内源，<code>Arm</code> 架构的机器，其镜像源需要在默认的 <code>x86</code> 架构源的 <code>URL</code> 末尾添加 <code>/ubuntu-ports</code>。</p>
+</li>
+<li>
+<p>建议直接使用 <code>snap</code> 安装。</p>
+</li>
+<li>
+<p>将当前用户添加到 <code>root</code> 用户组和 <code>docker</code> 用户组：</p>
+<pre><code class="language-shell"># 添加当前用户到 root 用户组
+sudo usermod -aG root $USER
+newgrp docker
+
+# 创建 docker 用户组并将当前用户添加到 docker 组
+sudo groupadd docker
+sudo usermod -aG root $USER
+newgrp docker
+</code></pre>
+</li>
+</ol>
+</li>
+<li>
+<p>修改 <code>sel4-CAmkES-L4v-dockerfiles/Makefile </code>：在 <code>line 58</code> 后添加两行 ：</p>
+<pre><code class="language-makefile">else ifeq ($(HOST_ARCH), aarch64)
+	DOCKER_PLATFORM := &quot;linux/arm64&quot;
+</code></pre>
+</li>
+<li>
+<p>在执行 <code>maker user</code> 构建镜像之前，从 <code>docker </code> 国内代理站手动拉取两个基本镜像：</p>
+<pre><code class="language-shell"># 拉取 sel4 镜像
+docker pull dockerproxy.net/trustworthysystems/sel4:latest-arm64
+
+# 拉取 camkes 镜像 
+docker pull dockerproxy.net/trustworthysystems/camkes:latest-arm64
+
+# 重命名 camkes 镜像
+docker tag dockerproxy.net/trustworthysystems/camkes:latest-arm64
+
+# 删除标签冗余的原始镜像
+docker rmi dockerproxy.net/trustworthysystems/camkes:latest-arm64
+</code></pre>
+<p>手动走代理源拉取镜像是因为 <code>docker.io</code> 已经被墙了，默哀一分钟。</p>
+</li>
+<li>
+<p>最终的所有镜像</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/setting_up_your_machine/所有镜像配置完毕.JPG" alt="automatic-scalability">
+	<figcaption ><font size=2>32GB SD Card 犹嫌不足</font></figcaption>
+</div>
+</li>
+</ol>
+<h2 id="an-example-workflow注意事项">An example workflow（注意事项）</h2>
+<ol>
+<li>
+<p>若 <code>repo sync</code> 遇到报错，可在一次同步结束后执行：</p>
+<pre><code class="language-shell">repo sync -j$(nproc) --fail-fast
+</code></pre>
+</li>
+<li>
+<p>虽然我们是在树莓派上运行，但最终编译出的 <strong><code>simulate</code> 例程仅支持在 <code>x86_64</code> 架构的机器上运行</strong>，而 <code>container</code> 环境中自带了 <code>x86_64</code> 架构的 <code>qemu</code>，所以在使用 <code>init-build.sh</code> 进行编译预设置时无需关心 <code>-DPLATFORM</code> 等参数，遵照教程内容即可。</p>
+</li>
+<li>
+<p>可使用 <code>-j</code> 参数进行多核编译加快速度：</p>
+<pre><code class="language-shell">ninja -j$(nproc)
+</code></pre>
+</li>
+<li>
+<p><code>simulate</code> 例程运行结果</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/setting_up_your_machine/最终测试结果.JPG" alt="automatic-scalability">
+	<figcaption ><font size=2>121 项测试均通过</font></figcaption>
+</div>
+</li>
+</ol>
+<h2 id="one-more-thing-or-more">One More Thing (or more?)</h2>
+<p>在树莓派上的这个环境可以用于 <code>seL4</code> 运行学习教程或进行简单开发测试。</p>
+<p>下一步是搞一张更大的 <code>SD Card</code>，参照 https://docs.sel4.systems/Hardware/Rpi4.html 直接在裸机上引导启动 <code>seL4 image</code>。</p>
+<h2 id="参考文档">参考文档</h2>
+<ol>
+<li>https://docs.sel4.systems/Tutorials/setting-up.html</li>
+<li>https://docs.sel4.systems/Tutorials/hello-world</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#prerequisite">Prerequisite</a></li>
+<li><a href="#googles-repo-tool%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">Google’s Repo tool（注意事项）</a></li>
+<li><a href="#docker%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">Docker（注意事项）</a></li>
+<li><a href="#an-example-workflow%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">An example workflow（注意事项）</a></li>
+<li><a href="#one-more-thing-or-more">One More Thing (or more?)</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3">参考文档</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_notifications/">
+              <h3 class="post-title">
+                seL4_Notifications
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,228 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notes for An Even Easier Introduction to CUDA | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Notes for An Even Easier Introduction to CUDA | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="引用内容均来自 Nvidia 开发者社区高质量开源文档 An Even Easier Introduction to CUDA | NVIDIA DEVELOPER | developer.nvidia.cn。
+引用内容均直接来自原文，部分..." />
+    <meta name="keywords" content="HPC" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Notes for An Even Easier Introduction to CUDA
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/FtDeh3RFRO/" class="post-tag">
+                  # HPC
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>引用内容均来自 Nvidia 开发者社区高质量开源文档 <a href="https://developer.nvidia.cn/blog/even-easier-introduction-cuda/">An Even Easier Introduction to CUDA | NVIDIA DEVELOPER | developer.nvidia.cn</a>。<br>
+引用内容均直接来自原文，部分文段小修了语序使句子通顺，引用格式为居中斜体。<br>
+开源万岁。</p>
+<blockquote>
+<p><em>CUDA C++ lets you use the powerful C++ programming language to develop high performance algorithms accelerated by thousands of parallel threads running on GPUs</em></p>
+</blockquote>
+<p>&quot;the powerful C++&quot;，确实 powerful，但就是觉得不喜欢。</p>
+<blockquote>
+<p><em>A function that the GPU can run is called a kernel in CUDA.</em></p>
+</blockquote>
+<blockquote>
+<p><em>To do this, all I have to do is add the specifier <code>__global__</code> to the function, which tells the CUDA C++ compiler that this is a function that runs on the GPU and can be called from CPU code.</em></p>
+</blockquote>
+<blockquote>
+<p><em>Code that runs on the GPU is often called <strong>device code</strong>, while code that runs on the CPU is <strong>host code</strong>.</em></p>
+</blockquote>
+<p>一些重点概念：<code>__global__</code> 声明核函数（kernel），核函数在 GPU 上运行，在 GPU 上运行设备代码（device code），在 CPU 上运行主机代码（host code）。</p>
+<blockquote>
+<p><em><a href="https://developer.nvidia.com/blog/unified-memory-in-cuda-6/"><strong>Unified Memory</strong></a> in CUDA makes provides a single memory space accessible by all GPUs and CPUs in your system.</em></p>
+</blockquote>
+<p>CUDA 提供了 API 来申请和释放 <code>Unified Memory</code>。具体请参阅原文引用中的链接。</p>
+<blockquote>
+<p><em>CUDA kernel launches are specified using the triple angle bracket syntax &lt;&lt;&lt; &gt;&gt;&gt;.</em></p>
+</blockquote>
+<p>核函数需得加载到 GPU 上才能运行，使用 <code>function_name &lt;&lt;&lt;x, y&gt;&gt;&gt; (parameter list)</code>加载并调用核函数。参数 x 和 y 的含义下面解释。</p>
+<blockquote>
+<p><em>The simplest way to find out how long the kernel takes to run is to run it with <strong>nvprof</strong>, the command line GPU profiler that comes with the CUDA Toolkit.</em></p>
+</blockquote>
+<blockquote>
+<p><em>CUDA's <code>&lt;&lt;&lt;x, y&gt;&gt;&gt;</code> syntax is called the execution configuration, and <strong>it tells the CUDA runtime how many parallel threads to use for the launch on the GPU</strong>.</em></p>
+</blockquote>
+<ul>
+<li>'x' stands for <strong>the number of Block</strong>.</li>
+<li>'y' stands for <strong>the number of threads in a Block</strong>.</li>
+</ul>
+<blockquote>
+<p>*CUDA GPUs run kernels using blocks of threads that are a multiple of 32 in size, so 256 threads is a reasonable size to choose *.</p>
+</blockquote>
+<p>对 Programmer 而言，<code>Block</code> 是 <code>CUDA-Programming</code> 中 <code>thread</code> 之外最小的 <code>Programmable Unit</code>。插播一句：硬件层面上最小的执行单元叫做 <code>Warp</code>。</p>
+<p>一个 <code>Block</code> 内的线程数是 <code>32</code> 的整数倍。因为实际执行过程中，一个 <code>Block</code> 被切分为一个或多个 <code>Warp</code>，而一个 <code>Warp</code> 内含 <code>32</code> 个线程是由硬件规定的。</p>
+<p>根据 <code>block_size</code> 划分规模为 <code>N</code> 的任务到 <code>block_num</code> 个线程块时保证<strong>安全取整</strong>的经典写法：</p>
+<pre><code class="language-cpp">const int block_size = 256;
+int N = 1000;
+
+int block_num = (N + block_size - 1) / block_size;
+
+kernel&lt;&lt;&lt;block_num, block_size&gt;&gt;&gt; (params, ...);
+</code></pre>
+<blockquote>
+<p><em>CUDA provides <strong>gridDim.x</strong>, which contains the number of blocks in the grid, and <strong>blockIdx.x</strong>, which contains the index of the current thread block in the grid</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>The code <strong><code>blockIdx.x * blockDim.x + threadIdx.x</code></strong> is idiomatic CUDA</em>.</p>
+</blockquote>
+<p><code>Grid</code>，<code>Block</code>，<code>Thread</code> 都是软件概念，<code>Warp</code>，<code>SM</code>，<code>SP</code> 是硬件概念。具体可参见 <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html">CUDA C++ Programming Guide|CUDA|docs.nvidia.com</a> 和我的解读文章 <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html">Notes for &quot;CUDA C++ Programming Guide&quot;|BouseBlog|rerevolution.cn</a></p>
+<blockquote>
+<p><em>GPUs also excel at heavily compute-bound computations such as dense matrix linear algebra, deep learning, image and signal processing, physical simulations, and more</em>.</p>
+</blockquote>
+<p><code>GPU</code> 非常适合处理计算密集型任务。很多时候 <code>CUDA</code> 程序的性能瓶颈和硬件通讯带宽紧密相关，所以程序设计应当重视<strong>计算通讯比</strong>的提升。</p>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/nju-shu-dian-shi-yan-yi/">
+              <h3 class="post-title">
+                NJU-数电实验一
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

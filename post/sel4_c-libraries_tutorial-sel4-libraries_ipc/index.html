@@ -1,0 +1,355 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_C-Libraries_tutorial-seL4 Libraries_IPC | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_C-Libraries_tutorial-seL4 Libraries_IPC | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/seL4 Libraries: IPC
+部分文段做了微小增删使句子通顺。
+Exercises
+Allocate an IPC b..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_C-Libraries_tutorial-seL4 Libraries_IPC
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-19
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/libraries-2"><code>seL4</code> Docs/Tutorials/seL4 Libraries: IPC</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="exercises">Exercises</h2>
+<h3 id="allocate-an-ipc-buffer">Allocate an IPC buffer</h3>
+<blockquote>
+<p>You implement your own Virtual Memory Manager, essentially. To the extent that you must allocate a physical memory frame, then map it into your thread’s page directory – and even manually allocate page tables on your own, where necessary.</p>
+</blockquote>
+<p>如果需要的话，用户只能自行实现虚拟内存管理器。一般而言，用户自行必须申请物理内存页，然后将物理内存映射到虚拟内存，这将可能涉及建立页目录（高级页表）、建立页表页（低级页表）等操作。</p>
+<blockquote>
+<p>Here’s the first step in a conventional memory manager’s process of allocating memory: first allocate a physical frame.</p>
+</blockquote>
+<p>传统的内存管理机制中，第一步通常是申请物理内存页（即 <code>frame</code>，或称“页框”，这是可爱的计算机教材翻译编写人员的可爱成果。）</p>
+<p>可以使用 <code>VKA</code> 工具申请物理内存：</p>
+<p><code>int vka_alloc_frame(vka_t * vka, uint32_t size_bits, vka_object_t * result);</code> 用 <code>VKA</code> 工具申请物理内存页对象。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic2/vka申请物理内存.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>使用 VKA 申请物理内存</font>
+    </figcaption>
+</div>
+<h3 id="try-to-map-a-page">Try to map a page</h3>
+<blockquote>
+<p>The control of how the address space is managed is up to the threads that have write-capabilities to that address space. There is both flexibility and responsibility implied here. Granted, seL4 itself provides strong guarantees of isolation even if a thread decides to go rogue.</p>
+</blockquote>
+<p>一个虚拟内存空间如何组织、如何建立同物理内存的映射，都由拥有操作权限的线程决定。当然，<code>seL4</code> 内核为内存空间隔离性提供了强力的最终保障，避免有权限的线程执行一些恶意操作。</p>
+<blockquote>
+<p>The <em>ARCH</em> versions of seL4 sys calls are abstractions over the architecture provided by libsel4utils.</p>
+<p>The one in thsi quiz is defined as:</p>
+<pre><code class="language-c">#define seL4_ARCH_Page_Map seL4_X86_Page_Map
+
+/*The signature for the underlying function is:*/
+
+int seL4_X86_Page_Map(seL4_X86_Page service, seL4_X86_PageDirectory pd, seL4_Word vaddr, seL4_CapRights rights, seL4_X86_VMAttributes attr) 
+</code></pre>
+</blockquote>
+<p><code>seL4</code> 建立页映射的 <code>API</code> 根据硬件平台的不同而不同。</p>
+<p>此外，<code>seL4</code> 中用于页式内存管理的抽象原语也不尽相同，但顶级页表页都统一为 <code>VSpace</code> 的 <code>root CNode</code>。</p>
+<p><code>x86</code> 平台上，<code>seL4_X86_Page_Map</code> 用于建立物理内存页和虚拟内存页之间的映射。</p>
+<h3 id="allocate-a-page-table">Allocate a page table</h3>
+<p><code>int vka_alloc_page_table(vka_t * vka, vka_object_t * result);</code> 用 <code>VKA</code> 工具申请页表页对象。</p>
+<h3 id="map-a-page-table">Map a page table</h3>
+<p>这一节在 <code>Try to map a page</code> 节的调用失败后，新建了 <code>page table</code> 对象，完善了页管理结构，再次调用 <code>seL4_X86_Page_Map</code> 对申请的物理页进行映射。</p>
+<h3 id="comprehensive-process-of-mapping-a-page">Comprehensive process of mapping a page</h3>
+<pre><code class="language-c">/* TASK 1: get a frame cap for the ipc buffer */
+vka_object_t ipc_frame_object;                                                               
+error = vka_alloc_frame(&amp;vka, IPCBUF_FRAME_SIZE_BITS, &amp;ipc_frame_object);                   
+ZF_LOGF_IFERR(error, &quot;Failed to alloc a frame for the IPC buffer.\n&quot;
+              &quot;\tThe frame size is not the number of bytes, but an exponent.\n&quot;
+              &quot;\tNB: This frame is not an immediately usable, virtually mapped page.\n&quot;);
+
+seL4_Word ipc_buffer_vaddr = IPCBUF_VADDR;
+
+/* TASK 2: try to map the frame the first time  */
+error = seL4_X86_Page_Map(ipc_frame_object.cptr, pd_cap, ipc_buffer_vaddr, seL4_AllRights, seL4_ARCH_Default_VMAttributes);
+
+/* Attention here!!! The criterion is &quot;if(0 != error)&quot;  */
+if(error != 0)
+{
+    /* TASK 3: create a page table */
+    vka_object_t pt_object;
+    error = vka_alloc_page_table(&amp;vka, &amp;pt_object);                                         
+    ZF_LOGF_IFERR(error, &quot;Failed to allocate new page table.\n&quot;);
+    
+    /* TASK 4: map the page table */
+    error = seL4_X86_PageTable_Map(pt_object.cptr, pd_cap, ipc_buffer_vaddr, seL4_ARCH_Default_VMAttributes);
+    ZF_LOGF_IFERR(error, &quot;Failed to map page table into VSpace.\n&quot; 
+                  &quot;\tWe are inserting a new page table into the top-level table.\n&quot; 
+                  &quot;\tPass a capability to the new page table, and not for example, the IPC buffer frame vaddr.\n&quot;);
+    
+    /* TASK 5: then map the frame in */
+    error = seL4_X86_Page_Map(ipc_frame_object.cptr, pd_cap, ipc_buffer_vaddr, seL4_AllRights, seL4_ARCH_Default_VMAttributes); 
+    ZF_LOGF_IFERR(error, &quot;Failed again to map the IPC buffer frame into the VSpace.\n&quot; 
+                  &quot;\t(It's not supposed to fail.)\n&quot;
+                  &quot;\tPass a capability to the IPC buffer's physical frame.\n&quot;
+                  &quot;\tRevisit the first seL4_ARCH_Page_Map call above and double-check your arguments.\n&quot;); 
+}                                                                      
+</code></pre>
+<p><font color=red size=4>My keen readers，或者说孩子们，为什么页表页和页映射到了同一个虚拟地址 <code>ipc_buffer_vaddr</code>？这个问题在 <a href="https://docs.sel4.systems/Tutorials/mapping">seL4-tutorials-Mapping</a> 中已经存在了 ，该教程甚至将页目录页、页表页和页全部映射到了同一个虚拟地址 <code>TEST_VADDR</code>：</font></p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic2/mapping映射页目录页.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>Tutorial-mapping 映射页目录页</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic2/mapping映射页表页.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>Tutorial-mapping 映射页表页</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic2/mapping映射页.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>Tutorial-mapping 映射页</font>
+    </figcaption>
+</div>
+<p>孩子们，这一定是个需要重视并得到解答的问题。</p>
+<h3 id="allocate-an-endpoint">Allocate an endpoint</h3>
+<blockquote>
+<p>The VKA allocator is an seL4 type-aware object allocator? So we can simply ask it for a new object of a particular type, and it will do the low-level retyping for us, and return a capability to a new object as requested.</p>
+</blockquote>
+<p>使用 <code>VKA</code> 分配器获取内核对象隐去了手动调用 <code>seL4_Utyped_Retype()</code> 的麻烦，此物甚好。</p>
+<p><code>int vka_alloc_endpoint(vka_t * vka, vka_object_t * result);</code> 用于申请 <code>endpoint</code> 对象。</p>
+<h3 id="badge-an-endpoint">Badge an endpoint</h3>
+<blockquote>
+<p>Each thread has only one IPC buffer. If multiple other threads are sending data to a listening thread, how can that listening thread distinguish between the data sent by each of its IPC partners? Each sender must “badge” its capability to its target’s endpoint.</p>
+</blockquote>
+<p>每个线程仅有一个 <code>IPC buffer</code>，当出现一对多通信的情况时（以一收多发为例），发送者线程必须用 <code>badge</code> 机制标记自己用于连接目标 <code>endpoint</code> 的 <code>capability</code>，以便接收者进程可以区分消息来源。</p>
+<blockquote>
+<p>Note the distinction: the badge is not applied to the target endpoint, but to the sender’s <strong>capability</strong> to the target endpoint. This enables the listening thread to mint off copies of a capability to an Endpoint to multiple senders. Each sender is responsible for applying a unique badge value to the capability that the listener gave it so that the listener can identify it.</p>
+</blockquote>
+<p><code>badge</code> 标记的是发送者进程用于连接目标 <code>endpoint</code> 的 <code>capability</code>，而不是目标 <code>endpoint</code>。这样，接收者进程就可以将保存在自己这里的目标 <code>endpoint</code> 的 <code>capability</code> 拷贝多份并用不同 <code>badge</code> 标记，然后逐一发送给发送者进程，发送者进程收到拷贝后保存该 <code>capability</code>，之后双方可以使用标记过的 <code>capability</code> 实现一对一通信。</p>
+<p><code>int vka_mint_object(vka_t * vka, vka_object_t * object, cspacepath_t * result, seL4_CapRights rights, seL4_Word badge);</code> 用于拷贝 <code>capability</code> 并用 <code>badge</code> 标记。</p>
+<h3 id="message-registers">Message registers</h3>
+<blockquote>
+<p>So <code>seL4_SetMR()</code> and <code>seL4_GetMR()</code> simply write to and read from the IPC buffer you designated for your thread.</p>
+</blockquote>
+<p><code>seL4_SetMR()</code> 和 <code>seL4_GetMR()</code> 的调用不需要，也不能指定要读写的目标缓冲区，因为它们隐式读写调用者线程的 <code>IPC buffer</code>。</p>
+<p><code>seL4_MessageInfo_t CONST seL4_MessageInfo_new(seL4_Uint32 label, seL4_Uint32 capsUnwrapped, seL4_Uint32 extraCaps, seL4_Uint32 length);</code> 用于生成消息描述结构体。</p>
+<p><code>void seL4_SetMR(int i, seL4_Word mr);</code> 用于在发送缓冲区填写消息。</p>
+<h3 id="ipc">IPC</h3>
+<blockquote>
+<p>The <code>seL4_Call()</code> syscall will send a message across an endpoint synchronously. If there is no thread waiting at the other end of the target endpoint, the sender will block until there is a waiter. The reason for this is because the seL4 kernel would prefer not to buffer IPC data in the kernel address space.</p>
+</blockquote>
+<p>发送者调用 <code>seL4_Call</code> 进行同步通信，意味着当没有接收者接收消息时，发送者会一直阻塞等待，直到有线程从 <code>endpoint</code> 接收了消息。这样的阻塞式处理保证 <code>IPC message</code>  不会长时间缓存在内核地址空间。当然，<code>seL4</code> 也提供一些非阻塞式的收发 <code>API</code>。</p>
+<blockquote>
+<p>Notice how the sending thread uses the <strong>badged</strong> capability to the endpoint object, and the receiving thread uses the unmodified original capability to the same endpoint? The sender must identify itself.</p>
+<p>Notice also that the fact that both the sender and the receiver share the same root CSpace, enables the receiving thread to just casually use the original, unbadged capability without any extra work needed to make it accessible.</p>
+<p>Notice however also, that while the sending thread has a capability that grants it full rights to send data across the endpoint since it was the one that created that capability, the receiver’s capability may not necessarily grant it sending powers (write capability) to the endpoint. It’s entirely possible that the receiver may not be able to send a response message, if the sender doesn’t want it to.</p>
+</blockquote>
+<p>在本小节的 <code>quiz</code> 中，<code>sender</code> 拷贝并标记了 <code>endpoint capability</code> 并临时保存在自己的 <code>CSpace</code> 中。又由于 <code>receiver</code> 和 <code>sender</code> 共享同一个 <code>CSpace</code>，所以 <code>sender</code> 无需显式调用一些 <code>API</code> 将 <code>badged capability</code> 发送给 <code>receiver</code>。</p>
+<p>在本 <code>quiz</code> 中，<code>sender</code> 通过 <code>badged endpoint capability</code> 发送消息，而 <code>receiver</code> 使用 <code>original edpoint capability</code> 接收消息，所以 <code>sender</code> 需要在所发送的消息内容中标明自己的身份。</p>
+<p><code>badged capability</code> 的创建者通常拥有该 <code>capability</code> 索引的 <code>ednpoint object</code> 的一切权限，而 <code>badged capability</code> 的接收者可能只拥有 <code>endpoint object</code> 的读权限，没有写权限，具体情况取决于创建者进程的授权。</p>
+<h3 id="receive-a-reply">Receive a reply</h3>
+<p><code>seL4_Word seL4_GetMR(int i);</code> 用于从指定的 <code>IPC buffer register</code> 读取消息。</p>
+<h3 id="receive-an-ipc">Receive an IPC</h3>
+<p><code>seL4_MessageInfo_t seL4_Recv(seL4_CPtr src, seL4_Word * sender);</code> 用于阻塞式接收消息，并将消息发送者的 <code>badge</code> 保存到参数 <code>sender</code> 所指向的内存。</p>
+<h3 id="validate-the-message">Validate the message</h3>
+<p><code>seL4_Recv</code> 的返回值即消息描述结构体。</p>
+<p><code>seL4_MessageInfo_get_length();</code> 用于读取消息描述结构体中记录的消息长度。</p>
+<h3 id="read-the-message-registers">Read the message registers</h3>
+<p><code>seL4_Word seL4_GetMR(int i);</code> 用于从指定的 <code>IPC buffer register</code> 读取消息。</p>
+<h3 id="write-the-message-registers">Write the message registers</h3>
+<p><code>void seL4_SetMR(int i, seL4_Word mr);</code> 用于向指定的 <code>IPC buffer register</code> 写入消息。</p>
+<h3 id="reply-to-a-message">Reply to a message</h3>
+<blockquote>
+<p>Whenever an IPC message is sent using the <code>seL4_Call()</code> syscall, a <code>Reply</code> capability is automatically generated by the seL4 kernel.</p>
+<p>This is unique to the <code>seL4_Call()</code> syscall, and if you send data instead with the <code>seL4_Send()</code> syscall, the seL4 kernel will not generate a Reply capability.</p>
+<p>The “Reply” capability is a one-time capability to respond to a particular sender.</p>
+</blockquote>
+<p>使用 <code>seL4_Call</code> 发送消息时，<code>seL4</code> 内核会自动生成一个 <code>Reply capability</code>，这是一个“一次性”的 <code>capability</code>，专用于消息接收线程对特定的消息发送线程做出回复。</p>
+<blockquote>
+<p>The Reply capability solves the issue of a receiver getting a message from a sender, but not having a sufficiently permissive capability to respond to that sender.</p>
+<p>If a sender doesn’t want to grant the target the ability to send to it repeatedly, but would like to allow the receiver to respond to a specific message once, it can use <code>seL4_Call()</code>, and the seL4 kernel will facilitate this one-time permissive response</p>
+</blockquote>
+<p>调用 <code>seL_Call()</code> 后生成的 <code>Reply capability</code> 用于消息接收者没有足够的写权限从而无法对消息发送者做出回复，但消息发送者又希望得到回复的情景。</p>
+<p><code>seL4_MessageInfo_t seL4_ReplyRecv(seL4_CPtr dest, seL4_MessageInfo_t msgInfo, seL4_Word * sender);</code> 用于对调用 <code>seL4_Call</code> 的消息发送者做出回复，并继续等待下一条消息，下一条消息的发送者的 <code>badge</code> 将继续被写入参数 <code>sender</code> 所指的内存中。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#exercises">Exercises</a>
+<ul>
+<li><a href="#allocate-an-ipc-buffer">Allocate an IPC buffer</a></li>
+<li><a href="#try-to-map-a-page">Try to map a page</a></li>
+<li><a href="#allocate-a-page-table">Allocate a page table</a></li>
+<li><a href="#map-a-page-table">Map a page table</a></li>
+<li><a href="#comprehensive-process-of-mapping-a-page">Comprehensive process of mapping a page</a></li>
+<li><a href="#allocate-an-endpoint">Allocate an endpoint</a></li>
+<li><a href="#badge-an-endpoint">Badge an endpoint</a></li>
+<li><a href="#message-registers">Message registers</a></li>
+<li><a href="#ipc">IPC</a></li>
+<li><a href="#receive-a-reply">Receive a reply</a></li>
+<li><a href="#receive-an-ipc">Receive an IPC</a></li>
+<li><a href="#validate-the-message">Validate the message</a></li>
+<li><a href="#read-the-message-registers">Read the message registers</a></li>
+<li><a href="#write-the-message-registers">Write the message registers</a></li>
+<li><a href="#reply-to-a-message">Reply to a message</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_clibraries_tutorials-initialisation_and_thread/">
+              <h3 class="post-title">
+                seL4_C-Libraries_tutorials-Initialisation_and_thread
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

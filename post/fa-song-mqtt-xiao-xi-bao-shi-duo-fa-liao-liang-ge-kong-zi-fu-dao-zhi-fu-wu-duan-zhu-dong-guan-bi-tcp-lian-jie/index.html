@@ -1,0 +1,292 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>发送MQTT消息包时多发了两个空字符导致服务端主动关闭TCP连接 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="发送MQTT消息包时多发了两个空字符导致服务端主动关闭TCP连接 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="发送MQTT消息包时多发了两个空字符导致服务端主动关闭TCP连接
+简单的情况说明
+从 WireShark 抓包情况来看，在正常的 MQTT 报文发送完后，两个空字符单独组成一个报文，类型为保留型（Reserved）。服务端在收到这个报文后，..." />
+    <meta name="keywords" content="Network" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              发送MQTT消息包时多发了两个空字符导致服务端主动关闭TCP连接
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/D1lJ5JKZ8Q/" class="post-tag">
+                  # Network
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="发送mqtt消息包时多发了两个空字符导致服务端主动关闭tcp连接">发送MQTT消息包时多发了两个空字符导致服务端主动关闭TCP连接</h4>
+<h5 id="简单的情况说明">简单的情况说明</h5>
+<p>从 WireShark 抓包情况来看，在正常的 MQTT 报文发送完后，两个空字符单独组成一个报文，类型为保留型（Reserved）。服务端在收到这个报文后，会主动关闭 TCP 连接。后续，就算客户端再次主动建立 TCP 连接，并成功发送其他的 MQTT 通信报文（指服务端成功接收并返回响应 ACK），服务端也不会再解析收到的 MQTT 报文。</p>
+<h5 id="具体的抓包情况">具体的抓包情况</h5>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/MQTT华为云.png" alt="automatic-scalability" width=90%>
+	<figcaption >
+    </figcaption>
+</div>
+<p>上图是<strong>基于 TCP 协议</strong>的 MQTT 通信中，发送一次连接报文（CONNECT）的全部抓包数据，客户端明显地没有收到连接响应报文（CONNACK）。</p>
+<h5 id="mqtt-报文的详细信息与问题分析">MQTT 报文的详细信息与问题分析：</h5>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/MQTT保留报文.png" alt="automatic-scalability" width=70%>
+	<figcaption >
+    </figcaption>
+</div>
+<p>上图是客户端发送的连接报文的具体信息，在正常的连接命令（Connect Command）下方，还有一条把 👴 坑得飞上天的保留报文（Reserved），具体内容是 <code>00 00</code>，两个空字符，总计 16 位。虽然看起来平平无奇，但只要善良的 TCP 连接把它发给服务端，服务端就会无情地主动关闭当前的 TCP 连接，并导致一系列后续情况，前文已说明。</p>
+<p>为什么会有这样一条“全空”的保留报文呢？</p>
+<p>是 👴 自己写的</p>
+<p>部分关键代码如下</p>
+<pre><code class="language-c">/**
+ * @brief  WF-ESP8266 模块发送字符串
+ * @param  enumEnUnvarnishT：声明是否已使能了透传模式；pStr：要发送的字符串
+ * @param	ulStrLength：要发送的字符串的字节数；ucId：多连接模式下的连接 ID
+ * @retval 1：发送成功；0：发送失败
+*/
+bool ESP8266_SendString (FunctionalState enumEnUnvarnishTx, unsigned char * pStr, u32 ulStrLength, ENUM_ID_NO_TypeDef ucId)
+{
+	char cStr [20];
+	bool bRet = false;
+	
+	if (enumEnUnvarnishTx)			// 已设置透传模式，直接发送数据即可（透传模式下不能再发送普通 AT 命令）
+	{	
+		macESP8266_Usart_SendString (pStr);
+		
+		bRet = true;
+	}
+	else					// 没有设置透传模式，进行普通的数据发送（可发数据，也可发指令）
+	{
+		if (ucId &lt; 5)			// 准备多连接模式发送，要说明 Link_ID，即 &quot;ucId&quot;
+		{
+			sprintf (cStr, &quot;AT+CIPSEND=%d,%d&quot;, ucId, ulStrLength + 2);			// 当 ESP8266 接受到的数据长度达到 &quot;ulStrLength + 2&quot;，开始向网络发送数据
+		}
+		else				// 准备单连接模式发送
+		{
+			sprintf (cStr, &quot;AT+CIPSEND=%d&quot;, ulStrLength);
+		}
+		if(ESP8266_Cmd (cStr, &quot;&gt; &quot;, 0, 1000))		// 非透传模式下，正式发送数据
+		{
+			macESP8266_Usart_SendString (pStr, ulStrLength + 2);		// 请注意此处的：给消息包长度 +2
+		}
+  }
+    
+	return bRet;
+}
+
+
+#define macESP8266_Usart_SendString(fmt, ...) Usart_SendString (macESP8266_USARTx, fmt, ##__VA_ARGS__)
+
+/**
+ * @brief  串口发送字符串
+ * @param  pUSARTx：串口结构体指针；str：要发送的字符串；...：变参函数标志
+ * @retval 无
+*/
+void Usart_SendString( USART_TypeDef * pUSARTx, uint8_t * str, ...)
+{
+	va_list param_list;
+	
+	va_start (param_list, str);
+	
+	unsigned int count = 0;
+	unsigned int len = 0;
+	
+	len = va_arg (param_list, uint32_t);
+  do 
+  {	
+		/* 发送一个字节数据到USART */
+		USART_SendData(pUSARTx, *(str + count));
+		
+		/* 等待发送数据寄存器为空 */
+		while (USART_GetFlagStatus(pUSARTx, USART_FLAG_TXE) == RESET);
+		count++;
+  } while(count &lt; len);			// 根据调用 macESP8266_Usart_SendString() 时传入的消息包长度，逐字节发送数据
+	
+	/* 清理为 valist 保留的内存 */
+	va_end(param_list);
+}
+
+</code></pre>
+<p>前文提到，保留报文的内容是两个空字符。分析上述代码，不难发现：在调用串口发送函数 <code>macESP8266_Usart_SendString ()</code> 时，莫明其妙地给作为参数的消息包长度 <code>ulStrLength</code> 加 2，导致按此参数逐字节发送数据的串口在最后多发了两个字节的数据，默认为 <code>00 00</code>，即我们的保留报文。</p>
+<p>那为什么会莫名奇妙地加 2 呢？</p>
+<p>👴 忘了，也许是参考某个例程时留下的痕迹吧，👴 可真是愚钝 (～￣(OO)￣)ブ。</p>
+<h5 id="后续">后续</h5>
+<p>后来 👴 改正了这个错误（删除 +2），我们来看看正常而优美的 MQTT 通信过程：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/成功的华为云.png" alt="automatic-scalability" width=70%>
+	<figcaption >
+    </figcaption>
+</div>
+<p>可以看到，连接报文的下方没有保留报文了，客户端也收到了服务端发来的连接响应报文（Connect ACK），👴 也变成了成功的 man。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%8F%91%E9%80%81mqtt%E6%B6%88%E6%81%AF%E5%8C%85%E6%97%B6%E5%A4%9A%E5%8F%91%E4%BA%86%E4%B8%A4%E4%B8%AA%E7%A9%BA%E5%AD%97%E7%AC%A6%E5%AF%BC%E8%87%B4%E6%9C%8D%E5%8A%A1%E7%AB%AF%E4%B8%BB%E5%8A%A8%E5%85%B3%E9%97%ADtcp%E8%BF%9E%E6%8E%A5">发送MQTT消息包时多发了两个空字符导致服务端主动关闭TCP连接</a>
+<ul>
+<li><a href="#%E7%AE%80%E5%8D%95%E7%9A%84%E6%83%85%E5%86%B5%E8%AF%B4%E6%98%8E">简单的情况说明</a></li>
+<li><a href="#%E5%85%B7%E4%BD%93%E7%9A%84%E6%8A%93%E5%8C%85%E6%83%85%E5%86%B5">具体的抓包情况</a></li>
+<li><a href="#mqtt-%E6%8A%A5%E6%96%87%E7%9A%84%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF%E4%B8%8E%E9%97%AE%E9%A2%98%E5%88%86%E6%9E%90">MQTT 报文的详细信息与问题分析：</a></li>
+<li><a href="#%E5%90%8E%E7%BB%AD">后续</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/duo-ci-lian-xu-chong-fu-diao-yong-tong-yi-han-shu-dui-nei-cun-zao-cheng-ya-li/">
+              <h3 class="post-title">
+                多次连续重复调用同一函数对内存造成压力
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

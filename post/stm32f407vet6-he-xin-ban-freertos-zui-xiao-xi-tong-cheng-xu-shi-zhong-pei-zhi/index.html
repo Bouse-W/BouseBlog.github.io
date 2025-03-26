@@ -1,0 +1,354 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>STM32F407VET6 核心板 FreeRTOS 最小系统程序时钟配置 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="STM32F407VET6 核心板 FreeRTOS 最小系统程序时钟配置 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="前面一点
+
+网上很多教程都是拿了野火或正点原子的一个工程模板直接移植内核文件，时钟、SysTick 等一些重要配置都是现成的，这样并不好。
+
+我现在怀疑我 G431 的板子上移植 RT-Thread 几次都失败主要地就是时钟配置不对的原因。..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              STM32F407VET6 核心板 FreeRTOS 最小系统程序时钟配置
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="前面一点">前面一点</h4>
+<ul>
+<li>网上很多教程都是拿了野火或正点原子的一个工程模板直接移植内核文件，时钟、<code>SysTick</code> 等一些重要配置都是现成的，这样并不好。
+<ul>
+<li>我现在怀疑我 <code>G431</code> 的板子上移植 <code>RT-Thread</code> 几次都失败主要地就是时钟配置不对的原因。</li>
+</ul>
+</li>
+</ul>
+<h4 id="关于-systick">关于 <code>SysTick</code></h4>
+<ul>
+<li>
+<p><code>FreeRTOS</code> 在 <code>port.c</code> 中实现了不同平台上 <code>SysTick</code> 的初始化并以此作为软件的系统时钟，所以板载的其他外设就应当改用硬件 <code>TIM</code> 作为时钟源。这一点在使用 <code>CubeMX</code> 添加 <code>FreeRTOS</code> 中间件时会以 <code>Warning</code> 形式给出，但手动移植 <code>FreeRTOS</code> 时常常会忽略这个问题，导致操纵系统和外设共用一个时钟，造成中断处理的抢占和冲突。</p>
+</li>
+<li>
+<p><code>FreeRTOS</code> 对 <code>SysTick</code> 的配置</p>
+<pre><code class="language-c">  /* file name: port.c */
+
+  ...
+
+  /* Let the user override the default SysTick clock rate.  If defined by the
+   * user, this symbol must equal the SysTick clock rate when the CLK bit is 0 in the
+   * configuration register. */
+  #ifndef configSYSTICK_CLOCK_HZ		// 实际编译的部分
+      #define configSYSTICK_CLOCK_HZ             ( configCPU_CLOCK_HZ )
+      /* Ensure the SysTick is clocked at the same frequency as the core. */
+      #define portNVIC_SYSTICK_CLK_BIT_CONFIG    ( portNVIC_SYSTICK_CLK_BIT )
+  #else		// 实际不编译
+      /* Select the option to clock SysTick not at the same frequency as the core. */
+      #define portNVIC_SYSTICK_CLK_BIT_CONFIG    ( 0 )
+  #endif
+
+  ...
+
+  /*
+   * Setup the SysTick timer to generate the tick interrupts at the required
+   * frequency.
+   */
+  #if ( configOVERRIDE_DEFAULT_TICK_CONFIGURATION == 0 )
+
+      __weak void vPortSetupTimerInterrupt( void )
+      {
+          /* Calculate the constants required to configure the tick interrupt. */
+          #if ( configUSE_TICKLESS_IDLE == 1 )		// 实际不编译
+          {
+              ulTimerCountsForOneTick = ( configSYSTICK_CLOCK_HZ / configTICK_RATE_HZ );
+              xMaximumPossibleSuppressedTicks = portMAX_24_BIT_NUMBER / ulTimerCountsForOneTick;
+              ulStoppedTimerCompensation = portMISSED_COUNTS_FACTOR / ( configCPU_CLOCK_HZ / configSYSTICK_CLOCK_HZ );
+          }
+          #endif /* configUSE_TICKLESS_IDLE */
+
+          /* Stop and clear the SysTick. */
+          portNVIC_SYSTICK_CTRL_REG = 0UL;
+          portNVIC_SYSTICK_CURRENT_VALUE_REG = 0UL;
+
+          /* Configure SysTick to interrupt at the requested rate. */
+          portNVIC_SYSTICK_LOAD_REG = ( configSYSTICK_CLOCK_HZ / configTICK_RATE_HZ ) - 1UL;
+          portNVIC_SYSTICK_CTRL_REG = ( portNVIC_SYSTICK_CLK_BIT_CONFIG | portNVIC_SYSTICK_INT_BIT | portNVIC_SYSTICK_ENABLE_BIT );
+      }
+
+  #endif /* configOVERRIDE_DEFAULT_TICK_CONFIGURATION */
+</code></pre>
+<ul>
+<li>
+<p><code>portNVIC_SYSTICK_LOAD_REG</code>：<code>SysTick</code> 计时器的重装载寄存器，赋值为 [latex]\frac{{configSYSTICK_CLOCK_HZ}}{{configTICK_RATE_HZ}} - 1[/latex]。</p>
+<ul>
+<li><code>configTICK_RATE_HZ</code> 规定了 <code>FreeRTOS</code> 内核中断频率。</li>
+<li><code>configSYSTICK_CLOCK_HZ</code> 即 <code>系统滴答时钟频率</code> ，是一个在 <code>port.c</code> 中定义的宏，实际为 <code>configCPU_CLOCK_HZ</code>，这还是一个宏，在 <code>FreeRTOSConfig.h</code> 中定义，见名知义，它定义了 <code>CPU</code> 的运行主频，也就是时钟树里的 <code>FCLK</code>。</li>
+<li>根据 <code>STM32F407</code> 时钟树的结构不难看出：<code>FCLK</code> 是 <code>AHB Prescaler</code> 的一路输出，和 <code>HCLK</code>、<code>Ethernet PTP clock</code> 取值相同。</li>
+</ul>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/STM32F407时钟树.png" width=75%>
+	<font size=2>
+	<figcaption>STM32F407 时钟树（部分）</figcaption>
+	</font>
+</div>
+</li>
+<li>
+<p><code>portNVIC_SYSTICK_CTRL_REG</code>：<code>SysTick</code> 计时器的控制寄存器，只有低 <code>3</code> 位和第 <code>16</code> 位是有效。</p>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/STM32F407滴答控制寄存器.png" width=70%>
+	<font size=2>
+		<figcaption>STM32F407滴答控制寄存器</figcaption>
+	</font>
+</div>
+<ul>
+<li><code>BIT 16</code>：计数归零标志位，当计数寄存器递减到 <code>0</code> 时置为 <code>1</code>，此时可读出为 <code>1</code>。</li>
+<li><code>BIT 2</code>：<code>SysTick</code> 计时器的时钟源配置位，其实只是决定是否对 <code>AHB Prescaler</code> 的输出作 <code>8</code> 分频，置 <code>0</code> 分频，置 <code>1</code> 不分频。时钟源终究只能是 <code>AHB Prescaler</code> 的一路输出（<code>CubeMx</code> 中喜欢把 <code>AHB Prescaler</code> 的输出直接标成 <code>HCLK</code>，这是有点不准确，至少和意法官方 <code>DataSheet</code> 中的标记不同）。</li>
+<li><code>BIT 1</code>：<code>SysTick 中断</code> 开关位，置 <code>1</code> 打开中断。</li>
+<li><code>BIT 0</code>：<code>SysTick</code> 定时器使能位，置 <code>1</code> 使能定时器。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="关于修改-freertosconfigh-的时钟部分">关于修改 <code>FreeRTOSConfig.h</code> 的时钟部分</h4>
+<pre><code class="language-c">/* file name: FreeRTOSConfig.h */
+
+/* Ensure stdint is only used by the compiler, and not the assembler. */
+#if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
+	#include &lt;stdint.h&gt;
+	extern uint32_t SystemCoreClock;
+#endif
+
+/* 内核主频 FCLK*/
+#define configCPU_CLOCK_HZ				( SystemCoreClock )
+
+/* FreeRTOS 系统中断频率，默认 1K Hz */
+#define configTICK_RATE_HZ				( ( TickType_t ) 1000 )
+</code></pre>
+<ul>
+<li>
+<p><code>configCPU_CLOCK_HZ</code> 规定了处理器内核的运行主频，具体值是 <code>SystemCoreClock</code>，它在下面这段代码中定义。</p>
+</li>
+<li>
+<p><code>configTICK_RATE_HZ</code> 规定了 <code>FreeRTOS</code> 内核中断频率，这里定为 <code>1K Hz</code>，也就是每 <code>1ms</code> 中断一次，这 <code>1ms</code> 其实就是一个任务执行的时间片。</p>
+</li>
+</ul>
+<pre><code class="language-c">/* file name: system_stm32f4xx.c */
+
+/** @addtogroup STM32F4xx_System_Private_Variables
+  * @{
+  */
+  /* This variable is updated in three ways:
+      1) by calling CMSIS function SystemCoreClockUpdate()
+      2) by calling HAL API function HAL_RCC_GetHCLKFreq()
+      3) each time HAL_RCC_ClockConfig() is called to configure the system clock frequency 
+         Note: If you use this function to configure the system clock; then there
+               is no need to call the 2 first functions listed above, since SystemCoreClock variable is updated automatically.
+  */
+//uint32_t SystemCoreClock = 16000000;
+uint32_t SystemCoreClock = 168000000;
+</code></pre>
+<p><code>FreeRTOS</code> 官方的移植模板中， <code>STM32F407</code> 平台上默认的内核主频值 <code>SystemCoreClock = 16000000 = 16M</code>，为什么是这个数呢？因为这是 <code>STM32F407</code> 的 <code>HSI</code> 能提供的时钟频率，从上面 <code>STM32F407 时钟树（部分）</code> 中也能看到。</p>
+<ul>
+<li><code>system_stm32f4xx.c</code> 是 <code>ST</code> 官方给出的一个系统初始化文件，在不知道片上会否接外晶振提供高速时钟（<code>HSE</code>）的情况下，就默认选用 <code>HSI</code> 作为时钟源了。</li>
+</ul>
+<p>也应注意到，<code>SystemCoreClock</code> 的值可以用 <code>3</code> 种方式更新：调用固件库中的 <code>SystemCoreClockUpdate()</code>、调用 <code>HAL</code> 库中的 <code>HAL_RCC_GetHCLKFreq()</code>、调用 <code>HAL</code> 库中的 <code>HAL_RCC_ClockConfig()</code>，所以<strong>不必过于纠结它在定义时被初始化为多少。</strong></p>
+<ul>
+<li>
+<p>使用 <code>CubeMX</code> 生成的代码在 <code>SystemClock_Config()</code> 函数中调用 <code>HAL_RCC_ClockConfig()</code> 函数进行时钟初始化，这时也会更新 <code>SystemCoreClock</code> 的值。</p>
+</li>
+<li>
+<p>王同学还是在下边对 <code>SystemCoreClock</code> 进行了重新定义，赋初值为 <code>168000000 = 168M Hz</code>，其实是不必要的。</p>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/弱智的表现.png" width=25%>
+</div>
+</li>
+</ul>
+<h4 id="关于硬件-tim">关于硬件 <code>TIM</code></h4>
+<p><code>STM32F407</code> 总计有 <code>14</code> 个硬件 <code>TIM</code>（<code>TIM1 ~ TIM14</code>），分别为 <code>2</code> 个高级定时器、<code>10</code> 个通用定时器、<code>2</code> 个一般定时器：</p>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/STM32F407定时器.png" width=50%>
+	<font size=2>
+		<figcaption>STM32F407 的定时器</figcaption>
+	</font>
+</div>
+<p>硬件 <code>TIM</code> 和 <code>SysTick</code> 定时器都可以被用作一些外设的时钟源，一个重要区别在于：<code>TIM</code> 分为两组分别挂载在 <code>APB1</code> 和 <code>APB2</code> 总线上；<code>SysTick</code> 挂载在 <code>AHB</code> 总线上。详可见上面图片 <code>STM32F407 时钟树（部分）</code>。</p>
+<p>本工程中，蒟蒻的王同学还是选择使用 <code>CubeMX</code> 完成时钟和一些硬件的初始化配置，下面是时钟部分：</p>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/CubeMX时钟配置.png" width=80%>
+</div>
+<ul>
+<li>我选则了 <code>TIM11</code> 作为 <code>Timebase Source</code>，挂载在 <code>APB2</code> 总线上，为了和之前使用 <code>SysTick</code> 作为时钟源时的配置保持一致，故调整了 <code>APB2</code> 的分频参数，保证 <code>APB2 timer clocks</code> 值为 <code>168M Hz</code>。</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E9%9D%A2%E4%B8%80%E7%82%B9">前面一点</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E-systick">关于 <code>SysTick</code></a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E%E4%BF%AE%E6%94%B9-freertosconfigh-%E7%9A%84%E6%97%B6%E9%92%9F%E9%83%A8%E5%88%86">关于修改 <code>FreeRTOSConfig.h</code> 的时钟部分</a></li>
+<li><a href="#%E5%85%B3%E4%BA%8E%E7%A1%AC%E4%BB%B6-tim">关于硬件 <code>TIM</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/stm32f103ve-gu-jian-ku-zhong-de-chuan-kou-shou-fa/">
+              <h3 class="post-title">
+                STM32F103VE 固件库中的串口收发
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

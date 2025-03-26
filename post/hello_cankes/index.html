@@ -1,0 +1,328 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hello_CAmkES | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Hello_CAmkES | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Hello CAmkES
+部分文段做了微小增删使句子通顺。
+Background
+
+The fundamentals of CA..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Hello_CAmkES
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-21
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/hello-camkes-0"><code>seL4</code> Docs/Tutorials/Hello CAmkES</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="background">Background</h2>
+<blockquote>
+<p>The fundamentals of CAmkES are the component, the interface and the connection.</p>
+</blockquote>
+<blockquote>
+<p>Components are logical groupings of code and resources. They communicate with other component instances via well-defined interfaces which must be statically defined, over communication channels.</p>
+</blockquote>
+<p><code>CAmkES</code> 的基础是组件（<code>component</code>）、接口（<code>interface</code>）和连接 <code>connection</code>。</p>
+<h3 id="component">Component</h3>
+<blockquote>
+<p>We use the term component in CAmkES to refer to the <em>type</em> of our functional grouping.</p>
+</blockquote>
+<p><code>component</code> 是资源和代码的逻辑分组。实际的 <code>component</code> 指的是各种不同分组的“类型”，而非一个具体的分组实例，就像类和对象的区别，<code>component</code> 是前者。</p>
+<blockquote>
+<p>For example, the statement <code>component foo bar</code> refers to a component instance <code>bar</code> whose type is <code>foo</code>.</p>
+</blockquote>
+<p><code>component</code> 很像 <code>C</code> 语言的 <code>struct</code> 关键字，下面是定义一个 <code>component</code> 的例子：</p>
+<pre><code class="language-c">component foo {
+  control;
+  uses MyInterface a;
+  attribute Int b;
+}
+</code></pre>
+<h3 id="describing-a-static-system-assembly-composition-and-configuration">Describing a static system: Assembly, Composition and Configuration</h3>
+<blockquote>
+<p>In CAmkES, we will commonly see the use of three hierarchical elements, being <code>assembly</code>, <code>composition</code> and <code>configuration</code>.</p>
+</blockquote>
+<blockquote>
+<p>In the CAmkES ADL (Architecture Description Language), we employ the term <code>assembly</code> as a top-level element that will encapsulate our system definition. Each CAmkES project must contain at least one <code>assembly</code> definition.</p>
+</blockquote>
+<p><code>CAmkES</code> 中常用到三个层级式的元素（对象？概念？）：<code>assembly</code>、<code>composition</code> 和 <code>configuration</code>。</p>
+<p>在 <code>CAmkES</code> 的体系定义语言（<code>Architecture Description Language</code>） 中，<code>assembly</code> 是一个用于封装所有系统定义的顶层元素，每个 <code>CAmkES</code> 项目都至少定义一个 <code>assembly</code>，下面是一个使实例：</p>
+<pre><code class="language-c">assembly {
+  composition {
+    component foo bar;
+  }
+
+  configuration {
+      bar.b = 0;
+  }
+}
+</code></pre>
+<blockquote>
+<p>The <code>composition</code> element is used as a container to encapsulate our component and connector instantiations.</p>
+</blockquote>
+<p><code>compositon</code> 用于封装 <code>component</code> 和 <code>connector</code> 的实例对象。</p>
+<blockquote>
+<p>The <code>configuration</code> element is also used to describe settings and attribute assignments in our given system.</p>
+</blockquote>
+<p><code>configuration</code> 用于描述系统设置并为一些对象属性赋初值。</p>
+<h2 id="creating-your-first-camkes-application">Creating your first CAmkES application</h2>
+<h3 id="looking-at-the-sources">Looking at the sources</h3>
+<h4 id="clientc"><code>client.c</code></h4>
+<blockquote>
+<p>For this tutorial we require our component to simply print “Hello CAmkES World”. We define this in a typical C file <code>client.c</code></p>
+</blockquote>
+<p>本 <code>quiz</code> 在 <code>client.c</code> 中<u><strong>实现了一个 <code>component</code></strong></u>。下面是本 <code>quiz</code> 中 <code>client.c</code> 的源代码示例：</p>
+<pre><code class="language-c">/*
+ * CAmkES tutorial part 0: just a component.
+ */
+
+#include &lt;stdio.h&gt;
+
+/* generated header for our component */
+#include &lt;camkes.h&gt;
+
+/* run the control thread */
+int run(void)
+{
+    printf(&quot;Hello CAmkES World\n&quot;);
+    return 0;
+}
+</code></pre>
+<blockquote>
+<p><code>run</code> is the entry point of a CAmkES component.</p>
+</blockquote>
+<p><code>CAmkES</code> 组件的入口函数不是大家喜闻乐见的 <code>main</code>，而是 <code>run</code>。</p>
+<h4 id="hellocamkes"><code>hello.camkes</code></h4>
+<blockquote>
+<p>The <code>hello.camkes</code> file is where we form our description of a static CAmkES system. Our <code>.camkes</code> files are written using the CAmkES syntax.</p>
+</blockquote>
+<p>使用扩展名为 <code>.camkes</code> 的文件描述整个 <code>CAmkES</code> <strong>静态</strong>系统，下面是本 <code>quiz</code> 中<code>hello.camkes</code> 的示例：</p>
+<pre><code class="language-c">/*
+ * CAmkES tutorial part 0: just a component.
+ */
+
+component Client
+{
+    control;
+}
+
+assembly
+{
+    composition
+    {
+        component Client client;
+    }
+}
+</code></pre>
+<blockquote>
+<p>We define our component <code>Client</code> and declare an instance of that component in our system.</p>
+</blockquote>
+<p>上述代码中定义了一个名为 <code>Client</code>（大写） 的 <code>component</code>，并在 <code>assembly</code> 中实例化了名为 <code>client</code>（小写） 的 <code>Client</code>（大写） 对象。</p>
+<h4 id="cmakeliststxt"><code>CMakeLists.txt</code></h4>
+<blockquote>
+<p>Every CAmkES project requires a <code>CMakeLists.txt</code> file to be incorporated in the seL4 build system.</p>
+</blockquote>
+<p>每个 <code>CAmkES</code> 构建系统都需要一个 <code>CMakeLists.txt</code>，下面是本 <code>quiz</code> 中的使用实例：</p>
+<pre><code class="language-shell">include(${SEL4_TUTORIALS_DIR}/settings.cmake)
+sel4_tutorials_regenerate_tutorial(${CMAKE_CURRENT_SOURCE_DIR})
+
+cmake_minimum_required(VERSION 3.7.2)
+
+project(hello-camkes-0 C ASM)
+
+find_package(camkes-tool REQUIRED)
+camkes_tool_setup_camkes_build_environment()
+
+DeclareCAmkESComponent(Client SOURCES client.c)
+
+DeclareCAmkESRootserver(hello.camkes)
+
+GenerateCAmkESRootserver()
+</code></pre>
+<blockquote>
+<p>Our <code>CMakeLists.txt</code> file declares our <code>Client</code> component, linking it with our <code>client.c</code> source file.</p>
+</blockquote>
+<p><strong>这个 <code>CMakeLists.txt</code> 声明了 <code>Client</code> 组件，并将它和 <code>client.c</code> 源代码连接起来。</strong></p>
+<blockquote>
+<p>In addition it declares the CAmkES Root Server using our <code>hello.camkes</code> system description.</p>
+</blockquote>
+<p>另外，它还调用 <code>hello.cmake</code> 声明了 <code>CAmkES</code> 根服务器（<code>CAmkES Root Server</code>）</p>
+<p>结束了，孩子们。故事的开头总是极尽温柔。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#component">Component</a></li>
+<li><a href="#describing-a-static-system-assembly-composition-and-configuration">Describing a static system: Assembly, Composition and Configuration</a></li>
+</ul>
+</li>
+<li><a href="#creating-your-first-camkes-application">Creating your first CAmkES application</a>
+<ul>
+<li><a href="#looking-at-the-sources">Looking at the sources</a>
+<ul>
+<li><a href="#clientc"><code>client.c</code></a></li>
+<li><a href="#hellocamkes"><code>hello.camkes</code></a></li>
+<li><a href="#cmakeliststxt"><code>CMakeLists.txt</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4-libraries_timer/">
+              <h3 class="post-title">
+                seL4 Libraries_Timer
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

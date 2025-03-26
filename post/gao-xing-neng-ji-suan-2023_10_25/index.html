@@ -1,0 +1,205 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>高性能计算2023_10_25 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="高性能计算2023_10_25 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="数据冲突和缓存不一致是同一个问题吗？
+非常好博文，使我的 gcc 旋转：
+一小时，完全搞懂 CPU 缓存一致性|知乎|zhihu.com
+什么是缓存一致性问题|博客园|cnblogs.com
+如何写出让 CPU 跑得更快的代码|微信公众号|..." />
+    <meta name="keywords" content="HPC" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              高性能计算2023_10_25
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/FtDeh3RFRO/" class="post-tag">
+                  # HPC
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="数据冲突和缓存不一致是同一个问题吗">数据冲突和缓存不一致是同一个问题吗？</h4>
+<p>非常好博文，使我的 gcc 旋转：</p>
+<p><a href="https://zhuanlan.zhihu.com/p/651732241">一小时，完全搞懂 CPU 缓存一致性|知乎|zhihu.com</a></p>
+<p><a href="https://www.cnblogs.com/HuiH/p/12690598.html">什么是缓存一致性问题|博客园|cnblogs.com</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&amp;mid=2247486022&amp;idx=1&amp;sn=8bb5a066d81f77523a06cd09251055da&amp;scene=21#wechat_redirect">如何写出让 CPU 跑得更快的代码|微信公众号|mp.weixin.qq.com</a></p>
+<p>阅读上述博文时的一些想法：</p>
+<ol>
+<li>采用 MESI 协议的 CPU 中，“数据从 Cache 写入内存”这一操作是完全被动的，写入内存的操作只发生在两种情况中：
+<ul>
+<li>标记为 M(odified) 的数据等待 remote read / write 事件发生后被写入内存</li>
+<li>标记为 I(nvalid) 的数据等待 local read / write 事件发生后，CPU 在其他核心中寻找被标记为 M 的同一数据写入内存</li>
+<li>其他任何状态的任何数据在任何情况都不能被写入内存。</li>
+</ul>
+</li>
+</ol>
+<p>“缓存一致性”大致就是说，不同核心共享的缓存数据要保持一致，没有标记为 M 的数据在内存和缓存中要保持一致。</p>
+<p>“数据冲突”是一个非常泛泛然的说法，主要通过加“锁”解决。实际上我也没太弄清楚。</p>
+<p>应该拿一个具体的 CPU 设计来分析，<strong>多级缓存怎么做</strong>、<strong>总线加锁怎么做</strong>、<strong>MESI 协议怎么实现</strong>、<strong>数据冲突怎么定义怎么解决</strong>.....这些都值得认真学习分析。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%86%B2%E7%AA%81%E5%92%8C%E7%BC%93%E5%AD%98%E4%B8%8D%E4%B8%80%E8%87%B4%E6%98%AF%E5%90%8C%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98%E5%90%97">数据冲突和缓存不一致是同一个问题吗？</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/fa-song-mqtt-xiao-xi-bao-shi-duo-fa-liao-liang-ge-kong-zi-fu-dao-zhi-fu-wu-duan-zhu-dong-guan-bi-tcp-lian-jie/">
+              <h3 class="post-title">
+                发送MQTT消息包时多发了两个空字符导致服务端主动关闭TCP连接
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,206 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notes for CUDA C++ Programming Guide | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Notes for CUDA C++ Programming Guide | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="引用内容均来自 Nvidia CUDA 官方编程文档 CUDA C++ Programming Guide
+引用内容均直接来自原文，部分文段小修了语序使句子通顺，引用格式为居中斜体。
+
+The GPU can hide memory acc..." />
+    <meta name="keywords" content="HPC" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Notes for CUDA C++ Programming Guide
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/FtDeh3RFRO/" class="post-tag">
+                  # HPC
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>引用内容均来自 Nvidia CUDA 官方编程文档 <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html">CUDA C++ Programming Guide</a><br>
+引用内容均直接来自原文，部分文段小修了语序使句子通顺，引用格式为居中斜体。</p>
+<blockquote>
+<p><em>The GPU can <strong>hide memory access latencies with computation</strong>, instead of relying on large data caches and complex flow control to avoid long memory access latencies, both of which are expensive in terms of transistors.</em></p>
+</blockquote>
+<p>不理解什么是“借计算掩藏访存延迟”。</p>
+<p>非常好非常详细的博文：<br>
+<a href="https://blog.csdn.net/weixin_44444450/article/details/118058031">CUDA——SM中warp调度器调度机制&amp;&amp;访存延迟隐藏 | CSDN | blogs.csdn.net</a><br>
+<a href="https://blog.csdn.net/fb_help/article/details/81707216">CUDA：延迟隐藏详解 | CSDN | blogs.csdn.net</a></p>
+<p>简单解释一下：一个核函数被 <code>Programmer</code> 指定到 [latex]n[/latex] 个  <code>Block</code> 上运行，一个 <code>Block</code> 被划分为一个或多个 <code>Warp</code>，当所有 <code>Warp</code> 都完成了计算而处于访存阶段时，计算单元空闲下来，就出现了“访存延迟”。假设每个 <code>Warp</code> 的计算周期是 [latex]T_1[/latex]，访存周期是 [latex]T_2 = k T_1[/latex]，那么当第 [latex]k + 1[/latex] 个 <code>Warp</code> 完成计算进入访存阶段时，第 [latex]1[/latex] 个 <code>Warp</code> 也完成了访存并重新执行计算任务。这样计算单元就不会空闲，掩藏了访存延迟。需要补充的是：一个 <code>Warp</code> 调度器每次调度且仅调度 [latex]1[/latex] 个 <code>Warp</code>、多个 <code>Warp</code> 间用类似流水线的方式调度，每次只能由一个 <code>Warp</code> 占用计算单元。</p>
+<blockquote>
+<p><em>At its core are three key abstractions — a hierarchy of thread groups, shared memories, and barrier synchronization.</em></p>
+</blockquote>
+<blockquote>
+<p><em>Indeed, each block of threads can be scheduled on any of the available multiprocessors within a GPU, in any order, concurrently or sequentially.</em></p>
+</blockquote>
+<p>一个 <code>Block</code> 的线程可以在任意一个 <code>SM</code> 上执行，线程可以任意顺序执行：并发执行或串行执行。<br>
+注意 <code>Block</code> 的分派不能跨 <code>SM</code>。即一个<br>
+一个 <code>Warp</code> 中的线程必须执行相同的指令为什么和本条中的“以任意顺序执行”不冲突？</p>
+<blockquote>
+<p><em>Only <strong>the runtime system</strong> needs to know the physical multiprocessor count.</em></p>
+</blockquote>
+<p><code>multiprocessor</code> 就是 <code>SM</code> (Streaming multiprocessor)，但这里的 &quot;the runtime system&quot; 指什么？</p>
+<blockquote>
+<p><em>This decomposition preserves language expressivity by allowing threads to cooperate when solving each sub-problem, and at the same time enables automatic scalability.</em></p>
+</blockquote>
+<p>允许线程在处理子问题时通信协作，使 CUDA 编程模型具有了自动可扩展性。觉得抽象请看下一条和下附图。</p>
+<blockquote>
+<p><em>A multithreaded program is partitioned into blocks of threads that execute independently from each other, so that <strong>a GPU with more multiprocessors will automatically execute the program in less time than a GPU with fewer multiprocessors</strong>.</em></p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/automatic-scalability.png" alt="automatic-scalability" width=50%>
+	<figcaption>
+	Figure 1.Automatic Scalability.<cite><a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#scalable-programming-model-automatic-scalability">CUDA C++ Programming Guide</a></cite>
+  </figcaption>
+</div>
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/notes-for-an-even-easier-introduction-to-cuda/">
+              <h3 class="post-title">
+                Notes for An Even Easier Introduction to CUDA
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

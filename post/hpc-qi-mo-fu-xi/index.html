@@ -1,0 +1,545 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HPC 期末复习 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="HPC 期末复习 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="引用内容若无特殊标注则均来自任课老师课件。
+题外话，J 老师是我极敬服的一位青年教师，无论是理论课程的安排和教学还是课程实验的设计都使我受益良多。
+00&amp;01-概述&amp;并行计算机架构
+
+
+1 EFLOPS = 10310^31..." />
+    <meta name="keywords" content="HPC" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              HPC 期末复习
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                14 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/FtDeh3RFRO/" class="post-tag">
+                  # HPC
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>引用内容若无特殊标注则均来自任课老师课件。</p>
+<p>题外话，<code>J</code> 老师是我极敬服的一位青年教师，无论是理论课程的安排和教学还是课程实验的设计都使我受益良多。</p>
+<h5 id="0001-概述并行计算机架构">00&amp;01-概述&amp;并行计算机架构</h5>
+<ul>
+<li>
+<p>1 EFLOPS = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><msup><mn>0</mn><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">10^3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span> PFLOPS = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><msup><mn>0</mn><mn>6</mn></msup></mrow><annotation encoding="application/x-tex">10^6</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span> TFLOPS = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><msup><mn>0</mn><mn>9</mn></msup></mrow><annotation encoding="application/x-tex">10^9</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span> GFLOPS = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><msup><mn>0</mn><mn>12</mn></msup></mrow><annotation encoding="application/x-tex">10^{12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span> MFLOPS = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><msup><mn>0</mn><mn>18</mn></msup></mrow><annotation encoding="application/x-tex">10^{18}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span></span> FLOPS</p>
+<ul>
+<li>Floating-point Operating Per Second (FLOPS)</li>
+<li>一颗 Kirin 9000E 是 2.3TFPLOS，一颗日常家用的 Apple M1 Max 就达到 10.4TFLPOS。</li>
+</ul>
+</li>
+<li>
+<p>冯·诺依曼架构与哈佛架构</p>
+<ul>
+<li>冯氏架构也可以叫普林斯顿架构。</li>
+<li>冯氏架构中指令与数据存在同一存储器中。哈佛架构中二者放在不同存储空间，独立编址。</li>
+<li>冯氏架构的数据总线和指令总线分时复用，取值和取数据无法并行。哈佛架构由于二者独立存储，故取值和取数据可以并行，这样提高了处理速度和带宽。</li>
+</ul>
+</li>
+<li>
+<p>超标量结构中，多条指令在单个核中（理论上并行执行），共享上下文存储空间，实际加速效果必然不能很好。</p>
+</li>
+<li>
+<p>Intel 攒出了一个单核、多指令、上下文空间独立的超线程结构（Intel Only）。但由于两个线程还是在一个核中，同时需要某个资源时，其中一个线程必须出让资源暂时挂起，实际加速效果也不能达到理想的 2X。但是超线程的并行度较之超标量有提升，从 ILP 提到 TLP。</p>
+<ul>
+<li>把超线程的核切一切，分成单处理器多核结构，超线程就变多线程。这样就是比较传统的加速架构了。</li>
+<li>超线程的一个结果就是带出了“逻辑核”的概念，和处理器中的“物理核”形成对照。</li>
+</ul>
+</li>
+<li>
+<p>SIMD，可以由硬件严格实现（一个核中多放几个执行单元），也可由软件通过多线程执行相同任务不同数据（如 <code>OpenMp</code> 处理 <code>for</code> 循环）从概念上实现 SIMD。</p>
+</li>
+<li>
+<p>我们自己的处理器！龙芯 3A6000</p>
+<ul>
+<li>官网地址：<a href="https://www.loongson.cn/product/show?id=26">龙芯 3A6000|龙芯中科|loongson.cn</a></li>
+</ul>
+</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/龙芯-3A6000-产品参数.png" alt="automatic-scalability" width=70%>
+	<figcaption ><font size=1>截图自龙芯中科官网</font></figcaption>
+</div>
+<pre><code>* 有物理核和逻辑核之分，应该是采用了超线程技术。每个处理器核是 64 位超标量结构。
+* 最让我印象深刻的是“支持128/256 位向量指令”，即支持 SIMD 指令扩展。
+* 峰值运算速度在 240GFLPOS，跟 Apple M1 Max 的 10.4 TFLPOS 是有些差距，还有继续突破创新的空间。
+</code></pre>
+<ul>
+<li><code>UMA</code> 和 <code>NUMA</code> 是说不同的存储访问结构。二者都是多处理机（单地址空间共享存储器）架构，和 <code>NORMA</code> 架构（多计算机，多地址空间非共享存储器）形成对比。
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/336365600">每个程序员都应该知道的 CPU 知识：NUMA|知乎专栏|zhuanlan.zhihu.com</a></li>
+<li><code>UMA</code> 架构的处理器里会看到一个古老的硬件叫“北桥”。
+<ul>
+<li>“根据北桥的原理，把计算机朝北边放置可以提高机器运行速度” —— 来自 Professor zkl 的组成原理小幽默。</li>
+</ul>
+</li>
+<li>Linux 中可以用 <code>numactl</code> 控制远程程序运行时对远程内存和本地内存的分配使用，以此可以影响程序执行效率。</li>
+</ul>
+</li>
+</ul>
+<h5 id="02-并行算法性能评测">02-并行算法性能评测</h5>
+<ul>
+<li>
+<p>RoofLine 模型</p>
+<ul>
+<li>RoofLine 模型用来评估计算平台在不同算术密度下能达到的理论计算上限。</li>
+</ul>
+<blockquote>
+<p><em>算术密度 I(Operation intensity) 指<u>单位时间内（算术操作数 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>π</mi></mrow><annotation encoding="application/x-tex">\pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span></span></span></span>）/（读内存字节数 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>β</mi></mrow><annotation encoding="application/x-tex">\beta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05278em;">β</span></span></span></span>）的比率</u>。</em></p>
+</blockquote>
+<blockquote>
+<p><em>RoofLine 模型中，算力决定“屋檐”的高度，带宽决定“房檐”的斜率。</em></p>
+</blockquote>
+<center><img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/RoofLine.png" width=70%></center>
+<center><font size=1>RooLine Model.截图自任课老师课件</font></center>
+<br>
+<ul>
+<li>计算密度较小的任务属于访存密集型任务，其在特定硬件平台上的实际计算密度值越接近该平台带宽瓶颈区的“线”，说明执行性能越好。</li>
+<li>计算密度较大的任务属于计算密集型任务，其执行性能的评价与访存密集型任务类似。<br>
+<br></li>
+</ul>
+<center><img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/RoofLinelog.png" width=70%></center>
+<center><font size=1>Log Rooflines for CPU, GPU, TPU.截图自任课老师课件</font></center>
+</li>
+<li>
+<p>不同应用场景下评价并行算法性能的两个定律。</p>
+<ul>
+<li>
+<p>Amdahl 定律</p>
+<ul>
+<li>假定总计算负载不变，固定计算负载分布在多个处理器上。<br>
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>=</mo><mfrac><mrow><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><msub><mi>W</mi><mi>p</mi></msub></mrow><mrow><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><mfrac><msub><mi>W</mi><mi>p</mi></msub><mi>p</mi></mfrac></mrow></mfrac></mrow><annotation encoding="application/x-tex">S = \frac{W_s + W_p}{W_s + \frac{W_p}{p}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.899006em;vertical-align:-0.9133549999999999em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.985651em;"><span style="top:-2.4246649999999996em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0933357142857143em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.2255000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.605242857142857em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.23056em;"><span style="top:-2.3000000000000003em;margin-left:-0.13889em;margin-right:0.1em;"><span class="pstrut" style="height:2.5em;"></span><span class="mord mathdefault mtight">p</span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.39444em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.48288571428571425em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.50732em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285716em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9133549999999999em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>，上下同除以问题总规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span></span>，可得 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>=</mo><mfrac><mrow><mi>f</mi><mo>+</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>f</mi><mo>)</mo></mrow><mrow><mi>f</mi><mo>+</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>f</mi></mrow><mi>p</mi></mfrac></mrow></mfrac><mo>=</mo><mfrac><mi>p</mi><mrow><mn>1</mn><mo>+</mo><mi>f</mi><mo>(</mo><mi>p</mi><mo>−</mo><mn>1</mn><mo>)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">S = \frac{f + (1 - f)}{f + \frac{1 - f}{p}} = \frac{p}{1 + f(p-1)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.8289099999999998em;vertical-align:-0.8189099999999998em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.51911em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9584142857142857em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.2255000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.4623857142857144em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.48288571428571425em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mbin mtight">+</span><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8189099999999998em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.2675em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7475em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">+</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mopen mtight">(</span><span class="mord mathdefault mtight">p</span><span class="mbin mtight">−</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.446108em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>。<br>
+由上面公式，在 Amadahl 定律的应用场景中，当 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">p \to \infty</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord">∞</span></span></span></span> 有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>s</mi><mo>→</mo><mfrac><mn>1</mn><mi>f</mi></mfrac></mrow><annotation encoding="application/x-tex">s \to \frac{1}{f}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.326216em;vertical-align:-0.481108em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.481108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>。</li>
+<li>若存在额外开销 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>W</mi><mi>o</mi></msub></mrow><annotation encoding="application/x-tex">W_o</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，则 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>=</mo><mfrac><mrow><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><msub><mi>W</mi><mi>p</mi></msub></mrow><mrow><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><mfrac><msub><mi>W</mi><mi>p</mi></msub><mi>p</mi></mfrac><mo>+</mo><msub><mi>W</mi><mi>o</mi></msub></mrow></mfrac><mo>=</mo><mfrac><mi>W</mi><mrow><mi>f</mi><mi>W</mi><mo>+</mo><mfrac><mrow><mi>W</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>f</mi><mo>)</mo></mrow><mi>p</mi></mfrac><mo>+</mo><msub><mi>W</mi><mi>o</mi></msub></mrow></mfrac><mo>=</mo><mfrac><mi>p</mi><mrow><mn>1</mn><mo>+</mo><mi>f</mi><mo>(</mo><mi>p</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>+</mo><mfrac><mrow><msub><mi>W</mi><mi>o</mi></msub><mo>×</mo><mi>p</mi></mrow><mi>W</mi></mfrac></mrow></mfrac></mrow><annotation encoding="application/x-tex">S = \frac{W_s + W_p}{W_s + \frac{W_p}{p} + W_o} = \frac{W}{fW + \frac{W(1 - f)}{p} + W_o} = \frac{p}{1 + f(p-1) + \frac{W_o \times p}{W}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.899006em;vertical-align:-0.9133549999999999em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.985651em;"><span style="top:-2.4246649999999996em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0933357142857143em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.2255000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.605242857142857em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.23056em;"><span style="top:-2.3000000000000003em;margin-left:-0.13889em;margin-right:0.1em;"><span class="pstrut" style="height:2.5em;"></span><span class="mord mathdefault mtight">p</span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.39444em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.48288571428571425em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.50732em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285716em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9133549999999999em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.7468009999999998em;vertical-align:-0.8744699999999999em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.872331em;"><span style="top:-2.46355em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0377857142857143em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.2255000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.5020714285714285em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.48288571428571425em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8744699999999999em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.466415em;vertical-align:-0.718915em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7475em;"><span style="top:-2.521885em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">+</span><span class="mord mathdefault mtight" style="margin-right:0.10764em;">f</span><span class="mopen mtight">(</span><span class="mord mathdefault mtight">p</span><span class="mbin mtight">−</span><span class="mord mtight">1</span><span class="mclose mtight">)</span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.95445em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span></span></span></span><span style="top:-3.2255000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.466357142857143em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.23056em;"><span style="top:-2.3em;margin-left:-0.13889em;margin-right:0.1em;"><span class="pstrut" style="height:2.5em;"></span><span class="mord mathdefault mtight">o</span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2em;"><span></span></span></span></span></span></span><span class="mbin mtight">×</span><span class="mord mathdefault mtight">p</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.344em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.446108em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.718915em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>。</li>
+</ul>
+</li>
+<li>
+<p>Gustafson 定律</p>
+<ul>
+<li>维持计算时间固定，加大计算量，此时必须增多处理器数才能保证时间不变。<br>
+<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>=</mo><mfrac><mrow><mrow><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><mi>p</mi></mrow><mo>×</mo><msub><mi>W</mi><mi>p</mi></msub></mrow><mrow><msub><mi>W</mi><mi>s</mi></msub><mo>+</mo><mfrac><mrow><mi>p</mi><mo>×</mo><msub><mi>W</mi><mi>p</mi></msub></mrow><mi>p</mi></mfrac></mrow></mfrac></mrow><annotation encoding="application/x-tex">S = \frac{{W_s + p} \times W_p}{W_s + \frac{p \times W_p}{p}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.899006em;vertical-align:-0.9133549999999999em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.985651em;"><span style="top:-2.4246649999999996em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">+</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0933357142857143em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.2255000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.605242857142857em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span><span class="mbin mtight">×</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.23056em;"><span style="top:-2.3000000000000003em;margin-left:-0.13889em;margin-right:0.1em;"><span class="pstrut" style="height:2.5em;"></span><span class="mord mathdefault mtight">p</span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.39444em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.48288571428571425em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.50732em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mbin mtight">+</span><span class="mord mathdefault mtight">p</span></span><span class="mbin mtight">×</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285716em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9133549999999999em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>，上下同除以问题总规模 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">W</span></span></span></span>，可得 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>=</mo><mi>p</mi><mo>−</mo><mi>f</mi><mo>(</mo><mi>p</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>f</mi><mo>)</mo><mi>p</mi><mo>+</mo><mi>f</mi></mrow><annotation encoding="application/x-tex">S = p - f(p -1) = (1 - f)p + f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.7777700000000001em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mord mathdefault">p</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span></span></span></span>。<br>
+由上面公式，在 Gustafson 定律的应用场景中，当 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">p \to \infty</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord">∞</span></span></span></span> 由 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>→</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>f</mi><mo>)</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">S \to (1 - f)p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mclose">)</span><span class="mord mathdefault">p</span></span></span></span>。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><em>在实际应用中，增多处理器必须相应地增大问题规模才有实际意义</em>。</p>
+</blockquote>
+<ul>
+<li>
+<p>并行计算的加速比和系统效率。</p>
+<ul>
+<li>
+<p>系统效率可以简单理解为每个处理器对加速比的贡献度。</p>
+</li>
+<li>
+<p>加速比 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>p</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>T</mi><mi>s</mi></msub><msub><mi>T</mi><mi>p</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">S(p) = \frac{T_s}{T_p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.4307509999999999em;vertical-align:-0.5423199999999999em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8884309999999999em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285716em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2818857142857143em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.4101em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.16454285714285719em;"><span style="top:-2.357em;margin-left:-0.13889em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.5423199999999999em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>，理想情况下 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>p</mi><mo>)</mo><mo>=</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">S(p) = p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span>，此时 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>p</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">S(p)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mclose">)</span></span></span></span> 称为线性加速比。</p>
+<ul>
+<li>实际工程中确实有可能出现超线性加速比，即 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>p</mi><mo>)</mo><mo>&gt;</mo><mi>p</mi></mrow><annotation encoding="application/x-tex">S(p) &gt; p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span>，只要相关的硬件资源到位（内存、缓存）并做到软硬件深度优化。</li>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mi>s</mi></msub></mrow><annotation encoding="application/x-tex">T_s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.151392em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">s</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>：同一任务使用最佳串行算法的执行时间。</li>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>T</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">T_p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span>：同一任务使用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span> 个处理器的并行执行时间。</li>
+</ul>
+</li>
+<li>
+<p>系统效率 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>E</mi><mo>(</mo><mi>p</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>S</mi><mo>(</mo><mi>p</mi><mo>)</mo></mrow><mi>p</mi></mfrac></mrow><annotation encoding="application/x-tex">E(p) = \frac{S(p)}{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.491108em;vertical-align:-0.481108em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">S</span><span class="mopen mtight">(</span><span class="mord mathdefault mtight">p</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.481108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>。</p>
+<ul>
+<li>现实中达到线性加速比几乎是不可能的，因为引入更多处理器会带来更大的通信、同步、空闲等待等开销，因此系统效率（处理器对加速比的贡献度）应当介乎 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn><mo>∼</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">0 \sim 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span> 中。</li>
+<li>工程应用中，常通过增大问题规模提升系统效率和加速比。</li>
+</ul>
+</li>
+<li>
+<p>基于对系统效率的理解，对一个并行计算程序，在不增大问题规模的前提下，增加处理器数，可以维持系统效率基本不变，并且加速比得到明显提升，那么称此程序具有<strong>强可扩展性</strong>。</p>
+<ul>
+<li>直观的体现就是，相同规模的问题可以在更短时间内完成处理。</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/强.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>截图自任课老师课件</font></figcaption>
+</div>
+</li>
+<li>
+<p>对一个并行计算程序，增加处理器数（或说线程数），必须增大问题规模，才能保持系统效率基本不变，那么称此程序具有<strong>弱可扩展性</strong>。</p>
+<ul>
+<li>下面这个图，描述加速比 Speedup 的我真的不是很理解。若系统效率 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>E</mi><mo>(</mo><mi>p</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>S</mi><mo>(</mo><mi>p</mi><mo>)</mo></mrow><mi>p</mi></mfrac></mrow><annotation encoding="application/x-tex">E(p) = \frac{S(p)}{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">E</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.491108em;vertical-align:-0.481108em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.05764em;">S</span><span class="mopen mtight">(</span><span class="mord mathdefault mtight">p</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.481108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 保持基本不变，则增大处理器数量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span>，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>(</mo><mi>p</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">S(p)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord mathdefault">p</span><span class="mclose">)</span></span></span></span> 应该也上升，为什么这里是水平不变。</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/弱.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>截图自任课老师课件</font></figcaption>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="03-并行算法设计基础">03-并行算法设计基础</h5>
+<ul>
+<li>
+<p>通讯和同步的区别</p>
+<ul>
+<li>感觉是两个本就没有相似性的概念，就很难对它们的区别作出规范的描述，就像描述毛驴和锅铲的区别一样。</li>
+</ul>
+<blockquote>
+<p><em>同步（Synchronization）是<strong>在时间上</strong>强使各执行进程在某一点必须相互等待</em>。<br>
+<em>通信（Communication）是<strong>在空间上</strong>对各并发执行的进程施行数据交换</em>。</p>
+</blockquote>
+</li>
+<li>
+<p>对计算机的逻辑抽象，传统串行机和理论的并行机。</p>
+<ul>
+<li>
+<p>冯·诺伊曼架构是对传统串行机的抽象，主要从指令执行和数据存储两个主要方面描述机器的运行逻辑。对并行机的抽象描述也着眼于此。</p>
+</li>
+<li>
+<p>PRAM 模型</p>
+<ul>
+<li>Parallel Random Access Machine.并行随机存取机器，从指令和内存角度描述也可称为 SIMD-SM 模型（单指令多数据-共享存储模型）。</li>
+<li>多处理器、没有局存、没有局部程序、共享内存、单地址空间、单个指令控制器、隐式同步，这些特点也决定了它不适合执行 MIMD 任务。</li>
+</ul>
+</li>
+<li>
+<p>PRAM 模型的存取模式</p>
+<ul>
+<li>E: Execlusive, C: Concurrent</li>
+<li>CRCW, CREW, EREW, ERCW</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/读写模式.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>截图自任课老师课件</font></figcaption>
+</div>
+</li>
+<li>
+<p>APRAM 模型</p>
+<ul>
+<li>Asynchronized Parallel Random Access Machine.异步并行随机存取机器，也可称为 MIMD-SM 模型（多指令多数据-共享存储模型）。</li>
+<li>多处理器、有局存、有局部时钟、有局部程序、无全局时钟、共享内存、处理器任何时间依赖关系需明确地在各处理器的程序中加入同步（路）障（Synchronization Barrier）。</li>
+</ul>
+</li>
+<li>
+<p>BSP 模型</p>
+<ul>
+<li>Bulk Synchronous Parallel.块同步模型，一种异步 MIMD-DM 模型。</li>
+<li>支持消息传递系统、强调通信和计算分离、块内异步并行、块间显式同步。</li>
+</ul>
+</li>
+<li>
+<p>logP 模型</p>
+<ul>
+<li>一种分布存储的、点到点通讯的多处理机模型，其中通讯由一组参数描述，实行隐式同步。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="04-05-并行算法的一般设计策略-并行算法设计的基本设计技术">04-05 并行算法的一般设计策略-并行算法设计的基本设计技术</h5>
+<ul>
+<li>
+<p>3 种一般设计策略。</p>
+</li>
+<li>
+<p>5 种基本设计技术。</p>
+<p>详可参见<br>
+《高性能科学与工程计算》，Georg Hager，Gerhard Wellein，2014<br>
+《并行计算——结构 算法 编程》，陈国良，2011<br>
+少念经，多实践。</p>
+</li>
+</ul>
+<h5 id="06-并行算法的一般设计过程">06 并行算法的一般设计过程</h5>
+<ul>
+<li>PCAM 设计方法学
+<ul>
+<li>
+<p>Partitioning</p>
+<ul>
+<li>先进行域分解（数据分解），再进行计算功能分解，使计算集和数据集互不交互。</li>
+<li>几条划分判据
+<ul>
+<li>所划分的任务数是否高于目标机上处理器数一个量级？
+<ul>
+<li><strong>不要让处理器闲下来</strong>。除了让任务数比处理器数高出几个量级，还可以对划分块做<strong>循环跨步编号</strong>，这在带状划分和棋盘划分都有应用。</li>
+</ul>
+</li>
+<li>划分是否避免了冗余的计算和存储要求？
+<ul>
+<li>矩阵-矩阵乘的简单并行分块算法就没有避免冗余存储，导致对处理器存储要求过高。两个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi><mo>×</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">n \times n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 乘数矩阵，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span> 个处理器，采用棋盘法划分。<strong>在多到多播送后</strong>，每个处理器有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><msqrt><mi>p</mi></msqrt></mrow><annotation encoding="application/x-tex">2\sqrt{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.04em;vertical-align:-0.33693999999999996em;"></span><span class="mord">2</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.70306em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathdefault">p</span></span></span><span style="top:-2.66306em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg width='400em' height='1.08em' viewBox='0 0 400000 1080' preserveAspectRatio='xMinYMin slice'><path d='M95,702c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,
+-10,-9.5,-14c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54c44.2,-33.3,65.8,
+-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10s173,378,173,378c0.7,0,
+35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429c69,-144,104.5,-217.7,106.5,
+-221c5.3,-9.3,12,-14,20,-14H400000v40H845.2724s-225.272,467,-225.272,467
+s-235,486,-235,486c-2.7,4.7,-9,7,-19,7c-6,0,-10,-1,-12,-3s-194,-422,-194,-422
+s-65,47,-65,47z M834 80H400000v40H845z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.33693999999999996em;"><span></span></span></span></span></span></span></span></span> 个块，每个块大小为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><msup><mi>n</mi><mn>2</mn></msup><mi>p</mi></mfrac></mrow><annotation encoding="application/x-tex">\frac{n^2}{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.499028em;vertical-align:-0.481108em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01792em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathdefault mtight">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913142857142857em;"><span style="top:-2.931em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.481108em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>，则每个处理器存储数据量为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><msup><mi>n</mi><mn>2</mn></msup><msqrt><mi>p</mi></msqrt></mrow><annotation encoding="application/x-tex">2 n^2 \sqrt{p}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1510479999999998em;vertical-align:-0.33693999999999996em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.70306em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathdefault">p</span></span></span><span style="top:-2.66306em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg width='400em' height='1.08em' viewBox='0 0 400000 1080' preserveAspectRatio='xMinYMin slice'><path d='M95,702c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,
+-10,-9.5,-14c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54c44.2,-33.3,65.8,
+-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10s173,378,173,378c0.7,0,
+35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429c69,-144,104.5,-217.7,106.5,
+-221c5.3,-9.3,12,-14,20,-14H400000v40H845.2724s-225.272,467,-225.272,467
+s-235,486,-235,486c-2.7,4.7,-9,7,-19,7c-6,0,-10,-1,-12,-3s-194,-422,-194,-422
+s-65,47,-65,47z M834 80H400000v40H845z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.33693999999999996em;"><span></span></span></span></span></span></span></span></span>。这空间复杂度还<strong>不如串行算法</strong>中只用一个处理器直接存储两个矩阵，存储数据量是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>2</mn><msup><mi>n</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">2 n^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord">2</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>。</li>
+</ul>
+</li>
+<li>各任务的尺寸是否大致相当？
+<ul>
+<li>和<strong>循环跨步编号</strong>一样都有利于负载均衡。</li>
+</ul>
+</li>
+<li>划分的任务数是否与问题尺寸成比例？
+<ul>
+<li>理想情况下，问题尺寸增加应该引起任务数增加，而不是任务尺寸增加。否则算法可能无法求解大尺寸问题。</li>
+</ul>
+</li>
+<li>是否采用了几种不同的划分法？</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Communication</p>
+<ul>
+<li>通讯限制了算法的并行度。</li>
+<li>四种通讯模式：全局/局部通讯、结构化/非结构化通讯、静态/动态通讯、同步/异步通讯。</li>
+<li>几条通讯判据
+<ul>
+<li>所有任务是否执行大致同样多的通信？</li>
+<li>每个任务是否只与少数近邻通信？
+<ul>
+<li>应当避免全局通信，调整划分结构将全局通信换成局部通信。</li>
+<li>矩阵-矩阵乘中的 <code>Cannon</code> 算法，实现了严格的局部通信（两个乘数矩阵的分块只是在近邻间交换），与 <code>Cannon</code> 算法相似的 <code>Fox</code> 算法，需要有一个乘数矩阵的每个块在同一行内进行一到多通信。</li>
+</ul>
+</li>
+<li>诸通信操作能否并发执行？</li>
+<li>不同任务的计算能否并行执行？ 是否会因为等待数据而降低并行度？
+<ul>
+<li>矩阵-矩阵乘中的 <code>Systolic</code> 算法，采用时间对准（元素未提前加载到阵列中），虽然各处理器上的计算在并行执行，但除了 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>P</mi><mrow><mo>(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo>)</mo></mrow></msub></mrow><annotation encoding="application/x-tex">P_{(1,1)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.03853em;vertical-align:-0.3551999999999999em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.34480000000000005em;"><span style="top:-2.5198em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mpunct mtight">,</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3551999999999999em;"><span></span></span></span></span></span></span></span></span></span> 处理器，其他处理器都要等待数据，这样就有一些无法避免的延迟。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Agglomeration</p>
+<ul>
+<li>由抽象到具体的实际过程。合并小尺寸任务，减少任务数。通过提升任务粒度和增加重复计算消减通信成本。</li>
+<li>表面积-容积效应，很像生物学中“细胞相对表面积”的相关概念。
+<ul>
+<li>细胞的相对表面积（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mi mathvariant="normal">表</mi><mi mathvariant="normal">面</mi><mi mathvariant="normal">积</mi></mrow><mrow><mi mathvariant="normal">体</mi><mi mathvariant="normal">积</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{表面积}{体积}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.739em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.394em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">体</span><span class="mord cjk_fallback mtight">积</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord cjk_fallback mtight">表</span><span class="mord cjk_fallback mtight">面</span><span class="mord cjk_fallback mtight">积</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>）越小，细胞的物质运输效率越高。</li>
+<li>并行单元的通讯量与任务子集的表面积成正比，计算量与任务子集的体积成正比。</li>
+<li>计算单元的通信与计算量之比随任务尺寸增大而减小。</li>
+</ul>
+</li>
+<li>几条组合判据（纯念经了）
+<ul>
+<li>增加粒度是否减少了通讯成本？</li>
+<li>重复计算是否已权衡了其得益？</li>
+<li>是否保持了灵活性和可扩展性？</li>
+<li>组合的任务数是否与问题尺寸成比例？</li>
+<li>是否保持了类似的计算和通讯？</li>
+<li>有没有减少并行执行机会？</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Mapping</p>
+<ul>
+<li>能并发执行的任务放在不同处理器上以增加并行度，需要频繁通信的任务放在同一处理器上提高局部性。</li>
+<li>可采用负载平衡算法或任务调度算法实现有效的映射。
+<ul>
+<li>任务调度算法有“经理/雇员模式（集中式）”和“非集中模式（无中心管理者）”。</li>
+</ul>
+</li>
+<li>几条映射判据
+<ul>
+<li>如果采用集中式负载平衡算法，是否检查了中央管理者不会成为瓶颈？</li>
+<li>如果采用动态负载平衡算法，是否衡量过不同策略的成本？</li>
+<li>如果采用概率或循环映射法，是否有足够多的任务？
+<ul>
+<li>一般地，任务数不应少于处理器数的 10 倍。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="07-基本通信操作">07 基本通信操作</h5>
+<p>不想更辣！</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#0001-%E6%A6%82%E8%BF%B0%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%9E%B6%E6%9E%84">00&amp;01-概述&amp;并行计算机架构</a></li>
+<li><a href="#02-%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95%E6%80%A7%E8%83%BD%E8%AF%84%E6%B5%8B">02-并行算法性能评测</a></li>
+<li><a href="#03-%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95%E8%AE%BE%E8%AE%A1%E5%9F%BA%E7%A1%80">03-并行算法设计基础</a></li>
+<li><a href="#04-05-%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%80%E8%88%AC%E8%AE%BE%E8%AE%A1%E7%AD%96%E7%95%A5-%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95%E8%AE%BE%E8%AE%A1%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%AE%BE%E8%AE%A1%E6%8A%80%E6%9C%AF">04-05 并行算法的一般设计策略-并行算法设计的基本设计技术</a></li>
+<li><a href="#06-%E5%B9%B6%E8%A1%8C%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%80%E8%88%AC%E8%AE%BE%E8%AE%A1%E8%BF%87%E7%A8%8B">06 并行算法的一般设计过程</a></li>
+<li><a href="#07-%E5%9F%BA%E6%9C%AC%E9%80%9A%E4%BF%A1%E6%93%8D%E4%BD%9C">07 基本通信操作</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/hdlbits-verilog-language-basics-and-vectors/">
+              <h3 class="post-title">
+                HDLBits-Verilog Language-Basics and Vectors
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

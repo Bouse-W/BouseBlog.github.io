@@ -1,0 +1,503 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_C-Libraries_tutorials_seL4 Libraries_Processes_ELF-loading | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_C-Libraries_tutorials_seL4 Libraries_Processes_ELF-loading | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/seL4 Libraries: Processes &amp; ELF loading
+部分文段做了微小增删使句子通顺。
+Exe..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_C-Libraries_tutorials_seL4 Libraries_Processes_ELF-loading
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-19
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/libraries-3"><code>seL4</code> Docs/Tutorials/seL4 Libraries: Processes &amp; ELF loading</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="exercises">Exercises</h2>
+<h3 id="virtual-memory-management">Virtual memory management</h3>
+<blockquote>
+<p>Aside from receiving information about IRQs in the IRQControl object capability, and information about available IO-Ports, and ASID availability, and several other privileged bits of information,</p>
+<p>the init thread is also responsible, surprisingly, for reserving certain critical ranges of memory as being used, and unavailable for applications.</p>
+</blockquote>
+<p>系统启动时的 <code>init</code> 线程负责接收 <code>IRQ</code> 消息、可用 <code>IO</code> 端口信息、<code>ASID</code> 可用性信息和其他一些特权信息，除此之外，<code>init</code> 线程还负责保留一些关键内存区域，将其标记为正在实用，保证这些区域对应用程序不可用。</p>
+<pre><code class="language-c">int sel4utils_bootstrap_vspace_with_bootinfo_leaky(vspace_t * vspace,
+                                                   sel4utils_alloc_data_t * data,
+                                                   seL4_CPtr page_directory,
+                                                   vka_t * vka,
+                                                   seL4_BootInfo * info);
+</code></pre>
+<p><code>sel4utils_bootstrap_vsapce_with_bootinfo_leaky;</code> 用于设置一个特定的 <code>VSpace</code> 空间。最终效果是：创建一个 <code>page_directory</code> 对象，将新建 <code>pd</code> 的 <code>capability</code>设置为目标 <code>VSpace</code> 的 <code>root CNode</code>，同时使用参数列表中的 <code>@param vka</code> 作为目标 <code>VSpace</code> 空间的对象分配器。</p>
+<p><code>vspace_t</code> 结构体的定义如下：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/vspace_t.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>结构定义——vspace_t</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/vspace.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>结构定义——vspace</font>
+    </figcaption>
+</div>
+<p>那么新建虚拟内存空间有什么用呢？本 <code>quiz</code> 中的做法是：在新建虚拟内存空间中设置一段“保留区域”（<code>reserved memory range</code>），将保留区域分配给 <code>allocman</code>：</p>
+<p><code>vspace_reserve_range(...);</code> 在 <code>VSpace</code> 中设置保留区域：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/set_a_reservation_section_in_virtual_mempool.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>定义新的 VSpace，在其中设置保留区域</font>
+    </figcaption>
+</div>
+<p><code>bootstrap_configure_virtual_pool(...);</code> 给 <code>allocman</code> 设置虚拟内存池。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/set_a_new_memory_pool_for_allocman.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>为 allocman 设置虚拟内存池</font>
+    </figcaption>
+</div>
+<p>为什么要给 <code>allocman</code> 分配新的虚拟内存空间？看一下 <code>bootstrap_confgure_virtual_pool(...);</code> 的声明：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/declaration_bootstrp_configure_virtual_pool.JPG" alt="automatic-scalability" width=80%>
+	<figcaption >
+        <font size=2>定义新的 VSpace，在其中设置保留区域，并将保留区分配给 allocman</font>
+    </figcaption>
+</div>
+<p><code>allocman</code> 对象可以管理两个内存池：一个物理内存池，一个虚拟内存池。</p>
+<p>物理内存池是在调用 <code>bootstrap_use_current_simple</code> 创建 <code>allocman</code> 时在入口参数中指定的：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/定义allocman物理内存池.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>定义 allocman 的物理内存池</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/创建allocman对象.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>创建allocman对象，在入口参数中指定物理内存池大小和地址</font>
+    </figcaption>
+</div>
+<p>应当注意：只有在 <code>allocman</code> 对象创建完成后方可为其指定虚拟内存池。</p>
+<h3 id="configure-a-process">Configure a process</h3>
+<blockquote>
+<p><code>sel4utils_configure_process_custom</code> took a large amount of the work out of creating a new “processs”. It spawns the new thread with its own CSpace by automatically. This means the new thread we’re creating will not share a CSpace with our main thread.</p>
+</blockquote>
+<p><code>sel4utils_configure_process_custom</code> 用于创建一个新 <code>process</code>（<font color=red>这是进程还是线程？</font>）。</p>
+<pre><code class="language-c">int sel4utils_configure_process_custom(sel4utils_process_t * process,
+                                       vka_t * target_vka,
+                                       vspace_t * spawner_vspace,
+                                       sel4utils_process_config_t config);
+</code></pre>
+<p><code>@param process</code> <u>新线程（？）</u>的结构体指针。</p>
+<p><code>@param target_vka</code> <code>vka</code> 指针。</p>
+<p><code>@param spawner_vspace</code> <code>VSpace</code> 指针。</p>
+<p><code>@param config</code> 参数结构体指针。</p>
+<ul>
+<li>
+<p><code>process</code> 结构体的定义如下：</p>
+<pre><code class="language-c">typedef struct
+{
+    vka_object_t pd;
+    vspace_t vspace;
+    sel4utils_alloc_data_t data;
+    vka_object_t cspace;
+    uint32_t cspace_size;
+    uint32_t cspace_next_free;
+    sel4utils_thread_t thread;
+    vka_object_t fault_endpoint;
+    void * entry_point;
+    uintptr_t sysinfo;
+    /* cptr (with respect to the process cnode) of the tcb of the first thread (0 means not supplied) */
+    seL4_CPtr dest_tcb_cptr;
+    seL4_Word pagesz;
+    object_node_t * allocated_object_list_head;
+    /* ELF headers that describe the sections of the loaded image (at least as they
+     * existed at load time). Is different to the elf_regions, which have reservations,
+     * these are the original headers from the elf and include nonloaded information regions */
+    int num_elf_phdrs;
+    Elf_Phdr * elf_phdrs;
+    /* if the elf wasn't loaded into the address space, this describes the regions.
+     * this permits lazy loading / copy on write / page sharing / whatever crazy thing
+     * you want to implement */
+    int num_elf_regions;
+    sel4utils_elf_region_t * elf_regions;
+    bool own_vspace;
+    bool own_cspace;
+    bool own_ep; 
+} sel4utils_process_t; 
+</code></pre>
+<p><code>process</code> 难道是管理多个线程的内核对象？也可以算作某种进程？</p>
+<p><code>process</code> 是当前进程创建的子进程，创建时分配了独立的 <code>CSpace</code>，<font color=red>加载运行 <code>ELF</code> 文件使用 <code>process</code> 作为程序的运行抽象。</font></p>
+<p>孩子们，难道我们可以做动态库加载了吗？</p>
+</li>
+</ul>
+<p><code>process_config_default_simple</code> 用于<strong>创建一个参数结构体</strong>并返回其指针。</p>
+<pre><code class="language-c">sel4utils_process_config_t process_config_default_simple(simple_t * simple,
+                                                         const char * image_name,
+                                                         uint8_t prio)
+{
+    sel4utils_process_config_t config = process_config_new(simple);
+    config = process_config_elf(config, image_name, true);
+    config = process_config_create_cnode(config, CONFIG_SEL4UTILS_CSPACE_SIZE_BITS);
+    config = process_config_create_vspace(config, NULL, 0);
+    config = process_config_create_fault_endpoint(config);
+
+    if (config_set(CONFIG_KERNEL_MCS)) {
+        /* seL4_Time measures time in us, the config parameter uses ms. */
+        seL4_Time timeslice_us = CONFIG_BOOT_THREAD_TIME_SLICE * US_IN_MS;
+        config.sched_params = sched_params_round_robin(config.sched_params, simple, 0, timeslice_us);
+    }
+
+    return process_config_priority(config, prio);
+}
+</code></pre>
+<p><code>@param simple</code> 父线程的基本信息结构体。</p>
+<p><code>@param image_name</code> 新建线程要加载执行的 <code>ELF</code> 文件的文件名。孩子们，这很有趣。</p>
+<p><code>@param prio</code> 新建线程的优先级。</p>
+<p><code>process_config_default_simple </code>的实现中最有趣的是对 <code>ELF</code> 文件的设置，入口参数 <code>@param image_name</code> 传入了文件名，函数体中调用 <code>process_config_elf</code> 将文件名写入新建的 <code>config</code> 结构体，我们看一下该函数的定义：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/process_config_elf设置.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>函数定义——process_config_elf</font>
+    </figcaption>
+</div>
+<p>朴素地设置了 <code>config</code> 结构体中的一些成员变量，所以我们看一下 <code>sel4utils_process_config_t</code> 结构的定义：</p>
+<pre><code class="language-c">typedef struct
+{
+    /* should we handle elf logic at all? */
+    bool is_elf;
+    /* if so what is the image name? */
+    const char * image_name;
+    /* Do you want the elf image preloaded? */
+    bool do_elf_load;
+
+    /* otherwise what is the entry point and sysinfo? */
+    void * entry_point;
+    uintptr_t sysinfo;
+
+    /* should we create a default single level cspace? */
+    bool create_cspace;
+    /* if so how big ? */
+    int one_level_cspace_size_bits;
+    /* if not by what CPtr can the initial thread of the process
+     * invoke its own TCB (optional) */
+    seL4_CPtr dest_cspace_tcb_cptr;
+
+    /* otherwise what is the root cnode ?*/
+    /* Note if you use a custom cspace then
+     * sel4utils_copy_cap_to_process etc will not work */
+    vka_object_t cnode;
+
+    /* do you want us to create a vspace for you? */
+    bool create_vspace;
+    /* if not what is the page dir, and what is the vspace */
+    vspace_t *vspace;
+    vka_object_t page_dir;
+
+    /* if so, is there a regions you want left clear?*/                                     
+    sel4utils_elf_region_t *reservations;
+    int num_reservations;
+    
+    /* do you want a fault endpoint created? */
+    bool create_fault_endpoint;
+    /* otherwise what is it */
+    vka_object_t fault_endpoint;
+
+    /* scheduling params */
+    sched_params_t sched_params;
+
+    seL4_CPtr asid_pool;
+} sel4utils_process_config_t;
+</code></pre>
+<p><code>sel4utils_process_config_t</code> 的内容实在丰富。前 <code>3</code> 个成员变量均用于设置线程对 <code>elf</code> 文件的执行：</p>
+<p><code>@property is_elf</code> 进程是否要加载执行 <code>elf</code> 文件。</p>
+<p><code>@property image_name</code> 进程加载执行的 <code>elf</code> 文件名。（如果确定要加载执行 <code>elf</code> 文件而不是执行一个任务函数）</p>
+<p><code>@property do_elf_load</code> 是否预加载 <code>elf</code> 文件。</p>
+<p>接下来 <code>2</code> 个成员变量也很重要：</p>
+<p><code>@property entry_point</code> 如果 <code>process</code> 不加载执行其他 <code>elf</code> 文件，那它应该执行一个同 <code>elf</code> 文件中的任务函数，用 <code>entry_point</code> 指定该函数的位置（也即 <code>process</code> 运行的入口）。</p>
+<p><code>@property sysinfo</code> 若 <code>process</code> 决定执行一个任务函数，则在 <code>sysinfo</code> 中向它提供一些必要的系统信息。</p>
+<p>了解以上内容后，我们看一下本 <code>quiz</code> 中对上述各函数的调用：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/sel4_set_configt_and_configure_a_process.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>新建 process_config_t 并用以设置新建线程</font>
+    </figcaption>
+</div>
+<p><code>process_config_default_simple</code> 的调用过程中：</p>
+<ul>
+<li>
+<p><code>APP_IMAGE_NAME</code> 是宏定义，展开值为 &quot;app&quot;，<code>APP_PRIORITY</code> 展开值为 &quot;seL4_MaxPrior&quot;。</p>
+</li>
+<li>
+<p>调用链中 <code>process_config_default_simple</code> 接着调用了 <code>process_config_elf</code>，该函数的定义可向上参阅。</p>
+</li>
+</ul>
+<p>&quot;app&quot; 即新建 <code>process</code> 要加载执行的 <code>ELF</code> 文件，我们看一下 <code>app.c</code> 的部分源代码：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/app_entry.JPG" alt="automatic-scalability" width=60%>
+	<figcaption >
+        <font size=2>app.c 程序</font>
+    </figcaption>
+</div>
+<p>My keen readers，或者说孩子们，已经看出重点在何处了：<code>app.c</code> 的程序入口是 <code>main</code> 函数，所以它编译出的可执行文件（或说 <code>ELF</code> 文件，或说可链接文件？）是不能和 <code>main.c</code> 编译出的文件链接到一起的。（<code>main.c</code> 也有自己的 <code>main</code> 函数）</p>
+<p>于是就可以在 <code>main.c</code> 中调用一些 <code>API</code>，新建并初始化一个 <code>process</code> 对象，将 <code>process</code> 设置为名为 <code>app</code> 的 <code>ELF</code> 文件的运行抽象，同时也是 <code>main.c</code> 运行抽象的一个子线程。</p>
+<h3 id="get-a-cspacepath">Get a <code>cspacepath</code></h3>
+<blockquote>
+<p>In this scenario, our threads do <strong>not</strong> share the same CSpace! The only way the new thread will know which endpoint it needs a capability to, is if we tell it.</p>
+<p>We must provide our new thread with both a capability to the endpoint we’re listening on, and also make sure, that that capability we give it has sufficient privileges to send across the endpoint.</p>
+</blockquote>
+<p>本 <code>quiz</code> 中新建的线程并不和 <code>main</code> 线程共享 <code>CSpace</code>，因此无法直接访问 <code>CSpace</code> 获得一个 <code>endpoint capability</code>。</p>
+<p><code>main</code> 线程（消息接收者）要想和新建线程（消息发送者）通信，必须拷贝一份 <code>endpoint capability</code> 发送给新建线程，同时要赋予该 <code>capability</code> 足够的权限以便新建线程能通过它向 <code>main</code> 线程发送回复或其他消息。</p>
+<blockquote>
+<p>In this tutorial we spawned the new thread as a sender, and decided to just pre-initialize the sender’s CSpace with a sufficient capability to enable it to send to us right from the start of its execution.</p>
+</blockquote>
+<p>本 <code>quiz</code> 中，我们在创建新线程前就搞定 <code>badged endpoint capability</code> 的一切必要设置。毕竟前一章中已经详细学习了 <code>IPC</code> 的基本操作。</p>
+<blockquote>
+<p>So we use <code>vka_cspace_make_path()</code>, which locates one free capability slot in the selected CSpace, and returns a handle to it, to us.</p>
+</blockquote>
+<p>语焉不详，看一下 <code>vka_cspce_make_path</code> 的定义（我认为这就是定义，不是声明——我们嚼蛆——我们沉沦）：</p>
+<pre><code class="language-c">/**
+ * Convert an allocated cptr to a cspacepath, for use in
+ * operations such as Untyped_Retype
+ *
+ * @param data cookie for the underlying allocator
+ * @param slot a cslot allocated by the cspace alloc function
+ * @param res pointer to a cspacepath struct to fill out
+ */
+typedef void (*vka_cspace_make_path_fn)(void * data, seL4_CPtr slot, cspacepath_t *res);
+</code></pre>
+<p><code>vka_cspace_make_path</code> 查找 <code>@param slot</code> 在指定 <code>CSpace</code> 中的位置并将位置信息赋值给 <code>@param res</code>。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/cspace_path结构体.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>定义——cspacepath_t 结构体</font>
+    </figcaption>
+</div>
+<p><code>vka_cspace_make_path</code> 所查找的 <code>capability</code> 必然是某线程通过 <code>vka</code>（<code>@param data</code>）申请的内存对象的 <code>capability</code>，而所谓“指定 <code>CSpace</code>”也就是该线程的 <code>CSpace</code>。</p>
+<h3 id="badge-a-capability">Badge a capability</h3>
+<pre><code class="language-c">seL4_CPtr sel4utils_mint_cap_to_process(sel4utils_process_t * process,
+                                        cspacepath_t src,
+                                        seL4_CapRights rights,
+                                        seL4_Word data);
+</code></pre>
+<p><code>sel4utils_mint_cap_to_process(...);</code> 将目的 <code>capability</code>（<code>@param src</code>）在目的 <code>process</code>（<code>@param process</code>）的 <code>CSpace</code> 中复制一份，并为 <code>duplicated capability</code> 设置一些特殊数据（<code>@param data</code>），比如 <code>badge</code> 号：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/拷贝capability.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>拷贝 endpoint capability 并作 badge 标记</font>
+    </figcaption>
+</div>
+<h3 id="spawn-a-process">Spawn a process</h3>
+<pre><code class="language-c">int sel4utils_spawn_process_v(sel4utils_process_t * process,
+                              vka_t * vka,
+                              vspace_t * vspace,
+                              int argc,
+                              char * argv[],
+                              int resume);
+</code></pre>
+<p><code>sel4utils_spawn_process_v(...);</code> 用于启动一个完成了所有初始化设置的 <code>process</code>，几个重要的入口参数值得注意：</p>
+<p><code>@param vspace</code> 为新线程指定的 <code>VSpace</code>。</p>
+<p><code>@param argc</code> 传递给新线程的任务函数的执行参数的个数。</p>
+<p><code>@param argv[]</code> 传递给新线程的任务函数的执行参数列表。</p>
+<p>传递给任务函数的执行参数需要专门构建：</p>
+<pre><code class="language-c">void sel4utils_create_word_args(char strings[][WORD_STRING_SIZE],
+                                char * argv[],
+                                int argc,
+                                ...)
+</code></pre>
+<p><code>sel4utils_create_word_args(...);</code> 用于构建传递给某线程的任务函数的执行参数，**使用了可变参数列表定义法，来者不善。**入口参数的含义如下：</p>
+<p><code>@param strings</code> empty 2d array of chars to populate with word strings</p>
+<p><code>@param argv</code> empty 1d array of char pointers which will be set up with pointers to strings in strings</p>
+<p><code>@param argc</code> number of words</p>
+<p><code>@param ...</code> list of words to create arguments from.</p>
+<p>执行参数的数量由 <code>argc</code> 决定，参数将保存在二维数组 <code>char strings[][]</code> 中，每个参数都将被当作 <code>char * </code> 类型写入 <code>strings</code>，单条参数的最大长度为 <code>WORD_STRING_SIZE</code>。</p>
+<p>参数内容即 <code>...</code> 传递的内容，比较特别的是：本 <code>quiz</code> 中将一个 <code>badged endpoint capability</code> 作为唯一参数，把它当作 <code>char *</code> 写入 <code>strings</code>。</p>
+<p><code>argv</code> 是一个 <code>char *</code> 数组，每个 <code>char *</code> 都指向 <code>strings</code> 中的一个参数。在上面的 <code>sel4utils_spawn_process_v(...);</code> 中我们也看到：给任务函数传递执行参数时使用的就是 <code>char * argv[]</code>，而不是 <code>char strings[][]</code>。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic3/为任务函数准备参数并启动线程.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>为任务函数准备参数并启动线程</font>
+    </figcaption>
+</div>
+<h3 id="receive-a-message">Receive a message</h3>
+<p><code>main</code> 线程调用 <code>seL4_Recv();</code> 阻塞式接收 <code>IPC</code> 消息。</p>
+<h3 id="client-call">Client Call</h3>
+<p>按 <code>quiz</code> 源代码的逻辑来说，<code>Client Call</code> 节应当在 <code>Send a reply</code> 之前。这一节中，新建线程首先从父线程传递给自己的任务执行参数中获取了 <code>badged endpoint capability</code>，然后调用 <code>seL4_Call(...);</code> 向父线程发送消息并阻塞等待父线程回复。</p>
+<h3 id="send-a-reply">Send a reply</h3>
+<p>父线程调用 <code>seL4_ReplyRecv(...);</code> 向子线程发送回复信息。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#exercises">Exercises</a>
+<ul>
+<li><a href="#virtual-memory-management">Virtual memory management</a></li>
+<li><a href="#configure-a-process">Configure a process</a></li>
+<li><a href="#get-a-cspacepath">Get a <code>cspacepath</code></a></li>
+<li><a href="#badge-a-capability">Badge a capability</a></li>
+<li><a href="#spawn-a-process">Spawn a process</a></li>
+<li><a href="#receive-a-message">Receive a message</a></li>
+<li><a href="#client-call">Client Call</a></li>
+<li><a href="#send-a-reply">Send a reply</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_c-libraries_tutorial-sel4-libraries_ipc/">
+              <h3 class="post-title">
+                seL4_C-Libraries_tutorial-seL4 Libraries_IPC
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

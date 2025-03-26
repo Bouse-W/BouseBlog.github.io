@@ -1,0 +1,478 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_IPC | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_IPC | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/IPC
+部分文段做了微小增删使句子通顺。
+Background
+
+Interprocess communication (IPC..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_IPC
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/ipc"><code>seL4</code> Docs/Tutorials/IPC</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="background">Background</h2>
+<blockquote>
+<p>Interprocess communication (IPC) is the microkernel mechanism for synchronous transmission of small amounts of data and capabilities between processes</p>
+</blockquote>
+<p><code>IPC</code> 可用于进程间<strong>同步</strong>传递数据或 <code>capabilities</code>。</p>
+<blockquote>
+<p>In seL4, IPC is facilitated by small kernel objects known as <em>endpoints</em>, which act as general communication ports.</p>
+</blockquote>
+<p><code>seL4</code> 中，线程使用名为 <code>endpoints</code> 的内核对象进行 <code>IPC</code>。</p>
+<blockquote>
+<p>Endpoints consist of a queue of threads waiting to send, or waiting to receive messages.</p>
+</blockquote>
+<p><code>endpoints</code> 由一组等待发送消息的线程和一组等待接收消息的线程组成。和 <code>FreeRTOS</code> 中的消息队列非常相像。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/free_rtos消息队列.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>FreeRTOS 消息队列设计</font>
+        <br>
+        <font size=2>截图自《FreeRTOS 内核实现与应用开发实战指南——基于 STM32》.P225
+    </figcaption>
+</div>
+<h3 id="system-calls">System calls</h3>
+<blockquote>
+<ul>
+<li><code>seL4_Send</code>,
+<ul>
+<li>send messages on endpoints, which blocks until the message has been consumed by another thread.</li>
+</ul>
+</li>
+<li><code>seL4_NBSend</code> ,
+<ul>
+<li>performs a polling send: the send is only successful if a receiver is already blocked waiting for a message, and otherwise fails.</li>
+<li>To avoid a back channel, <code>seL4_NBSend</code> does not return a result indicating if the message was sent or not.</li>
+</ul>
+</li>
+<li><code>seL4_Recv</code>, <code>seL4_NBRecv</code>,
+<ul>
+<li>receive messages, and <code>seL4_NBRecv</code> can be used to poll for messages.</li>
+</ul>
+</li>
+<li><code>seL4_Call</code>,
+<ul>
+<li>essentially combines an <code>seL4_Send</code> and an <code>seL4_Recv</code> with one major difference: <strong>in the receive phase, thread which uses this function is blocked on a one-time capability termed a <em>reply capability</em>, and not the endpoint itself</strong>.
+<ul>
+<li>In a client-server scenario, where clients use <code>seL4_Call</code> to make requests, the server can explicitly reply to the correct client.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>seL4_Reply</code>,
+<ul>
+<li>invokes the reply capability that is stored internally in the thread control block (TCB) of the receiver to  sends an IPC to the client and wakes it up.</li>
+</ul>
+</li>
+<li><code>seL4_ReplyRecv</code>,
+<ul>
+<li>does the same thing as seL4_Reply, except it sends the reply and blocks on the provided endpoint in a combined system call.</li>
+</ul>
+</li>
+<li><code>seL4_CNode_SaveCaller</code>,
+<ul>
+<li>save the reply capability to an empty slot in the receivers CSpace.</li>
+<li>Since TCBs have a single space to store a reply capability, if servers need to service multiple requests (e.g saving requests to reply at a later time, after hardware operations have been completed), <code>seL4_CNode_SaveCaller</code> will make sense</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>有三个值得注意的 <code>API</code>：</p>
+<ol>
+<li>
+<p><code>seL4_Call</code></p>
+<p>将 <code>seL4_Send</code> 和 <code>seL4_Recv</code> 合二为一，一次调用完成一发一收，但与分别调用收发 <code>API</code> 有一个重大区别：<code>seL4_Call</code> 在接收消息阶段将调用者进程阻塞在一个一次性的 <code>reply capability</code> 上，而 <code>seL4_Recv</code> 将调用者进程阻塞在 <code>endpoint capability</code> 上。</p>
+</li>
+<li>
+<p><code>seL4_Reply</code></p>
+<p>通过一次性的 <code>reply capability</code> 向 <code>IPC</code> 另一方回复消息。<code>reply capability</code> 默认保存在 <code>TCB</code> 中。（<code>seL4_Reply</code> 向默认的 <code>reply capability</code> 发送消息，是不需要指定目的 <code>capability</code> 的，这同 <code>seL4_Send</code> 和 <code>seL4_ReplyRecv</code> 形成区别。）</p>
+</li>
+<li>
+<p><code>seL4_CNode_SaveCaller</code></p>
+<p>由于 <code>TCB</code> 中只能默认保存一个 <code>reply capabiity</code>，当一个 <code>server</code> 面对多个 <code>client</code> 时，可以调用 <code>seL4_CNode_SaveCaller</code> 保存多个不同的 <code>reply capability</code>。</p>
+<p>调用 <code>seL4_CNode_SaveCaller</code> 多用于延迟处理 <code>IPC</code> 通信请求，比如当 <code>server</code> 端正在处理数据（如硬件网卡收到的网络包）时，<code>client</code> 的请求到达（申请网络数据），<code>server</code> 可以调用 <code>API</code> 保存 <code>reply capability</code>，待数据处理完毕后再恢复通信（参见 <code>Exercise</code> 的 <code>Save a reply and store reply capabilities</code> 小节)。</p>
+<p>显然，<code>seL4_CNode_SaveCaller</code> 需要一个依据来确定到底保存面向哪个 <code>client</code> 的 <code>reply capability</code>，<code>seL4_CNode_SaveCaller</code> 直接默认保存调用者线程最新一次被调度执行时 <code>TCB</code> 中的 <code>reply capability</code>。</p>
+</li>
+</ol>
+<h3 id="ipc-buffer">IPC Buffer</h3>
+<blockquote>
+<p>Each thread has a buffer (referred to as the <em>IPC buffer</em>), which contains the payload of the IPC message, consisting of data and capabilities.</p>
+<p>Senders specify a message length and the kernel copies this (bounded) amount between the sender and receiver IPC buffer.</p>
+</blockquote>
+<p>每个线程都有一个 <code>IPC</code> 消息缓冲区，线程间 <code>IPC</code> 时，内核从发送线程的缓冲区复制消息，粘贴到接收线程的缓冲区。可见 <code>seL4 IPC</code> 是由内核代理完成的，没有使用共享内存等机制，提升了安全性。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/seL4_Call.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>seL4_Call</font>
+        <br>
+        <font size=2>线程只从自己的 IPC buffer 中读写内容，线程间消息传递由内核代劳，即调用函数 "arm_sys_send_recv"</font>
+        <br>
+        <font size=2>源代码在 ipc_build/kernel/libsel4/arch_include/arm/sel4/syscalls.h，不同体系结构应有细微不同
+    </figcaption>
+</div>
+<h3 id="data-transfer">Data transfer</h3>
+<blockquote>
+<p>The IPC buffer contains a bounded area of message registers (MR) used to transmit data on IPC. Each register is the machine word size.</p>
+</blockquote>
+<p><code>IPC buffer</code> 中有一块由消息寄存器（message registers）组成的有界区域，被用来传输数据。消息寄存器的长度等于机器字长。</p>
+<blockquote>
+<p>Messages can be loaded into the IPC buffer using <code>seL4_SetMR</code> and extracted using <code>seL4_GetMR</code>. Small messages are sent in registers and do not require a copy operation</p>
+</blockquote>
+<p>可以调用 <code>seL4_SetMR</code> 和 <code>seL4_GetMR</code> 在 <code>IPC buffer</code> 中读写消息。（这和前面的几个系统调用有哪些区别？）</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/seL4_Get_Set_MR.JPG" alt="automatic-scalability" width=60%>
+	<figcaption >
+        <font size=2>seL4 读写 MR 函数</font>
+        <br>
+        <font size=2>源代码在 ipc_build/kernel/libsel4/include/sel4/functions.h
+    </figcaption>
+</div>
+<p>短消息直接从寄存器中收发，不需要拷贝操作。（这是共享内存？）</p>
+<blockquote>
+<p>The amount of data being transferred, in terms of the number of message registers used, must be set in as the <code>length</code> field in the <code>seL4_MessageInfo_t</code> data structure.</p>
+</blockquote>
+<p>发送的数据量，也即消息寄存器的使用个数，必须在 <code>length</code> 域中显式设置，这个域属于 <code>seL4_MessageInfo_t</code> 数据结构。</p>
+<h3 id="cap-transfer">Cap transfer</h3>
+<blockquote>
+<p>Along with data, IPC can be used to send capabilities between processes per message. This is referred to as <em>cap transfer</em>.</p>
+<p>The number of capabilities being transferred is encoded in the <code>seL4_MessageInfo_t</code> structure as <code>extraCaps</code>.</p>
+</blockquote>
+<p><code>IPC</code> 可在进程间传递消息，也可传递 <code>capability</code>。每次通信要传递的 <code>capability</code> 数量保存在 <code>seL4_MessageInfo_t</code> 结构的 <code>extraCaps</code> 域中。</p>
+<p>下面是一个 <code>IPC</code> 收发 <code>capability</code> 的例子：</p>
+<pre><code class="language-c">/* Sender */
+seL4_MessageInfo info = seL4_MessageInfo_new(0, 0, 1, 0);
+seL4_SetCap(0, free_slot);
+seL4_Call(endpoint, info);
+
+/* Receiver */
+/* Receiver must specify a cspace address to place the received capability in */
+seL4_SetCapReceivePath(cnode, badged_endpoint, seL4_WordBits);
+seL4_Recv(endpoint, &amp;sender);
+
+/* After receiving a badged capability from the sender, receiver can then communicate with its counterpart throw that somewhat special capability, which means &quot;badged_endpoint&quot; here */
+</code></pre>
+<blockquote>
+<p>The access rights of the received capability are the same as by the rights that the receiver has to the endpoint.</p>
+<p>Note that while senders can send multiple capabilities, receivers can only receive one at a time.</p>
+</blockquote>
+<p>接收者对收到的 <code>capability</code> 的访问权限和它对通信 <code>endpoint</code> （的 <code>capability</code>）的访问权限相同。</p>
+<p>发送者可以一次发送多个 <code>capability</code>，但接收者一次只能接收一个 <code>capability</code>。</p>
+<h3 id="capability-unwrapping">Capability unwrapping</h3>
+<blockquote>
+<p><strong>If the n-th capability in the message refers to the endpoint through which the message is sent, the capability is unwrapped</strong>:</p>
+<ol>
+<li>its badge is placed into the n-th position of the receiver’s IPC buffer (in the field <code>caps_or_badges</code>),</li>
+<li>and the kernel sets the n-th bit (counting from the least significant) in the <code>capsUnwrapped</code> field of <code>seL4_MessageInfo_t</code></li>
+</ol>
+</blockquote>
+<p><code>Capability unwrapping</code> 译作“能力扩展”是否合适？</p>
+<p>若 <code>IPC</code> 消息中的第 <code>n</code> 个 <code>capability</code> 索引的是本次 <code>IPC</code> 所使用的 <code>endpoint</code>，那这个 <code>capaility</code> 就被 <code>unwapped</code>（扩展）了。</p>
+<p><font color=blue>我的理解是：收发双方通过 <code>endpoint</code> 传递消息，此时可能出现一对多的情况，以<u>一收多发</u>为例：一个 <code>server</code> 进程要接收几个 <code>client</code> 进程发送的不同数据，此时需要区分不同的 <code>IPC</code> 通路（或说信道），那么可以：</font></p>
+<ol>
+<li>
+<p><font color=blue>在 <code>server</code> 进程中将收发双方最初用于建立 <code>IPC</code> 连接的那个公共 <code>endpoint</code> 复制 <code>n</code> 份，每一份用不同的 <code>badge</code> 标记并分别发送给不同的 <code>client</code>，</font></p>
+</li>
+<li>
+<p><font color=blue>之后 <code>server</code> 调用接收 <code>API</code>，在收取消息的同时可以收取发送者的 <code>badge</code> 标记，</font></p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/seL4_Recv接收消息和标记.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>调用 seL4_Recv 接收消息和标记</font>
+    </figcaption>
+</div>
+</li>
+<li>
+<p><font color=blue><code>server</code> 根据标记的不同分别保存和各个 <code>client</code> 进行一对一通信的 <code>endpoint capability</code>：</font></p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/save_and_hang_up_caller.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>Save caller and hang up it for a moment</font>
+    </figcaption>
+</div>
+<p>调用 <code>seL4_CNode_SaveCaller</code> 后，会阻塞这条通信连接，直到下一次调用 <code>seL4_Send</code> 才将其唤醒。</p>
+</li>
+</ol>
+<p><font color=blue>实际上，这就是后面 <code>Exercise</code> 节的部分内容：调用 <code>seL4_CNode_Mint</code> 复制 <code>endpoint capability</code> 并用 <code>badge</code> 标记。</font></p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/sel4_cnode_mint.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>调用 seL4_CNode_Mint</font>
+    </figcaption>
+</div>
+<p>若 <code>endpoint capability</code> 是发送消息中的第 <code>n</code> 个 <code>capability</code>，那么消息描述结构体 <code>seL4_MessageInfo_t</code> 的 <code>capUnwrapped</code> 域的第 <code>n</code> 位置为 <code>1</code>，接收方会在 <code>IPC buffer</code> 的 <code>caps_or_badges</code> 域的第 <code>n</code> 处收到 <code>endpoint caability</code>。</p>
+<h3 id="message-info">Message Info</h3>
+<blockquote>
+<p>The <code>seL4_MessageInfo_t</code> data structure is used to describe a message to be sent to seL4, and for seL4 to describe the message that was sent to the receiver.</p>
+<p><code>seL4_MessageInfo_t</code> contains the following fields:</p>
+<ul>
+<li><code>length</code> the amount of message registers (data) in the message (<code>seL4_MsgMaxLength</code> maximum),</li>
+<li><code>extraCaps</code> the number of capabilities in the message (<code>seL4_MsgMaxExtraCaps</code>)</li>
+<li><code>capsUnwrapped</code> marks any capabilities unwrapped by the kernel.</li>
+<li><code>label</code> data that is transferred unmodified by the kernel from sender to receiver,</li>
+</ul>
+</blockquote>
+<p><code>seL4_MessageInfo_t</code> 结构用来描述 <code>IPC</code> 消息的基本信息。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/initialise_MessageInfo.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>初始化一个 MessageInfo 结构</font>
+        <br>
+        <font size=2>源代码在 ipc_build/libsel4/include/sel4/shared_types_gen.h
+    </figcaption>
+</div>
+<h3 id="badges">Badges</h3>
+<blockquote>
+<p>Along with the message the kernel additionally delivers the badge of the endpoint capability that the sender invoked to send the message.</p>
+<p>Once an endpoint is badged, the badge of the endpoint is transferred to any receiver that receives messages on that endpoint.</p>
+</blockquote>
+<p><code>badge</code> 全称应是 <code>bage of the endpoint capability</code>。<code>badge</code> 译作“标记”是否合适？</p>
+<p><code>IPC</code> 过程中，发方先占有 <code>endpoint</code>，将 <code>endpoint capability</code> 的 <code>badge</code> 和实际要发的消息打包一并发送给收方，收方收到 <code>badge</code> 后可以使用 <code>endpoint</code>。</p>
+<h3 id="fastpath">Fastpath</h3>
+<blockquote>
+<p>IPC has a fastpath – a heavily optimised path in the kernel – which allows these operations to be very fast.</p>
+</blockquote>
+<p><code>seL4</code> 这种微内核系统中，中各种服务程序都是相互隔离的，所以 <code>IPC</code> 机制非常重要，而 <code>IPC</code>  的快速执行也是不可或缺的，<code>seL4</code> 内核提供了一种高度优化的 <code>IPC</code> 路径实现快速通信。这种设计理念有点像 <code>Unix</code> 的“管道”。</p>
+<blockquote>
+<p>In order to use the fastpath, an IPC must meet the following conditions:</p>
+<ul>
+<li><code>seL4_Call</code> or <code>seL4_ReplyRecv</code> must be used.</li>
+<li>The data in the message must fit into the <code>seL4_FastMessageRegisters</code> registers.</li>
+<li>The processes must have valid address spaces.</li>
+<li>No caps should be transferred.</li>
+<li>No other threads in the scheduler of higher priority than the thread unblocked by the IPC can be running.</li>
+</ul>
+</blockquote>
+<h2 id="exercises">Exercises</h2>
+<h3 id="use-capability-transfer-to-send-the-badged-capability">Use capability transfer to send the badged capability</h3>
+<p><code>IPC</code> 发送方的基本操作：</p>
+<ol>
+<li>初始化 <code>seL4_MessageInfo_t</code> 结构对象。</li>
+<li>向 <code>IPC buffer</code> 写待发送消息：<code>data</code> 和 <code>capability</code>，调用函数 <code>seL4_SetMR</code> 和函数 <code>seL4_SetCap</code>。</li>
+<li>向 <code>endpoint</code> 发消息：调用系统调用 <code>seL4_Send</code>、<code>seL4_Call</code> 和 <code>seL4_Reply</code> 等。</li>
+</ol>
+<div align="center">
+    <center class="half">
+    	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/client_send.JPG" width=400>
+        <figcaption>
+            <font size=2>发送 data</font>
+        </figcaption>
+    	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/server_send.JPG" width=400>
+        <figcaption>
+            <font size=2>发送 capability</font>
+        </figcaption>
+    </center>
+</div>
+<h3 id="get-a-message-reply-and-wait">Get a message &amp; Reply and wait</h3>
+<p><code>seL4_Reply_Recv()</code> 等价于 <code>seL4_Reply() + seL4_Recv()</code>。</p>
+<p><code>seL4_Reply()</code> 可向对方发送回复信息。</p>
+<h3 id="save-a-reply-and-store-reply-capabilities">Save a reply and store reply capabilities</h3>
+<blockquote>
+<p>You will need to use <code>seL4_CNode_SaveCaller</code> to save the reply capability for each sender. You can use <code>free_slot</code> to store the reply capabilities.</p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/save_caller.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>Save caller and restore communication later by calling seL4_Send</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/ipc/final_result.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>Final result</font>
+    </figcaption>
+</div>
+<h2 id="one-more-thing-or-more">One more thing (or more?)</h2>
+<ul>
+<li>Try using <code>seL4_Send</code> and <code>seL4_Recv</code>.</li>
+<li>Try the non-blocking variants, <code>seL4_NBSend</code> and <code>seL4_NBRecv</code>.</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#system-calls">System calls</a></li>
+<li><a href="#ipc-buffer">IPC Buffer</a></li>
+<li><a href="#data-transfer">Data transfer</a></li>
+<li><a href="#cap-transfer">Cap transfer</a></li>
+<li><a href="#capability-unwrapping">Capability unwrapping</a></li>
+<li><a href="#message-info">Message Info</a></li>
+<li><a href="#badges">Badges</a></li>
+<li><a href="#fastpath">Fastpath</a></li>
+</ul>
+</li>
+<li><a href="#exercises">Exercises</a>
+<ul>
+<li><a href="#use-capability-transfer-to-send-the-badged-capability">Use capability transfer to send the badged capability</a></li>
+<li><a href="#get-a-message-reply-and-wait">Get a message &amp; Reply and wait</a></li>
+<li><a href="#save-a-reply-and-store-reply-capabilities">Save a reply and store reply capabilities</a></li>
+</ul>
+</li>
+<li><a href="#one-more-thing-or-more">One more thing (or more?)</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_interrupts/">
+              <h3 class="post-title">
+                seL4_Interrupts
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

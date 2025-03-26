@@ -1,0 +1,585 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>一次用时长达四天的期末复习——关于网络与分布式计算 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="一次用时长达四天的期末复习——关于网络与分布式计算 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="期末！复习！四天（不到）！还是一学期就去上了第一节课和最后一节课的网络与分布式！
+这么艰难的处境下（我也会感觉到艰难？），为什么还要跑来做笔记，做网络与分布式的笔记？为什么不像对付软件测试那样，闷着头乱背一气最后考场上随便答点东西了事？
+主..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              一次用时长达四天的期末复习——关于网络与分布式计算
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                17 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>期末！复习！四天（不到）！还是一学期就去上了第一节课和最后一节课的网络与分布式！</p>
+<p>这么艰难的处境下（我也会感觉到艰难？），为什么还要跑来做笔记，做网络与分布式的笔记？为什么不像对付软件测试那样，闷着头乱背一气最后考场上随便答点东西了事？</p>
+<p>主要是因为我觉得这门课还是可以为做一些小业务和小项目提供一点方法和思路的，这个想法产生于我被逼着做了一遍 <code>RMI</code> 相关的课程实验之后。</p>
+<p>Anyway，能看一点是一点吧。</p>
+<p>引用内容若无明确标注则均来自任课老师提供的课件。可能有不严谨或出错之处，等我有空了再行勘误。</p>
+<p>等我有空了再行勘误就是说不勘误。</p>
+<p>以下正文。</p>
+<h5 id="01-概述">01-概述</h5>
+<ul>
+<li>
+<p>分布式系统的定义</p>
+<ul>
+<li>分布式计算系统是由多个相互连接的计算机组成的一个整体，这些计算机在一组系统软件（分布式操作系统或<strong>中间件</strong>）环境下，合作执行一个共同的或不同的任务，<strong>最少依赖于集中的控制过程、数据和硬件</strong>。</li>
+<li>当前技术最成熟、应用最广泛的是使用中间件连接的分布式系统。</li>
+</ul>
+</li>
+<li>
+<p>分布式系统内不存在层次控制、没有全局时钟、大多数情况下没有共享内存。</p>
+</li>
+<li>
+<p>分布式操作系统在架构设计时也很讲究 <strong>scalbility</strong>。</p>
+</li>
+<li>
+<p>总线型多处理机系统</p>
+<ul>
+<li>硬件互连，共享存储器，规模一般较小。</li>
+<li>采用高速以太网或 Myrinet 网互连多个工作站。以太网很便宜，很皮实，带宽很高，很好用。
+<ul>
+<li>能否使用以太网连接异构节点（工作站）？如果能，使用以太网连接的异构节点是否还需要各自运行中间件以屏蔽异构性？</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>交换型多处理机系统和总线型多处理机系统都是硬件互连，共享存储器，因此都是 <code>UMA</code> 架构，即一致性存储访问架构。</p>
+<ul>
+<li><code>HPC</code> 课上了解到的 <code>ccNUMA</code> 属于 <code>NUMA</code> 架构，即非一致性存储访问架构。
+<ul>
+<li><code>ccNUMA</code>:</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>总线型和交换型多处理机系统架构都应该用于<strong>同构节点</strong>的互连。</p>
+</li>
+<li>
+<p>Middleware，中间件。用于提供一系列<strong>中间件服务</strong>。具体哪些服务 PPT 上念经我这里就不念了。</p>
+</li>
+<li>
+<p>几种分布式计算模式，挺有意思的。</p>
+<ul>
+<li>OOM
+<ul>
+<li>Object Oriented Model</li>
+</ul>
+</li>
+<li>SOM
+<ul>
+<li>Service Oriented Model</li>
+</ul>
+</li>
+<li>UBM
+<ul>
+<li>Utility Based Model</li>
+</ul>
+</li>
+<li>VJM
+<ul>
+<li>Voluntary Join Model</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="02-名字服务">02-名字服务</h5>
+<p>一个比较期待的 part。</p>
+<ul>
+<li>
+<p>域名服务是名字服务的一种实现。名字服务是一种宽泛的服务描述，仅定义一些基本概念和规范。</p>
+<ul>
+<li>有兴趣可以试试自己搓一个。</li>
+<li>基本概念我们一向视其为厨子的土豆和菜刀。名字服务的基本概念有实体、名字、地址（访问点）、属性、标识符、名字空间、名字域、名字服务器。</li>
+</ul>
+</li>
+<li>
+<p>黄页服务</p>
+<ul>
+<li>在特殊的文化环境中，起个这名字多少的确有点不合适😆。马云创业初期的一个重要产品就是“中国黄页”🤣。</li>
+<li>黄页服务即目录服务。目录服务基于目录数据库。目录数据库是命名实体与其一个或多个属性绑定的集合，属性包括属性类型和一个或多个属性值。传统黄页服务如 <code>X.500</code> 目录服务。</li>
+<li>在强互联网时代得到广泛应用的是<strong>名字服务</strong>，又称**“白页服务”**。
+<ul>
+<li>因为个人手机基本都有存储电话号码的功能。当代企业如果有在网上公开商务信息的需求，也普遍会选择创建自己的官网，不再需要一个“黄页服务提供者”帮自己整理和展示信息。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>关于名字解析的实现方式，有迭代解析和递归解析，这一点在一次完整的 DNS 中有良好体现。</p>
+</li>
+</ul>
+<p>看完了发现和期待的不一致。我只是太想知道 <code>java</code> 中的 <code>Naming</code> 类是做什么的了。</p>
+<h5 id="03-分布式进程">03-分布式进程</h5>
+<p>这是更期待的一个。因为我想到 <code>MPI</code> 并行编程。</p>
+<blockquote>
+<p><em>每个进程都对应于一个运行中的抽象。</em><sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup></p>
+</blockquote>
+<blockquote>
+<p><em>线程：在进程内部添加可独立执行的单元，它们共享进程的地址空间，但又各自保存运行时所需的状态。</em><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup></p>
+</blockquote>
+<blockquote>
+<p><em>用户态线程，即纤程。</em><sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
+</blockquote>
+<ul>
+<li>
+<p>用户级线程（ULT）由用户应用程序创建、调度、管理，<strong>OS 内核不知道用户级线程的存在</strong>。</p>
+<ul>
+<li>用户级线程可以在不支持线程的操纵系统中实现。那能否在不支持操作系统的系统中实现？</li>
+<li>用户级线程允许每个进程有自己定制的调度算法。</li>
+</ul>
+</li>
+<li>
+<p>内核级线程（KLT）的创建、调度、管理完全由 OS 内核负责，创建或销毁一个内核级线程时，需要进行一次系统调用。开销很大，几乎和进程的创建销毁相当。</p>
+<ul>
+<li>内核级线程是为哪些内核进程服务呢？有哪些内核级进程？</li>
+</ul>
+</li>
+<li>
+<p>Linux 内核中，没有“线程”的概念。</p>
+<ul>
+<li>Linux 内核中与线程相似的概念是<strong>轻量级进程（LWP）</strong>。即 Linux 内核中，任务执行、资源管理、任务调度的对象都是进程。突出一个强硬。</li>
+<li>与轻量级进程对应，还有<strong>重量级进程</strong>、<strong>中量级进程</strong>。</li>
+</ul>
+</li>
+<li>
+<p>一个经常被忽略但很强的多线程应用——Web 浏览器</p>
+<ul>
+<li>访问某页面的过程中，浏览器取得页面的主 <code>HTML</code> 文档，激活多个独立线程，分别取得页面的各个部分（图片、文字、链接等）。每个线程都与服务器建立一个独立连接并获取数据。</li>
+</ul>
+</li>
+<li>
+<p>关于<strong>分布式进程的创建</strong>，课件里讲了一包渣。关于<strong>分布式进程的定义</strong>，课件里根本没有。</p>
+<ul>
+<li>蒸馍，你不扶器😡？</li>
+</ul>
+</li>
+<li>
+<p>关于<strong>远程进程执行</strong>，课件里选择了含混不清地玩概念和没头没脑地举例子。</p>
+<ul>
+<li>蒸馍，你不扶器😡？</li>
+<li><code>MPI</code> 并行编程是否实现了远程进程执行的一些概念和规定？</li>
+<li><code>RPC</code> 编程是否实现了远程进程执行的一些概念和规定？</li>
+</ul>
+</li>
+<li>
+<p><strong>进程迁移</strong>指将一个正在运行的进程挂起，将其状态与资源全部封装后，从源节点转移到目标节点，并在目标节点上恢复现场并继续执行。同时保证与被迁移进程有通信关系的其他进程和进程间完成<strong>通信转移</strong>。</p>
+<ul>
+<li>
+<p>进程迁移可用来实现<strong>系统动态管理</strong>、<strong>动态负载平衡</strong>。但是可想而知运行开销很大。</p>
+</li>
+<li>
+<p>了解了<strong>操作转发</strong>后，明白了进程迁移时，源处理机和目标处理机<strong>不一定必须共享文件系统</strong>。</p>
+<ul>
+<li>与本地设备（位置）有关的 <code>I/O</code> 资源状态和一些内核堆栈信息如文件句柄、文件描述符表、文件打开表，这些资源无法迁移到远程处理机。进程迁移后对这些资源的操作只能<strong>转发到原处理机上执行</strong>。</li>
+<li>我以为转发机制仅是原处理机获取进程执行的中间数据和结果时使用。</li>
+</ul>
+</li>
+<li>
+<p>进程迁移的最后一步是<strong>操作转发</strong>，利用转发机制或单一系统映像的性质保证进程可以在远程处理机上透明执行。</p>
+<ul>
+<li>操作转发是进程迁移后保持正常运行的一个持续过程，不是一个单点步骤。</li>
+<li>原处理机仍要保持对迁移进程的管理和使用权限。并向远程处理机器提供对不可迁移资源的操作。</li>
+</ul>
+</li>
+<li>
+<p>同步迁移算法</p>
+<ul>
+<li>CoCheck 系统
+<ul>
+<li>CoCheck 系统实现了进程同步迁移。</li>
+<li>在 <code>MPI</code> 并行编程有极佳应用。详见 <a href="https://ieeexplore.ieee.org/document/508106">CoCheck: checkpointing and process migration for MPI|IEEE|ieeexplore.ieee.org</a>。知识终于并轨了。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>异步迁移算法</p>
+<ul>
+<li>DynamicPVM 系统
+<ul>
+<li>同样在 <code>MPI</code> 并行编程有极佳应用。详见 <a href="https://link.springer.com/chapter/10.1007/3-540-57981-8_130">DynamicPVM|SpringerLink|link.springer.com</a>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>类异步迁移算法</p>
+<ul>
+<li>VDPC 集群系统（可把他北航显出来了）
+<ul>
+<li>反正一般的搜索引擎搜不到，加了北航的 <code>tag</code> 也不行🙄。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="04-分布式系统通信">04-分布式系统通信</h5>
+<p>这个同样抱有期待。在课程安排中首次讲到了 <code>RMI</code> 和 <code>RPC</code>。</p>
+<ul>
+<li>
+<p><strong>消息</strong>是分布式系统最基本的通信机制，其他通信机制都建立在消息机制之上，无非是消息的高级抽象或封装。</p>
+</li>
+<li>
+<p><strong>通信层</strong>建立在节点操作系统和网络<strong>传输层协议</strong>之上</p>
+<ul>
+<li><a href="https://www.zhihu.com/question/421985640/answer/3305068047">锐评 from 序说.Next@知乎</a>：破 TCP/IP 说成万物互联，一下就牛 X 多了。@小米@华为@友商</li>
+</ul>
+</li>
+<li>
+<p>结合 <code>MQTT</code> 协议和基于 <code>ARQP</code> 协议的 <code>RabbitMQ</code> 理解分布式系统中的消息传送。（确实，都说了是破 TCP/IP）</p>
+<ul>
+<li>同步消息传送
+<ul>
+<li>同步就是等回复。收发双方都等。相当于收到响应之前一直阻塞。</li>
+</ul>
+</li>
+<li>阻塞发送/接收
+<ul>
+<li>引入消息缓冲区概念。有发送缓冲区和接收缓冲区。</li>
+<li>阻塞是收/发是说收方在读缓冲区时阻塞，发方在写入缓冲区时阻塞，其余时刻不阻塞。</li>
+<li>阻塞收/发的任务在收/发进程执行到收/发原语是执行。</li>
+</ul>
+</li>
+<li>非阻塞发送/接收
+<ul>
+<li>将消息发送和接收的任务完全丢给操作系统。收/发进程在执行到收/发原语时，只需通知操作系统有消息要发送/接收，即可返回不再管。</li>
+<li>也需要缓冲区。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><code>MQTT</code> 协议规范中没有“缓冲区”的概念。属于同步消息传送。实际应用中也确实会看到“等回复阶段”的<strong>响应消息</strong>。</p>
+<p><code>RabbitMQ</code> 提供了明晃晃的消息队列服务，这是缓冲区概念的良好实现。<code>RabbitMQ</code> 是绝对的异步消息传递，但还没弄清属于阻塞还是非阻塞（</p>
+<ul>
+<li>可靠性语义
+<ul>
+<li>
+<p>在 <code>MQTT</code> 规范中有定义。称为 <code>QoS</code> 等级。<code>MQTT</code> 提供 <code>QoS 0</code>、<code>QoS 1</code>、<code>QoS 2</code> 三种服务。<code>QoS</code> 标志位在报文的**固定头（Fixed header）**中。</p>
+<ul>
+<li><code>QoS 0</code> 发方最多发一次，不管发送/接收成功与否。</li>
+<li><code>QoS 1</code> 保证收方至少成功接收一次，收/发一次失败了就反复收/发。</li>
+<li><code>QoS 2</code> 保证收方成功接收一次，且只接收一次。确保收方不会因重发而收到重复消息。相当于课件中的“精确一次”。</li>
+</ul>
+</li>
+<li>
+<p>课件中突兀地提到了“事务语义”，它保证消息的原子性，不管节点崩溃或网络断开与否，要么完成一次消息传递，要么什么也不做。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>在分布式系统中，一定要保证对共享资源修改的 <code>ACID</code> 属性。</p>
+<ul>
+<li>
+<p>进程间消息传递方式之<strong>组通信</strong>。</p>
+<ul>
+<li>组是由若干确定进程的集合。可分为封闭组与开放组、对等组与分层组。</li>
+<li><code>MPI-Message Passing Interface</code> 直译就是消息传递接口，所以应当有很强的相关性。</li>
+<li>良好的组通信需要考虑可靠性、可扩展性、组播的原子性。
+<ul>
+<li>通信<strong>可靠性</strong>
+<ul>
+<li>实现小规模可靠通信，使用“连贯消息序号 + 历史缓冲器 + 接收响应 + 点对点重发”机制即可。当机群规模扩大时，会出现“反馈拥塞”问题，此时不得不考虑可靠多播的扩展性。</li>
+</ul>
+</li>
+<li>可靠多播的<strong>扩展性</strong>
+<ul>
+<li>可扩展性设计主要为了解决接收方“反馈拥塞”问题，具体有<strong>不分层反馈抑制</strong>式和<strong>分层反馈抑制</strong>式。分层反馈抑制可以在非常大的接收进程组中获得可扩展性。</li>
+</ul>
+</li>
+<li><strong>原子</strong>组播
+<ul>
+<li>保证消息播送的原子性，一要保证消息要么发送到进程组的所有成员，要么就不向任何成员发送。二要保证发送给组成员的一组消息有同样的顺序。
+<ul>
+<li>这种条条框框，首先不知道应用性如何，其次不清楚实现性如何。是否完备，是否繁复，是否可实现，都不知道。到底是工程项目的总结，还是大教授们一拍脑门再加一点经验主义凭空搓出来的，我不知道。</li>
+<li>我永远认为，工程上的科学技术应当永远生发于工程实践，工程实践应当永远先于理论发现。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>对应到 <code>MPI</code> 中是如何实现的？</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>RPC 初探</p>
+<ul>
+<li>“桩（stub）”可以发挥保证透明性、屏蔽异构型、建立缓冲区、封/解包数据（参数、返回值）、承载阻塞收/发等作用。
+<ul>
+<li>“保证透明性”，书上含混其词遛概念，所以我也没有想出好的理解。
+<ul>
+<li>蒸馍，你不扶器😡？</li>
+<li>书上是这么说的：要隐藏对远程过程调用，必须是调用者和被调用者就交换的信息格式达成一致，并在传递复杂数据结构时遵循相同的步骤。<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup>
+<ul>
+<li>简单说就是出一个 <code>CS</code> 双方都遵守的规范，规定参数表示方法（如用 2 的补码还是 1 的补码）、表示位长（如一个整型占 1 个字，一个字符型占 [latex] \frac{1}{2}[/latex] 个字）、对齐方式（如大端序、小端序）等。<code>CS</code> 双方的桩据此规范实现编解码模块。
+<ul>
+<li>一是效率低，二是如果系统中有 [latex]n[/latex] 种异构机型，那桩就要实现 [latex]n - 1[/latex] 种转换模块，得不偿失。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>客户端通常进行值参数传递和引用参数传递。可以理解为普通参数传递和指针传递。在两个独立内存空间之间传递指针本就是一件离谱的事，但 <code>RPC</code> 硬要想办法实现。
+<ul>
+<li>引用参数传递需要：
+<ol>
+<li>客户桩编解码模块将**有层次结构的参数（如某数据和此数据的指针和此指针的指针作为一组参数）**从客户机堆栈读到桩缓冲区，进行编码修改，把参数从层级结构改成扁平结构，再向服务器核心发送。</li>
+<li>服务端编解码模块将收到的扁平结构参数解码，恢复为层次结构参数，然后加载到本地堆栈中执行相关服务。</li>
+</ol>
+</li>
+</ul>
+</li>
+<li><code>DCE-RPC</code> 这种网上搜都搜不到的古董级分布式中间件，放在课本上讲，还仅仅只讲一两页，也没讲清楚。
+<ul>
+<li>蒸馍😡？</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>我已经尽我所能地把大教授们写在纸上虚浮缥缈的理论模型和我做过的实践联系到一起了，可还是无法改变越往后看越懵圈的冰冷事实。他们在白纸上写得好纯熟，画个框图画得好熟潇洒，用大段的字去堆一个逻辑过程更是他们的拿手好戏。一说实践就是哪个洋人曾经做的什么项目，一说技术就是他们实现的可以改变世界的重大创新和他们做出来的利好千秋百代的理论模型，我看教授先生你连个 <code>Hello World</code> 都写不明白。</p>
+<p>奔溃了，但不得不回来继续。</p>
+<h5 id="06-多副本一致性">06-多副本一致性</h5>
+<ul>
+<li>我说，球球你去给研究数据库的教这些吧。</li>
+</ul>
+<h5 id="12-面向对象的分布式计算">12-面向对象的分布式计算</h5>
+<ul>
+<li><a href="https://www.runoob.com/design-pattern/adapter-pattern.html">适配器模式</a>是比较巧妙的一种设计模式。</li>
+</ul>
+<p><a href="https://www.zhihu.com/question/421985640/answer/3305068047">锐评 from 评论区@知乎</a>：破消息队列说成“软总线”，一下就牛 X 多了<br>
+基于高能效金属材料和可靠真空技术的分布式多接口能量转换装置。<br>
+就是<strong>大！灯！泡！</strong></p>
+<ul>
+<li>关于我在客户端收集数据，传输层使用 <code>TCP/IP</code>，应用层使用 <code>MQTT</code>，服务器端用 <code>JS</code> 脚本将 raw 数据格式化，最后交给对应进程作处理，属于 <code>RPC</code> 还是 <code>RMI</code>。
+<ul>
+<li><code>JAVA-RMI</code> 本就是 <code>RPC</code> 的一种特殊实现，集成了 <code>JAVA</code> 语言的“接口 <code>Interface</code>”、“<code>Socket</code> 网络编程”、“面向对象 <code>OOP</code>”等特性，根据 <code>RPC</code> 的基本思想，攒出来一个实用的包，就是 <code>JAVA-RMI</code>。技术集成再创新不算创新吗？当然算。比前人多走一步即超越。</li>
+</ul>
+</li>
+</ul>
+<h5 id="13-面向服务的分布式计算">13-面向服务的分布式计算</h5>
+<p>强调说 <code>WSDL</code> 是重点。如果 <code>javadoc</code> 不算的话，那我是真的没用过，碰也没碰过。</p>
+<h5 id="后记">后记</h5>
+<ul>
+<li>
+<p>关于我想到的“做一个 <code>Cpp</code> 的类库实现一个类似 <code>JAVA-RMI</code> 的 <code>RPC</code> 过程，保证轻量化，用于在嵌入式系统或环境中实现任务卸载”。</p>
+<ul>
+<li>不知道什么时候开始，我做实践的时候也沾染上了一种油腻粗俗的气息：刚想到一个 idea，马上开始考虑“创新性如何？”、“实用性如何？”、“有多少人做过？”、“是不是重复造轮子？”云云。经这么一想，什么想法都搁置了。我说，我一个狗屁不通的本科生愣头青，能造轮子就算成功，何必好高骛远？心心念念“创新”、“突破”、“与众不同”耳耳，自己把自己引导成一个功夫永远停在一张扑扇大嘴和几张白纸上的弄虚作假之徒（我们的许多大教授副教授莫不如此），岂不和实践探索的真正理念背道而驰？</li>
+<li>想到什么就干什么，做到一半逃回来永远胜于一开始就止步不前。</li>
+</ul>
+</li>
+<li>
+<p>关于我的复习状态，既作此五六千余字的回顾总结理解性笔记，我以为足矣。关于他的考试内容，我无话可说。</p>
+<ul>
+<li>最后的考试他真的是在那个复习概要清单里无目的性地随机抽几条作为名词解释题的题干，名词解释题目总计占到 60 分，包括但不限于“云计算的三大核心服务和使用的关键技术（6 分）”。考题如此，我无话可说，但有建议可提：建议这门课在开课时发给学生每人一本《唐诗宋词三百首》，要求以一学期为限背诵全书，明确声明期末考试唯一内容为“从《唐诗宋词三百首》中无目的性地随机抽取若干篇目作为题干，要求全文默写并随机选段抽查释义”。这样既达到了这门课唯一的教学目的即训练记忆力，又能有这门课不具备的教学效果如陶冶学生情操，培养人文情怀。一举两得，利师利生。</li>
+</ul>
+</li>
+</ul>
+<h5 id="references">References</h5>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>陈海波，夏虞斌等.现代操作系统——原理与实现[M].北京：机械工业出版社，2020：76. <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>陈海波，夏虞斌等.现代操作系统——原理与实现[M].北京：机械工业出版社，2020：92. <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>陈海波，夏虞斌等.现代操作系统——原理与实现[M].北京：机械工业出版社，2020：102. <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn4" class="footnote-item"><p>胡建平，胡凯.分布式计算系统导论——原理与组成[M].北京：清华大学出版社，2014：93. <a href="#fnref4" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#01-%E6%A6%82%E8%BF%B0">01-概述</a></li>
+<li><a href="#02-%E5%90%8D%E5%AD%97%E6%9C%8D%E5%8A%A1">02-名字服务</a></li>
+<li><a href="#03-%E5%88%86%E5%B8%83%E5%BC%8F%E8%BF%9B%E7%A8%8B">03-分布式进程</a></li>
+<li><a href="#04-%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E9%80%9A%E4%BF%A1">04-分布式系统通信</a></li>
+<li><a href="#06-%E5%A4%9A%E5%89%AF%E6%9C%AC%E4%B8%80%E8%87%B4%E6%80%A7">06-多副本一致性</a></li>
+<li><a href="#12-%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97">12-面向对象的分布式计算</a></li>
+<li><a href="#13-%E9%9D%A2%E5%90%91%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%A1%E7%AE%97">13-面向服务的分布式计算</a></li>
+<li><a href="#%E5%90%8E%E8%AE%B0">后记</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/wen-jian-miao-shu-fu/">
+              <h3 class="post-title">
+                文件描述符
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,377 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_Threads | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_Threads | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Threads
+部分文段做了微小增删使句子通顺。
+CapDL Loader
+
+Previous tutorials have t..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_Threads
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/threads"><code>seL4</code> Docs/Tutorials/Threads</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="capdl-loader">CapDL Loader</h2>
+<blockquote>
+<p>Previous tutorials have taken place in the root task where the starting CSpace layout is set by the seL4 boot protocol. This tutorial uses the <em>capDL loader</em>, a root task which allocates statically configured objects and capabilities.</p>
+</blockquote>
+<blockquote>
+<p>The capDL loader parses a static description of the system and the relevant ELF binaries.</p>
+<p>The program that you construct will end up with its own CSpace and VSpace, which are separate from the root task, meaning CSlots like <code>seL4_CapInitThreadVSpace</code> have no meaning in applications loaded by the capDL loader.</p>
+</blockquote>
+<p>前几个教程都在 <code>root task</code> 中运行，它的 <code>CSpace</code>  的布局是在系统 <code>boot</code> 过程中由 <code>seL4 boot protocol</code> 自动完成的。本章教程将使用  <code>capDL</code> 加载器来构建自己的应用程序乃至运行进程。</p>
+<p><code>CapDL</code> 全称 &quot;Capability Distribution Language&quot;，它解析系统结构和相关 <code>ELF</code> 二进制程序的静态描述文件，构建用户自定义的应用程序，此程序将拥有自己独立的 <code>CSpace</code> 和 <code>VSpace</code>。</p>
+<h2 id="background">Background</h2>
+<h3 id="thread-control-blocks">Thread Control Blocks</h3>
+<blockquote>
+<p>Threads in seL4 are realized by <em>thread control block</em> objects (TCBs), one for each kernel thread.</p>
+<p>TCBs contain the following information:</p>
+<ul>
+<li>a priority and maximum control priority,</li>
+<li>register state and floating-point context,</li>
+<li>CSpace capability,</li>
+<li>VSpace capability,</li>
+<li>endpoint capability to send fault messages to,</li>
+<li>the reply capability slot.</li>
+</ul>
+</blockquote>
+<h3 id="scheduling-model">Scheduling model</h3>
+<blockquote>
+<p>The seL4 scheduler chooses the next thread to run on a specific processing core, and is a priority-based round-robin scheduler.</p>
+</blockquote>
+<p><code>seL4</code> 的线程调度器使用<strong>基于优先级的轮转调度</strong>算法。</p>
+<h4 id="priorities">Priorities</h4>
+<blockquote>
+<p>seL4 provides a priority range of 0-255, where 255 is the maximum priority (encoded in <code>libsel4</code> as <code>seL4_MinPrio</code> and <code>seL4_MaxPrio</code>).</p>
+</blockquote>
+<p><code>seL4</code> 中线程优先级取值范围是 <code>0 ~ 255</code>，<code>255</code> 是最高优先级。</p>
+<blockquote>
+<p>TCBs also have a <em>maximum control priority</em> (MCP), which acts as an informal capability over priorities. When setting the priority of a TCB, an explicit TCB capability must be provided to derive the authority from to set the priority.</p>
+<p>The priority being set is checked against the authority TCB’s MCP and the target priority is greater, the operation fails. The root task starts with both priority and MCP set to <code>seL4_MaxPrio</code>.</p>
+</blockquote>
+<p><code>MCP</code> 是线程 <code>TCB</code> 中有关线程优先级的一个“非正式（informal）” <code>capability</code>，每当要修改线程的优先级，都需要显示提供线程 <code>TCB</code> 的 <code>capability</code>，并从中获得授权：</p>
+<p>新设置的优先级值将和调用修改优先级 <code>API</code> 的进程（调用者进程）的 <code>MCP</code> 中的优先级值进行比较，<u>若新值更大（？意欲提升优先级，还是新值大于了 <code>MCP</code> 中的值）</u>，则设置失败。<code>root task</code> 的优先级和 <code>MCP</code> 都被设置为 <code>seL4_MaxPrio</code>。</p>
+<h4 id="round-robin">Round robin</h4>
+<blockquote>
+<p>Kernel time is accounted for in fixed-time quanta referred to as ticks, and each TCB has a timeslice field which represents the number of ticks that TCB is eligible to execute until preempted.</p>
+</blockquote>
+<p>进程执行时间被抽象为一些固定长度的时间量子（时间片），也就是“滴答”。每个 <code>TCB</code> 都在 <code>timeslice</code> 域中保存自己的时间片数量。</p>
+<blockquote>
+<p>The kernel timer driver is configured to fire a periodic interrupt which marks each tick, and when the timeslice is exhausted round robin scheduling is applied.</p>
+</blockquote>
+<p>内核定时器会周期性地触发“滴答中断”，当前进程的时间片耗尽时，就会触发轮转调度。</p>
+<h4 id="domain-scheduling">Domain scheduling</h4>
+<blockquote>
+<p>In order to provide confidentiality seL4 provides a top-level hierarchical scheduler which provides static, cyclical scheduling of scheduling partitions known as domains. Domains are statically configured at compile time with a cyclic schedule, and are non-preemptible resulting in completely deterministic scheduling of domains.</p>
+</blockquote>
+<p>为了给线程调度增加机密性（confidentiality），<code>seL4</code> 提供了一个顶层的分级调度器，可对名为“域”（domain）的“调度分区”（schedulign partitions）进行静态、循环调度。“域”在编译时使用一个循环调度策略（a cyclic schedule）进行静态配置，同一“域”中调度执行的进程是不可抢占的，这确保了一个“域”中进程调度的完全确定性。</p>
+<blockquote>
+<p>Threads can be assigned to domains, and threads are only scheduled when their domain is active.</p>
+</blockquote>
+<p>线程可以被分配到“域”中。仅当“域”为活动状态时，“域”中的线程才得到调度。</p>
+<h2 id="exercises">Exercises</h2>
+<h3 id="capdl-loader-2">CapDL Loader</h3>
+<blockquote>
+<p>CapDL is the “Capability Distribution Language”. It’s used to describe the kernel objects a seL4 application needs, and how capabilities to those objects will be distributed.</p>
+</blockquote>
+<p><code>CapDL</code> 用于描述 <code>seL4</code> 上层应用程序所需的内核对象，并管理这些内核对象的 <code>capability</code> 的分配。</p>
+<h3 id="configure-a-tcb">Configure a TCB</h3>
+<blockquote>
+<p>seL4 has a series of debug syscalls that are available in debug kernel builds.</p>
+<p><code>seL4_DebugDumpScheduler()</code> is used to dump the current state of the scheduler and can be useful to debug situations where a system seems to have hung.</p>
+</blockquote>
+<p><code>seL4</code> 有一系列用于内核 <code>debug</code>  的系统调用。<code>seL4_DebugDumpScheduler()</code> 用于打印进程调度器当前的状态信息。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/threads/configure_new_tcb.JPG" alt="automatic-scalability" width=90%>
+	<figcaption >
+        <font size=2>新建 TCB 内核对象并初始化参数</font>
+    </figcaption>
+</div>
+<p>从 <code>seL4_TCB_Configure()</code> 的调用参数我们可以看出：<code>seL4</code> 中的进程需要：<code>TCB object</code>、<code>CSpace</code>、<code>VSpace</code>、<code>IPC buffer</code> 以及这个这个调用中所没有的 <code>Stack</code></p>
+<p>可将 <code>seL4</code> 和 <code>FreeRTOS</code> 对进程的抽象做对比：</p>
+<ul>
+<li><code>FreeRTOS</code> 中进程称为“任务”。</li>
+<li><code>FreeRTOS</code> 一般没有虚拟内存管理，内核和任务共享一套物理内存空间。</li>
+<li><code>FreeRTOS</code> 的任务仅使用独立的栈作为内存空间，没有自己的虚拟内存。任务切换时上下文保存在自己的栈中。</li>
+</ul>
+<h3 id="change-priority-via-sel4_tcb_setpriority">Change priority via <code>seL4_TCB_SetPriority</code></h3>
+<blockquote>
+<p>A newly created thread will have a priority of 0, while the thread created by the loader is at a priority of 254.</p>
+</blockquote>
+<p>新建线程的优先级初始化为 <code>0</code>，而由 <code>CapDL loader</code> 新建的线程优先级初始化为 <code>254</code>。</p>
+<blockquote>
+<p>Use <code>seL4_TCB_SetPriority</code> to set the priority. Remember that to set a thread’s priority, the calling thread must have the authority to do so.</p>
+</blockquote>
+<p>调用 <code>seL4_TCB_SetPriority</code> 设置线程优先级。调用者线程必须拥有修改目标线程优先级的权限，获取“权限”的方式通常为：比较调用者线程的 <code>MCB</code> 值和目标线程新优先级的值，若前者更大，则调用者有此修改权限。</p>
+<h3 id="set-initial-register-state">Set initial register state</h3>
+<blockquote>
+<p>You need to set the program counter and stack pointer to valid values, otherwise your thread will crash immediately.</p>
+<p><code>libsel4utils</code> contains some functions for setting register contents in a platform agnostic manner.</p>
+</blockquote>
+<p>新建线程必须初始化一些重要的寄存器值，如 <code>PC (Program Counter)</code> 和 <code>SP (Stack Pointer)</code>。<code>seL4</code> 提供了一些平台架构无关的 <code>API</code> 来设置 <code>TCB</code> 中保存的寄存器值。</p>
+<blockquote>
+<p>Note: It is assumed that the stack grows downwards on all platforms.</p>
+</blockquote>
+<p><code>seL4</code> 规定栈地址从高地址向低地址增长，在任何平台上都是如此。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/threads/user_context.JPG" alt="automatic-scalability" width=30%>
+	<figcaption >
+        <font size=2>seL4 定义的用户线程上下文数据结构</font>
+    </figcaption>
+</div>
+<p>本 <code>quiz</code> 中，<code>PC</code> 寄存器的值直接被设置为用户自定义函数 <code>int new_thread(...);</code> 的地址，也就是函数名：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/threads/set_user_context.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>定义 PC 和 SP</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/threads/new_thread函数.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>定义 new_thread 函数</font>
+    </figcaption>
+</div>
+<p>与源文件中的函数名和可执行文件中的函数地址相关的问题，可以参考阅读《程序员的自我修养—链接、装载与库》，《链接器和加载器》</p>
+<h3 id="passing-arguments">Passing arguments</h3>
+<blockquote>
+<p>You will notice that all of the arguments to the new thread are 0.</p>
+<p>You can set the arguments by using the helper function <code>sel4utils_arch_init_local_context</code> or by directly manipulating the registers for your target architecture.</p>
+</blockquote>
+<p>本 <code>quiz</code> 中，传递给 <code>new_thread</code> 函数的 <code>3</code> 个参数都是 <code>0</code>。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/threads/init_context_with_args.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>初始化上下文参数的工具函数</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/threads/passing_arguments.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>调用工具函数实现 Passing arguments</font>
+    </figcaption>
+</div>
+<h3 id="resolving-a-fault">Resolving a fault</h3>
+<p>这一节主要鼓励使用 <code>objdump</code> 工具解析编译链接出的可执行文件。我使用的命令如下：</p>
+<pre><code class="language-shell">objdump -f -t -h -r ./threads &gt; theads_elf_info.txt
+</code></pre>
+<p>objdump 的重要参数如下：</p>
+<ul>
+<li><code>-f</code>：显示文件头信息。</li>
+<li><code>-h</code>：显示段（section）信息。</li>
+<li><code>-d</code>：反汇编可执行段。</li>
+<li><code>-D</code>：反汇编所有段。</li>
+<li><code>-t</code>：显示符号表。</li>
+<li><code>-T</code>：显示动态符号表。</li>
+<li><code>-r</code>：显示重定位信息。</li>
+<li><code>-R</code>：显示动态重定位信息。</li>
+<li><code>-S</code>：显示源代码和反汇编混合输出（如果可能）。</li>
+</ul>
+<h3 id="final-result">Final result</h3>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/threads/final_result.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>Final result</font>
+    </figcaption>
+</div>
+<h2 id="one-more-thing-or-more">One more thing (or more?)</h2>
+<ul>
+<li>Using different TCB invocations to change the new thread’s attributes or objects</li>
+<li>Investigate how setting different priorities affects when the threads are scheduled to run</li>
+<li>Implementing synchronisation primitives using global memory.</li>
+<li>Trying to repeat this tutorial in the root task where there are more resources available to create more thread objects.</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#capdl-loader">CapDL Loader</a></li>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#thread-control-blocks">Thread Control Blocks</a></li>
+<li><a href="#scheduling-model">Scheduling model</a>
+<ul>
+<li><a href="#priorities">Priorities</a></li>
+<li><a href="#round-robin">Round robin</a></li>
+<li><a href="#domain-scheduling">Domain scheduling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#exercises">Exercises</a>
+<ul>
+<li><a href="#capdl-loader-2">CapDL Loader</a></li>
+<li><a href="#configure-a-tcb">Configure a TCB</a></li>
+<li><a href="#change-priority-via-sel4_tcb_setpriority">Change priority via <code>seL4_TCB_SetPriority</code></a></li>
+<li><a href="#set-initial-register-state">Set initial register state</a></li>
+<li><a href="#passing-arguments">Passing arguments</a></li>
+<li><a href="#resolving-a-fault">Resolving a fault</a></li>
+<li><a href="#final-result">Final result</a></li>
+</ul>
+</li>
+<li><a href="#one-more-thing-or-more">One more thing (or more?)</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_setting-up-your-machine/">
+              <h3 class="post-title">
+                seL4_Setting up your machine
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

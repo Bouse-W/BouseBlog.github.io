@@ -1,0 +1,346 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>软件模拟 IIC 跨页写 EEPROM 的问题 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="软件模拟 IIC 跨页写 EEPROM 的问题 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="软件模拟 IIC 跨页写 EEPROM 的问题
+简要说明
+重点在于，在跨页过程中，IIC 停止后必须等待至少 5ms，方可正常启动和继续写
+思路来源：AT24C02跨页写数据 - 白衣尽湿 - 博客园 (cnblogs.com)
+代码与分析..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              软件模拟 IIC 跨页写 EEPROM 的问题
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="软件模拟-iic-跨页写-eeprom-的问题">软件模拟 IIC 跨页写 EEPROM 的问题</h4>
+<h5 id="简要说明">简要说明</h5>
+<p>重点在于，在跨页过程中，IIC 停止后必须等待至少 5ms，方可正常启动和继续写</p>
+<p>思路来源：<a href="https://www.cnblogs.com/leo0621/p/8252175.html">AT24C02跨页写数据 - 白衣尽湿 - 博客园 (cnblogs.com)</a></p>
+<h5 id="代码与分析">代码与分析</h5>
+<h6 id="使用-iic-向-eeprom_24c02-跨页写数据">使用 IIC 向 EEPROM_24c02 跨页写数据</h6>
+<pre><code class="language-c">/**
+  * @brief I2C 向 EEPROM 发送数据
+  * @param 数据缓冲区指针 pucBuf, 设备地址（带读写） ucAddr, 发送字节数 ucNum
+  * @retval 0 表示失败，1表示成功
+  */
+
+/* 
+    写串行EEPROM不像读操作可以连续读取很多字节，每次写操作只能在同一个page。
+    对于24xx02，page size = 8
+    简单的处理方法为：按字节写操作模式，每写1个字节，都发送地址
+    为了提高连续写的效率: 本函数采用 page wirte 操作。
+*/
+
+uint8_t iic_EEPROM_write (uint8_t *_pWriteBuf, uint16_t _usAddress, uint16_t _usSize)
+{
+    uint16_t i,m;
+    uint16_t usAddr;
+
+    usAddr = _usAddress;    
+    for (i = 0; i &amp;lt; _usSize; i++)
+    {
+        /* 当发送第1个字节或是页面首地址时，需要重新发起启动信号和地址 */
+        if ((i == 0) || (usAddr &amp;amp; (EEPROM_PAGE_SIZE - 1)) == 0)
+        {
+            /*　第０步：发停止信号，启动内部写操作　*/
+            I2CStop ();
+
+            delay_ms (700);         // 关键在此，必须暂停至少 5ms，否则 I2C 停止后即无法启动
+
+            /* 通过检查器件应答的方式，判断内部写操作是否完成, 一般小于 10ms           
+                CLK频率为 200KHz 时，查询次数为 30 次左右
+            */
+            for (m = 0; m &amp;lt; 1000; m++)
+            {               
+                /* 第1步：发起I2C总线启动信号 */
+                I2CStart ();
+
+                /* 第2步：发起控制字节，高 7bit 是地址，bit0 是读写控制位，0 表示写，1 表示读 */
+                I2CSendByte (EEPROM_DEV_ADDR | EEPROM_I2C_WR);  /* 此处是写指令 */
+
+                /* 第3步：发送一个时钟，判断器件是否正确应答 */
+                if (I2CWaitAck () == 0)
+                {
+                    break;
+                }
+            }
+            if (m  == 1000)                 // EEPROM器件写超时
+            {
+                goto cmd_fail;
+            }
+
+            /* 第4步：发送字节地址，24C02只有256字节，因此1个字节就够了，如果是24C04以上，那么此处需要连发多个地址 */
+            I2CSendByte ((uint8_t)usAddr);
+
+            /* 第5步：等待ACK */
+            if (I2CWaitAck () != 0)                 // EEPROM器件无应答
+            {
+                goto cmd_fail;
+            }
+        }
+
+        /* 第6步：开始写入数据 */
+        I2CSendByte (_pWriteBuf[i]);
+
+        /* 第7步：发送ACK */
+        if (I2CWaitAck () != 0)                 // EEPROM器件无应答
+        {
+            goto cmd_fail;
+        }
+
+        usAddr++;                           // 地址增 1
+    }
+
+    /* 命令执行成功，发送I2C总线停止信号 */
+    I2CStop ();
+    delay1 (500);
+    return SUCCESS;
+
+    cmd_fail: /* 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备 */
+    /* 发送I2C总线停止信号 */
+    I2CStop ();
+    delay1 (500);
+    return ERROR;
+}
+</code></pre>
+<h6 id="使用-iic-从-eeprom_24c02-读数据">使用 IIC 从 EEPROM_24c02 读数据</h6>
+<pre><code class="language-c">/**
+  * @brief I2C 从 EEPROM 读取数据
+  * @param 数据缓冲区 pucBuf, 设备地址（带读写） ucAddr, 发送字节数 ucNum
+  * @retval None
+  */
+
+/*
+    读数据可以连续进行，不存在跨页等问题
+*/
+
+uint8_t iic_EEPROM_read (uint8_t * pucBuf, uint8_t ucAddr, uint8_t ucNum)
+{
+    I2CStart ();
+    I2CSendByte (EEPROM_DEV_ADDR | EEPROM_I2C_WR);                          // 发器件地址
+    if (I2CWaitAck () == ERROR)
+    {
+        goto cmd_fail;
+    }
+
+    I2CSendByte (ucAddr);                       // 发器件内地址
+    if (I2CWaitAck () == ERROR)
+    {
+        goto cmd_fail;
+    }
+
+    I2CStart ();
+
+    I2CSendByte (EEPROM_DEV_ADDR | EEPROM_I2C_RD);                  // 发读命令
+    if (I2CWaitAck () == ERROR)
+    {
+        goto cmd_fail;
+    }
+
+    while (ucNum--)
+    {
+        *pucBuf++ = I2CReceiveByte ();
+        if (ucNum)
+        {
+            I2CSendAck ();
+        }
+
+        else
+        {
+            I2CSendNotAck ();
+        }
+    }
+
+    I2CStop ();
+    delay1 (500);
+    return SUCCESS;
+
+    cmd_fail:               // 命令执行失败后，切记发送停止信号，避免影响I2C总线上其他设备
+    I2CStop ();
+    delay1 (500);
+    return ERROR;
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E8%BD%AF%E4%BB%B6%E6%A8%A1%E6%8B%9F-iic-%E8%B7%A8%E9%A1%B5%E5%86%99-eeprom-%E7%9A%84%E9%97%AE%E9%A2%98">软件模拟 IIC 跨页写 EEPROM 的问题</a>
+<ul>
+<li><a href="#%E7%AE%80%E8%A6%81%E8%AF%B4%E6%98%8E">简要说明</a></li>
+<li><a href="#%E4%BB%A3%E7%A0%81%E4%B8%8E%E5%88%86%E6%9E%90">代码与分析</a>
+<ul>
+<li><a href="#%E4%BD%BF%E7%94%A8-iic-%E5%90%91-eeprom_24c02-%E8%B7%A8%E9%A1%B5%E5%86%99%E6%95%B0%E6%8D%AE">使用 IIC 向 EEPROM_24c02 跨页写数据</a></li>
+<li><a href="#%E4%BD%BF%E7%94%A8-iic-%E4%BB%8E-eeprom_24c02-%E8%AF%BB%E6%95%B0%E6%8D%AE">使用 IIC 从 EEPROM_24c02 读数据</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/jing-zhen-yu-shi-zhong-xin-hao/">
+              <h3 class="post-title">
+                晶振与时钟信号
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,369 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NJU-数电实验二 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="NJU-数电实验二 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="片段摘录和一点想法
+本部分中所有引用内容均来自 南京大学 计算机科学与技术系 数字逻辑与计算机组成 课程实验
+引用内容均直接来自原文，部分文段做了语序调整使句子通顺，格式为居中斜体。
+感谢 NJUers 的无私分享，开源万岁
+
+通常是多路输..." />
+    <meta name="keywords" content="Verilog" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              NJU-数电实验二
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/WydVhsUdGH/" class="post-tag">
+                  # Verilog
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h5 id="片段摘录和一点想法">片段摘录和一点想法</h5>
+<p><font size=3 color=#FF0000>本部分中所有引用内容均来自 <a href="https://nju-projectn.github.io/dlco-lecture-note/">南京大学 计算机科学与技术系 数字逻辑与计算机组成 课程实验</a></font></p>
+<p>引用内容均直接来自原文，部分文段做了语序调整使句子通顺，格式为居中斜体。</p>
+<p>感谢 NJUers 的无私分享，开源万岁</p>
+<blockquote>
+<p><em>通常是多路输入/输出电路，它将 [latex]n[/latex] 位的输入编码转换为 [latex]m[/latex]  位的编码输出。 一般情况下 [latex]n &lt; m[/latex]，输入编码和输出编码之间存在着<strong>一一对应</strong>的映射关系。</em></p>
+</blockquote>
+<blockquote>
+<p><em>常用的二进制译码器（如下图所示）是一个有 [latex]n[/latex] 路输入和 [latex]m = 2^n[/latex] 路输出的逻辑电路。</em></p>
+</blockquote>
+<blockquote>
+<p><em>在二进制码中，最常用的输出编码是 [latex]m = 2^n[/latex] 位中取 1 位编码，即任何时刻， [latex]m = 2^n[/latex] 位输出编码中只能有 1 位有效，其余各位都为 0，这样的二进制编码被称为<strong>独热编码（one-hot encoded）</strong>。</em></p>
+</blockquote>
+<blockquote>
+<p><em>在Verilog HDL代码中，for循环的condition条件表达式必须为常数，不能是可改变的量。</em></p>
+</blockquote>
+<blockquote>
+<p><em>编码器是一种与译码器功能相反的逻辑电路，编码器的输出编码比其输入编码位数少。</em></p>
+</blockquote>
+<blockquote>
+<p><em>优先编码器允许同时在几个输入端有输入信号，只对同时输入的几个信号中优先权最高的一个进行编码。</em></p>
+</blockquote>
+<p>关于 8 位控制数码管：现在学到如 3-8 译码器只能输出独热码，这如何控制 8 段数码管。<br>
+多个独热码加一起就好了（<br>
+或者参考《数字逻辑基础与 Verilog 设计》，肯定准备了魔法。</p>
+<ul>
+<li>《数字逻辑基础与 Verilog 设计》P 41 有 2 -7 数码管控制译码器的例子
+<ul>
+<li>针对 7 个输出 a ~ b，可以有 7 个 2 输入真值表或 2 输入卡诺图，最终化简出每个输出之于输入的积之和表达式。然后可以用 <code>assign</code> 直接做出 2-7 数码管控制译码器（强调数码管控制是要区别于独热码译码器）。
+<ul>
+<li>实际上，输入只有 2 位时，最多表示 4 个不相关的信息，最多产生 4 个不相关的输出（等于独热码输出），能控制 7 段数码管是因为 7 个控制信号里有相关的（积之和表达式相同）和为恒值的。最终用数码管也只能表示 0 ~ 3。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><em>实例化更加类似于从芯片库中取出一块芯片，给它起一个名字（实例名），然后连接输入输出引脚。因此，模块实例化同assign语句一样，只能在always语句块之外进行。</em></p>
+</blockquote>
+<h5 id="实验验收">实验验收</h5>
+<h6 id="一些准备">一些准备</h6>
+<ul>
+<li>
+<p>BCD码（Binary Coded Decimal），十进制（或十六进制）数的二进制编码。</p>
+<ul>
+<li>0X0 ~ 0XF 的 BCD 码与数码管 7  位（顺时针编号）控制位的映射</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Hex</th>
+<th>Binary</th>
+<th>共阴 smg（51 风格）</th>
+<th>独热码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0000</td>
+<td>0111111</td>
+<td>00000000</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0001</td>
+<td>0000110</td>
+<td>00000001</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0010</td>
+<td>1011011</td>
+<td>00000010</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0011</td>
+<td>1001111</td>
+<td>00000100</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0100</td>
+<td>1100110</td>
+<td>00001000</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0101</td>
+<td>1101101</td>
+<td>00010000</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0110</td>
+<td>1111100</td>
+<td>00100000</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0111</td>
+<td>0000111</td>
+<td>01000000</td>
+</tr>
+<tr>
+<td>8</td>
+<td>1000</td>
+<td>1111111</td>
+<td>10000000</td>
+</tr>
+<tr>
+<td>9</td>
+<td>1001</td>
+<td>1100111</td>
+<td>0000000100000000</td>
+</tr>
+<tr>
+<td>A</td>
+<td>1010</td>
+<td>1110111</td>
+<td>0000001000000000</td>
+</tr>
+<tr>
+<td>B</td>
+<td>1011</td>
+<td>1111100</td>
+<td>0000010000000000</td>
+</tr>
+<tr>
+<td>C</td>
+<td>1100</td>
+<td>0111001</td>
+<td>0000100000000000</td>
+</tr>
+<tr>
+<td>D</td>
+<td>1101</td>
+<td>1011110</td>
+<td>0001000000000000</td>
+</tr>
+<tr>
+<td>E</td>
+<td>1110</td>
+<td>1111001</td>
+<td>0010000000000000</td>
+</tr>
+<tr>
+<td>F</td>
+<td>1111</td>
+<td>1110001</td>
+<td>0100000000000000</td>
+</tr>
+</tbody>
+</table>
+<h6 id="题目分析">题目分析</h6>
+<ul>
+<li>
+<p>要求设计 8-3 优先编码器，8 位信号输入， 3 位编码输出 + 1 位指示输出，总 4 位输出接入 LED0 ~ LED3 模块，3 位编码输出接入 3-7 译码器。</p>
+</li>
+<li>
+<p>要求设计 3-7 译码器，3 位编码输入，7 位译码输出，译码结果不是独热码，是 7 段数码管的控制码，输出接入共阳数码管模块。</p>
+<ul>
+<li>用 <code>case</code> 语句即可。</li>
+<li>也可以根据真值表或卡诺图，以 3 位输入的积之和式表示 7 位输出的每一位，后直接 <code>assign</code> 给每位输出赋值。</li>
+<li>比较而言，<code>case</code> 语句构建译码器语义更明确，扩展性更好。</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%89%87%E6%AE%B5%E6%91%98%E5%BD%95%E5%92%8C%E4%B8%80%E7%82%B9%E6%83%B3%E6%B3%95">片段摘录和一点想法</a></li>
+<li><a href="#%E5%AE%9E%E9%AA%8C%E9%AA%8C%E6%94%B6">实验验收</a>
+<ul>
+<li><a href="#%E4%B8%80%E4%BA%9B%E5%87%86%E5%A4%87">一些准备</a></li>
+<li><a href="#%E9%A2%98%E7%9B%AE%E5%88%86%E6%9E%90">题目分析</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/mpich-on-debian-bullseye/">
+              <h3 class="post-title">
+                Mpich on Debian-Bullseye
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

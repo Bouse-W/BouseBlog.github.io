@@ -1,0 +1,199 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SSL 证书部署 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="SSL 证书部署 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="看了一下，华为云的 SSL 证书，最便宜的 ”单域名-DV (Basic) 型-RapidSSL 提供“ 的价格是 313.74/年，默认推荐的 ”单域名-OV 型-GeoTrust 提供“ 证书价格达到了 2305.74/年。。。
+
+	
+..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              SSL 证书部署
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>看了一下，华为云的 SSL 证书，最便宜的 ”单域名-DV (Basic) 型-RapidSSL 提供“ 的价格是 313.74/年，默认推荐的 ”单域名-OV 型-GeoTrust 提供“ 证书价格达到了 2305.74/年。。。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/10/华为云便宜证书.png" alt="automatic-scalability" width=90%>
+	<figcaption >
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/10/华为云推荐证书.png" alt="automatic-scalability" width=90%>
+	<figcaption >
+    </figcaption>
+</div>
+<p>菊厂果然是专门做大生意的。</p>
+<p>我这个服务器还是做活动抢的，算上注册个域名拢共花了 100 多块。搞一个 300 块的证书，那不是狗骑着吕布上战场吗？</p>
+<p>突然想到一个歪招：华为云服务器 + 阿里云免费 SSL 证书部署，毕竟财大气粗的阿里是为个人提供免费 SSL 证书服务的（不包部署，部署很贵，三百多。反而华子的部署服务才三十几块。）</p>
+<p>已经从电子元件垃圾佬进化为赛博软件垃圾佬了！（喜</p>
+<p>穷鬼的招，能叫歪吗？</p>
+<p>不能。</p>
+<p>想出歪招后不久，突然发现华为的 ”单域名-DV (Basic) 型-DigiCert 提供“ SSL 证书是免费的！！</p>
+<p>这一选项被藏在默认推荐的好几层之后，当你找到的时候，华子已经悄悄地把“便宜即不安全”的概念植入了你的脑海。。。</p>
+<p>所以下决心使用这个收费为 0 的安全证书，真的挺难的，就算我是个穷鬼。</p>
+<p>又看了一下，阿里的免费证书也是 DigiCert 提供的单域名 DV 型免费证书。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/10/阿里免费证书.png" alt="automatic-scalability" width=90%>
+	<figcaption >
+    </figcaption>
+</div>
+<p>和华子的免费证书大差不差。方便起见，我直接用华子的吧。</p>
+<p>穷鬼是没有钱，但要有胆量！</p>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/ssh/">
+              <h3 class="post-title">
+                SSH
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

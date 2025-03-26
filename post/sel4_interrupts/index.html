@@ -1,0 +1,247 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_Interrupts | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_Interrupts | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Interrupts
+部分文段做了微小增删使句子通顺。
+Background
+IRQControl
+
+The root task..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_Interrupts
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/interruputs"><code>seL4</code> Docs/Tutorials/Interrupts</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="background">Background</h2>
+<h3 id="irqcontrol">IRQControl</h3>
+<blockquote>
+<p>The root task is given a single capability from which capabilities to all irq numbers in the system can be derived, <code>seL4_CapIRQControl</code>.</p>
+<p>This capability can be moved between CSpaces and CSlots but cannot be duplicated.</p>
+<p>Revoking this capability results in all access to all irq capabilities being removed.</p>
+</blockquote>
+<p><code>root task</code> 有一个独立的 <code>capability</code>：<code>seL4_CapIRQControl</code>，从中可以派生出系统中所有中断号的 <code>capability</code>。</p>
+<p><code>seL4_CapIRQControl</code> 可以在 <code>CSpace</code> 和 <code>CSlot</code> 间移动，但<strong>不能复制</strong>。</p>
+<p>移除 <code>seL4_CapIRQControl</code> 会导致访问任何中断 <code>capability</code>（<code>irq capability</code>）的任何权限均被移除。</p>
+<h3 id="irqhandlers">IRQHandlers</h3>
+<blockquote>
+<p>IRQHandler capabilities give access to a single irq and are standard seL4 capabilities: they <em>can</em> be moved and duplicated according to system policy.</p>
+</blockquote>
+<p>一般的中断 <code>capability</code> 即中断处理句柄 <code>capability</code>（<code>IRQHandler capability</code>），可通过它访问对应的中断请求（<code>irq</code>），可调用一些通用 <code>API</code> 移动、复制 <code>IRQHandler capability</code>。</p>
+<blockquote>
+<p>There are a variety of different invocations to obtain irq capabilities which are hardware dependent, including:</p>
+<ul>
+<li><code>seL4_IRQControl_GetIOAPIC</code> (x86)</li>
+<li><code>seL4_IRQControl_GetMSI</code> (x86)</li>
+<li><code>seL4_IRQControl_GetTrigger</code> (ARM)</li>
+</ul>
+</blockquote>
+<p>不同架构平台上创建 <code>IRQHandler capability</code> 的 <code>API</code> 不同。</p>
+<h3 id="receiving-interrupts">Receiving interrupts</h3>
+<blockquote>
+<p>Interrupts are received by registering a capability to a notification object with the IRQHandler capability for that irq, as follows:</p>
+<pre><code class="language-c">seL4_IRQHandler_SetNotification(irq_handler, notification);
+</code></pre>
+</blockquote>
+<blockquote>
+<p>On success, <code>seL4_IRQHandler_SetNotification</code> will results in signals being delivered to the notification object when an interrupt occurs.</p>
+<p>To handle multiple interrupts on the same notification object, you can set different badges on the notification capabilities bound to each IRQHandler.</p>
+</blockquote>
+<p><code>seL4</code> 接收中断的方式：将 <code>IRQHandler</code> 和一个 <code>notification object</code> 绑定起来，当中断发生时 <code>notification object</code> 会接收到一个信号。</p>
+<p>使用 <code>badge</code> 区分绑定在同一个 <code>notification object</code> 上的不同 <code>IRQHandler</code>。</p>
+<h3 id="handling-interrupts">Handling interrupts</h3>
+<blockquote>
+<p>Once an interrupt is received and processed by the software, you can unmask the interrupt using <code>seL4_IRQHandler_Ack</code> on the IRQHandler.</p>
+<p>seL4 will not deliver any further interrupts after an IRQ is raised until that IRQHandler has been acked.</p>
+</blockquote>
+<p>一个中断处理完毕后，可调用 <code>seL4_IRQHandler_ACK</code> 来解除对该中断的屏蔽。在中断处理完成前，<code>seL4</code> 不会再向进程再发送该中断的信号（中断屏蔽）。</p>
+<h2 id="exercise">Exercise</h2>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/interrupts/start_a_timer.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>启动一个定时器，每毫秒发送一个定时中断，总计时 2s 共 2000 次中断</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/interrupts/final_result.JPG" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>Final result</font>
+    </figcaption>
+</div>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#irqcontrol">IRQControl</a></li>
+<li><a href="#irqhandlers">IRQHandlers</a></li>
+<li><a href="#receiving-interrupts">Receiving interrupts</a></li>
+<li><a href="#handling-interrupts">Handling interrupts</a></li>
+</ul>
+</li>
+<li><a href="#exercise">Exercise</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_hello-world/">
+              <h3 class="post-title">
+                seL4_Hello, world
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

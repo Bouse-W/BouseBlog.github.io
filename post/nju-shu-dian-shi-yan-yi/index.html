@@ -1,0 +1,302 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NJU-数电实验一 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="NJU-数电实验一 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="片段摘录和一点想法
+本部分中所有引用内容均来自 南京大学 计算机科学与技术系 数字逻辑与计算机组成 课程实验
+引用内容均直接来自原文，部分文段做了语序调整使句子通顺，格式为居中斜体。
+感谢 NJUers 的无私分享，开源万岁
+
+选择器是由多..." />
+    <meta name="keywords" content="Verilog" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              NJU-数电实验一
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/WydVhsUdGH/" class="post-tag">
+                  # Verilog
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h5 id="片段摘录和一点想法">片段摘录和一点想法</h5>
+<p>本部分中所有引用内容均来自 <a href="https://nju-projectn.github.io/dlco-lecture-note/">南京大学 计算机科学与技术系 数字逻辑与计算机组成 课程实验</a><br>
+引用内容均直接来自原文，部分文段做了语序调整使句子通顺，格式为居中斜体。<br>
+感谢 NJUers 的无私分享，开源万岁</p>
+<blockquote>
+<p><em>选择器是由多路数据输入、一位或多位的选择控制端，和一路数据输出所组成的。</em></p>
+<p><em>数字电路中存在大量的并行运算，通常的设计思路是使用电路同时生成所有可能用到的数字信号，再利用选择器选择最终输出哪一路信号。</em></p>
+<p><em>在Verilog中，各语句是并发执行的，模块中所有的assign语句、always语句块和实例化语句，其执行顺序不分先后</em>。</p>
+<p><em>Verilog语法规定，顺序执行的语句必须包含中always块中，always块中的语句按照它们中代码中出现的顺序执行。</em></p>
+</blockquote>
+<p>只是规定顺序执行的语句（如 <code>if-else</code>）包括在 <code>always</code> 块中，不是说 <code>always</code> 块中的语句都是顺序执行。</p>
+<blockquote>
+<p><em>always后面不带任何有关敏感事件列表的信息，只有 always 这个保留字，那么这个时候表明在任何情况下都执行always语句块中的语句。</em></p>
+<p><em>如果条件表达式不满足呢？这时，编译器就会自动产生一个寄存器来寄存当前的值，在条件不满足时保存输出的过去值。这样就会<strong>产生用户没有设计的多余的寄存器</strong>出来。</em></p>
+</blockquote>
+<p>可以用三目运算替代简单的 <code>if-else</code>，搭配 <code>assign</code> 使用，可以减少 <code>always</code> 语句块的使用和产生多余寄存器的隐患。<br>
+但三目运算多见于行为建模，不利于分析电路。</p>
+<blockquote>
+<p><em>强烈建议初学者不要使用行为建模方式设计电路</em></p>
+<p><em>大部分同学非常容易犯这样的错误，把行为建模当作过程式的C语言来写，尝试把任意复杂的行为描述映射到电路，最终综合器只会生成出延迟大，面积大，功耗高的低质量电路</em></p>
+<p><em>真正的描述电路 = 实例化 + 连线</em></p>
+<p><em>如果选择列表中没有包含选择表达式的所有选项，而此时又没有default选项的话，综合器会综合出一个锁存器以保存未被覆盖的情况下输出的过去值。这一般是不希望出现的情况</em>。</p>
+<p><em>同样地，我们建议初学者不要使用case语句</em></p>
+</blockquote>
+<h5 id="尝试回答问题">尝试回答问题</h5>
+<blockquote>
+<ul>
+<li>在硬件描述语言中，“执行”的精确含义是什么？</li>
+</ul>
+</blockquote>
+<p>硬件描述语言和高级语言有个显著差别：硬件描述语言没有操作内存的概念。存储单元用的是寄存器。</p>
+<p>用 C 语言举例，如果把 C 语言中申请内存、定义变量、定义数组等一干操作全 Ban 掉，C 语言就废了。</p>
+<p>但硬件描述语言如 Verilog，变量通常是两种类型 <code>wire</code> 型和 <code>reg</code> 型，变量要么是输入输出的电平信号，要么是保存在寄存器里，没有内存这一概念。</p>
+<p>基于此，硬件描述语言中“执行”该是按照语句中描述的逻辑综合出一些有输入有输出的电路单元，许多单元连接组成一个逻辑电路。上电后电路各处元件的输入输出逻辑和源文件中描述的逻辑一致。</p>
+<blockquote>
+<ul>
+<li>是谁在执行Verilog的语句？ 是电路，综合器，还是其它的？</li>
+</ul>
+</blockquote>
+<p>硬件描述语言编写的文件，首先被综合器编译成高度抽象的纯粹逻辑表达式文件。然后综合器据此表达式文件（也即逻辑门网络文件）生成等价且尽量优化的电路。</p>
+<p>所以实际执行 Verilog 语句的是电路，编译 Verilog 语句并生成电路的是综合器。</p>
+<blockquote>
+<ul>
+<li>if的条件满足，就不执行else后的语句，这里的“不执行”又是什么意思？ 和描述电路有什么联系？</li>
+</ul>
+</blockquote>
+<p>“不执行”应当指综合器在编译时忽略这个 <code>else</code> 中的表达式，在生成电路时同样忽略这部分的逻辑。</p>
+<blockquote>
+<ul>
+<li>有“并发执行”，又有“顺序执行”，还有“任何一个变量发生变化就立即执行”，以及“在任何情况下都执行”，它们都是如何在设计出来的电路中体现的？</li>
+</ul>
+</blockquote>
+<p>“并发执行”的语句之间没有依赖或选择关系，<br>
+“顺序执行”的语句之间有依赖或选择关系，<br>
+“任何一个变量发生变化就立即执行”的语句，<br>
+“在任何情况下都执行”的语句，</p>
+<h5 id="实验验收">实验验收</h5>
+<ul>
+<li>
+<p>Problems &amp; Solutions</p>
+<ol>
+<li>
+<p>为了实现 2 位 4 选 1 选择器，我直接复制粘贴了多路选择器的源码到一个文件里，命名为 &quot;multiplexer_template.v&quot;，在自己实现的选择器源码里使用 <code>include</code> 关键字包含模板文件，在模块定义中直接实例化一个 <code>MuxKeyWithDefault</code> 模块。这样处理是有问题的。</p>
+<ul>
+<li>
+<p>直接实例化模板里的 <code>MuxKeyWithDefault</code> 模块，根据需要传入初始化参数，获得一个 2 位 4 选 1 选择器，是可以实现的，这里报错是因为文件结构处理有误，也不清楚 Verilog 里 <code>include</code> 关键字的用法。</p>
+</li>
+<li>
+<p>目前的处理方法</p>
+<ul>
+<li>
+<p>拆分实验教程给出的多选器模板代码，每个模块定义都拆成一个单独文件，文件名和模块名相同。</p>
+<ul>
+<li>**一个文件中只定义一个模块是良好的 verilog 编程习惯。**当然 verilog 也允许一个文件中定义多个模块，但这多个模块间必然有主从关系，并且要在文件中显式连接主从模块（在主模块定义中实例化从模块并连接对应端口）。</li>
+</ul>
+</li>
+<li>
+<p>拆出的模块文件和自己编写的模块文件放到同一个目录。</p>
+<ul>
+<li>
+<p>只要在 Makefile 中说明了相关文件的位置，模块定义时就可以直接调用其他文件中定义的模块，不用在源码中</p>
+<p><code>include</code>。</p>
+<ul>
+<li>使用 vivado ，要把相关文件添加到同一个工程目录才能直接调用。道理都差不多。</li>
+<li>使用 verlator，为调用其他模而使用 <code>include</code>反而报错，说找不到文件。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Makefile 里定义 <code>.v</code> 源文件路径 <code>VSCRS</code> 时使用了 shell 中的 <code>find</code> 命令，直接把项目目录下所有带 <code>.v</code> 后缀的文件都包含在内，所以直接调用同目录下其他文件中定义的模块可行。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p>综合与时序分析</p>
+</li>
+<li>
+<p>其他</p>
+<ul>
+<li>2 位 4 选 1 选择器模块已成功接入 <code>nvboard</code></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%89%87%E6%AE%B5%E6%91%98%E5%BD%95%E5%92%8C%E4%B8%80%E7%82%B9%E6%83%B3%E6%B3%95">片段摘录和一点想法</a></li>
+<li><a href="#%E5%B0%9D%E8%AF%95%E5%9B%9E%E7%AD%94%E9%97%AE%E9%A2%98">尝试回答问题</a></li>
+<li><a href="#%E5%AE%9E%E9%AA%8C%E9%AA%8C%E6%94%B6">实验验收</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/nju-shu-dian-shi-yan-er/">
+              <h3 class="post-title">
+                NJU-数电实验二
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

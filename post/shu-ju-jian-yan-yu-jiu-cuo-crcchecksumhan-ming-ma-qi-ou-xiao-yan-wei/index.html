@@ -1,0 +1,356 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>数据检验与纠错——CRC、Checksum、汉明码、奇偶校验位 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="数据检验与纠错——CRC、Checksum、汉明码、奇偶校验位 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="是复习过程中遇到的一些有关数据传输的琐碎知识，互有联系但分割零落在不同教材、章节之间，遂作一点潦草记录，只主要地解释具体算法。
+CRC 校验
+
+
+地理位置：
+计算机网络——链路层和局域网——差错检测和校验技术
+
+
+数据准备：
+
+
+DDD，待..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              数据检验与纠错——CRC、Checksum、汉明码、奇偶校验位
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>是复习过程中遇到的一些有关数据传输的琐碎知识，互有联系但分割零落在不同教材、章节之间，遂作一点潦草记录，只主要地解释具体算法。</p>
+<h4 id="crc-校验">CRC 校验</h4>
+<ol>
+<li>
+<p>地理位置：</p>
+<p>计算机网络——链路层和局域网——差错检测和校验技术</p>
+</li>
+<li>
+<p>数据准备：</p>
+<ul>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span></span></span></span>，待发送数据，二进制，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">∣</mi><mi>D</mi><mi mathvariant="normal">∣</mi><mo>=</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">|D| = d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span>（<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span> bits）</p>
+</li>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>G</mi></mrow><annotation encoding="application/x-tex">G</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">G</span></span></span></span>，生成多项式，二进制，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">∣</mi><mi>G</mi><mi mathvariant="normal">∣</mi><mo>=</mo><mi>r</mi><mo>+</mo><mn>1</mn><mo separator="true">,</mo><mi>r</mi><mo>=</mo><mn>8</mn><mi mathvariant="normal">、</mi><mn>12</mn><mi mathvariant="normal">、</mi><mn>16</mn><mi mathvariant="normal">、</mi><mn>32</mn></mrow><annotation encoding="application/x-tex">|G| = r + 1, r = 8、12、16、32</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathdefault">G</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8388800000000001em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span><span class="mord cjk_fallback">、</span><span class="mord">1</span><span class="mord">2</span><span class="mord cjk_fallback">、</span><span class="mord">1</span><span class="mord">6</span><span class="mord cjk_fallback">、</span><span class="mord">3</span><span class="mord">2</span></span></span></span></p>
+</li>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span>，附加比特，二进制，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">∣</mi><mi>R</mi><mi mathvariant="normal">∣</mi><mo>=</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">|R| = r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span></p>
+</li>
+</ul>
+</li>
+<li>
+<p>算法：</p>
+<ul>
+<li>
+<p>发送发处理：</p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi><mo>=</mo><mi>R</mi><mi>e</mi><mi>m</mi><mi>a</mi><mi>i</mi><mi>n</mi><mi>d</mi><mi>e</mi><mi>r</mi><mtext> </mtext><mo>(</mo><mfrac><mrow><mi>D</mi><mtext> </mtext><mo>⋅</mo><mtext> </mtext><msup><mn>2</mn><mi>r</mi></msup></mrow><mi>G</mi></mfrac><mo>)</mo></mrow><annotation encoding="application/x-tex">R = Remainder \  (\frac{D \  \cdot \  2^{r}}{G})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.25598em;vertical-align:-0.345em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span><span class="mord mathdefault">e</span><span class="mord mathdefault">m</span><span class="mord mathdefault">a</span><span class="mord mathdefault">i</span><span class="mord mathdefault">n</span><span class="mord mathdefault">d</span><span class="mord mathdefault">e</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace"> </span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.91098em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">G</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">D</span><span class="mspace mtight"><span class="mtight"> </span></span><span class="mbin mtight">⋅</span><span class="mspace mtight"><span class="mtight"> </span></span><span class="mord mtight"><span class="mord mtight">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7385428571428572em;"><span style="top:-2.931em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span>，即取 $\frac{D \  后补 r 位 0}{G}\ $ 的余数为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span> 位的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.00773em;">R</span></span></span></span>（不够则填充前导零），<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mrow><mo>(</mo><mo>)</mo></mrow><mrow><mo>(</mo><mo>)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">\frac{()}{()}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.53em;vertical-align:-0.52em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 是“伪除法”，<strong>将被除数相减改为被除数异或</strong>。</li>
+</ul>
+</li>
+<li>
+<p>接收方处理：</p>
+<ul>
+<li>以接收数据 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mrow><mi>r</mi><mi>e</mi><mi>c</mi><mi>e</mi><mi>i</mi><mi>v</mi><mi>e</mi></mrow></msub></mrow><annotation encoding="application/x-tex">D_{receive}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">c</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">i</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">v</span><span class="mord mathdefault mtight">e</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 为被除数，与生成多项式 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>G</mi></mrow><annotation encoding="application/x-tex">G</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">G</span></span></span></span> 做“伪除法”，若余数为 <code>0</code> 则接收数据正确，若余数非 <code>0</code> 则接收数据有误。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>特性（计算机网络自顶向下方法（原书第 <code>7</code> 版）P292）：</p>
+<ul>
+<li>
+<p>能检测小于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r + 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span> 比特的突发差错（这意味着所有连续的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span></span></span></span> 比特或者更少的差错都可以检测到。）</p>
+</li>
+<li>
+<p>长度大于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">r + 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span> 比特的突发差错以概率 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn><mo>−</mo><msup><mn>0.5</mn><mi>r</mi></msup></mrow><annotation encoding="application/x-tex">1 - {0.5}^r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.72777em;vertical-align:-0.08333em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.698732em;vertical-align:0em;"></span><span class="mord"><span class="mord"><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.698732em;"><span style="top:-3.09734em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span></span></span></span></span></span></span></span></span></span></span> 被检测到。</p>
+</li>
+<li>
+<p>每个 <code>CRC</code> 标准（以 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>G</mi></mrow><annotation encoding="application/x-tex">G</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">G</span></span></span></span> 的位数区分）也都能检测任何奇数个比特差错。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="checksum-校验和">Checksum 校验和</h4>
+<ol>
+<li>
+<p>地理位置：</p>
+<p>计算机网络——运输层——<code>UDP</code> 校验和</p>
+</li>
+<li>
+<p>数据准备：</p>
+<ul>
+<li>二进制格式下，运输层报文段中所有比特，每 <code>16</code> 位（半字）划分为一个子段。如最后有剩余不足 <code>16</code> 位的也作为一个子段。</li>
+</ul>
+</li>
+<li>
+<p>算法：</p>
+<ul>
+<li>
+<p>发送方处理：</p>
+<ul>
+<li>
+<p>逐次全加，溢出回卷</p>
+<p>前 <code>2</code> 个子段相加，最高位有 <code>1</code> 溢出则将溢出的 <code>1</code> 拉回最低位再加一遍，得到结果 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mrow><mi>t</mi><mi>e</mi><mi>m</mi><mi>p</mi></mrow><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">{temp}_{0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.85922em;vertical-align:-0.24414em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">m</span><span class="mord mathdefault">p</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.20696799999999996em;"><span style="top:-2.4558600000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.24414em;"><span></span></span></span></span></span></span></span></span></span></p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mrow><mi>t</mi><mi>e</mi><mi>m</mi><mi>p</mi></mrow><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">{temp}_{0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.85922em;vertical-align:-0.24414em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">m</span><span class="mord mathdefault">p</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.20696799999999996em;"><span style="top:-2.4558600000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.24414em;"><span></span></span></span></span></span></span></span></span></span> 和下一个子段相加回卷得到 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mrow><mi>t</mi><mi>e</mi><mi>m</mi><mi>p</mi></mrow><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">{temp}_{1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.85922em;vertical-align:-0.24414em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">m</span><span class="mord mathdefault">p</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.20696799999999996em;"><span style="top:-2.4558600000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.24414em;"><span></span></span></span></span></span></span></span></span></span></p>
+</li>
+<li>
+<p>结果取反码</p>
+<p>逐次进行，直到所有子段全加完，得到一个 <code>16</code> 位结果 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mrow><mi>t</mi><mi>e</mi><mi>m</mi><mi>p</mi></mrow><mrow><mi>r</mi><mi>e</mi><mi>s</mi><mi>u</mi><mi>l</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">{temp}_{result}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.85922em;vertical-align:-0.24414em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault">t</span><span class="mord mathdefault">e</span><span class="mord mathdefault">m</span><span class="mord mathdefault">p</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.24196799999999993em;"><span style="top:-2.4558600000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.02778em;">r</span><span class="mord mathdefault mtight">e</span><span class="mord mathdefault mtight">s</span><span class="mord mathdefault mtight">u</span><span class="mord mathdefault mtight" style="margin-right:0.01968em;">l</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.24414em;"><span></span></span></span></span></span></span></span></span></span>，<strong>取其反码，得到校验和检测字段</strong>，和运输层报文段封装一处发送出去。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>接收方处理：</p>
+<ul>
+<li>
+<p>逐次全加，溢出回卷</p>
+<p>接收到报文段数据，每 <code>16</code> 位划为一个子段，逐次全加，溢出回卷，得到结果。</p>
+<p>检查结果是否所有位全为 <code>1</code>，若是则接收数据正确无差错，不是则数据出错。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>特性：</p>
+<p>只能进行差错检测，无法据此恢复差错。</p>
+</li>
+</ol>
+<h4 id="奇偶校验位">奇偶校验位</h4>
+<ol>
+<li>
+<p>地理位置：</p>
+<p>计算机网络——链路层——差错检测和校验技术</p>
+</li>
+<li>
+<p>数据准备：</p>
+<ul>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span></span></span></span>，待发送数据，二进制，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">∣</mi><mi>D</mi><mi mathvariant="normal">∣</mi><mo>=</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">|D| = d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">d</span></span></span></span></p>
+</li>
+<li>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>c</mi></mrow><annotation encoding="application/x-tex">c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">c</span></span></span></span>，奇偶校验位，二进制</p>
+<ul>
+<li>
+<p>一维奇偶校验，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">∣</mi><mi>c</mi><mi mathvariant="normal">∣</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">|c| = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathdefault">c</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></p>
+</li>
+<li>
+<p>二维奇偶校验，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">∣</mi><mi>c</mi><mi mathvariant="normal">∣</mi><mo>=</mo><mi>i</mi><mo>+</mo><mi>j</mi></mrow><annotation encoding="application/x-tex">|c| = i + j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord mathdefault">c</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.74285em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">i</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span></span></span></span>（<code>d</code> 位有效数据被划为 <code>i</code> 行 <code>j</code> 列矩阵）</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>算法：</p>
+<ul>
+<li>
+<p>发送发处理：</p>
+<ul>
+<li>
+<p>一维奇偶校验，根据奇校验（或偶校验）要求，设置奇偶校验位为 <code>0</code> 或 <code>1</code>，保证最终数据中有奇数个（或偶数个）<code>1</code></p>
+</li>
+<li>
+<p>二维奇偶校验，将 <code>d</code> 位有效数据划为 <code>i</code> 行 <code>j</code> 列矩阵，每一行和每一列都添加一个奇偶校验位并按一位校验方式设置校验位的值。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>接收方处理：</p>
+<ul>
+<li>按奇偶要求检查接收数据中 <code>1</code> 的个数即可（一维检查或二维位检查）。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>特性：</p>
+<ul>
+<li>
+<p>只设单个奇偶校验位时，只能检出奇数个比特差错，无法检出偶数个比特差错。</p>
+</li>
+<li>
+<p>设置二维奇偶校验位时，接收方可以<strong>检出并纠正单个比特差错</strong>（包括校验位上出现的单比特差错），可以<strong>检出但无法纠正一个分组中两个比特差错的任意组合</strong>。</p>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="汉明码">汉明码</h4>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#crc-%E6%A0%A1%E9%AA%8C">CRC 校验</a></li>
+<li><a href="#checksum-%E6%A0%A1%E9%AA%8C%E5%92%8C">Checksum 校验和</a></li>
+<li><a href="#%E5%A5%87%E5%81%B6%E6%A0%A1%E9%AA%8C%E4%BD%8D">奇偶校验位</a></li>
+<li><a href="#%E6%B1%89%E6%98%8E%E7%A0%81">汉明码</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/shi-yong-githubio-de-zi-yu-ming-jian-li-ge-ren-bo-ke/">
+              <h3 class="post-title">
+                使用 GitHubIo 的子域名建立个人博客
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

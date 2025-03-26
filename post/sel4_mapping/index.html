@@ -1,0 +1,312 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_Mapping | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_Mapping | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Mpping
+部分文段做了微小增删使句子通顺。
+Background
+Virtual memory
+
+seL4 does not..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_Mapping
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/mapping"><code>seL4</code> Docs/Tutorials/Mpping</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="background">Background</h2>
+<h3 id="virtual-memory">Virtual memory</h3>
+<blockquote>
+<p>seL4 does not provide virtual memory management, beyond kernel primitives for manipulating hardware paging structures. User-level must provide services for creating intermediate paging structures, mapping and unmapping pages.</p>
+<p>Users are free to define their own address space layout with one restriction: the seL4 kernel claims the high part of the virtual memory range. On most 32-bit platforms, this is 0xe0000000 and above. This variable is set per platform, and can be found by finding the <code>kernelBase</code> variable in the seL4 source.</p>
+</blockquote>
+<p><code>seL4</code>  支持虚拟内存，提供了用于操作硬件分页结构的内核原语，但不提供虚拟内存管理的内核函数。</p>
+<p><font color=blue size=2><code>seL4</code> 和 <code>Linux</code> 对比：<code>Linux</code> 也提供了硬件分页结构的抽象原语，如 <code>struct page{...};</code>、<code>struct zone{...};</code>；<code>Linux</code> 还提供了管理虚拟内存的内核函数，如 <code>sruct page * alloc_pages(...);</code>、<code>void free_pages(...);</code>、<code>void * kmalloc(...);</code>，这是 <code>seL4</code> 所没有的。</font></p>
+<p>进行虚拟内存管理所需的<u>创建内存映射中间件、建立页映射和取消映射</u>必须由用户级程序实现。</p>
+<p>用户可以自由定义虚拟内存空间的布局，但有一条限制：<code>seL4</code> 内核要求使用虚拟内存的高地址部分，在大多数 <code>32</code> 位平台上，这个范围从 <code>0xe0000000</code> 开始向高地址延申。</p>
+<h3 id="paging-structures">Paging structures</h3>
+<blockquote>
+<p>As part of the boot process, seL4 initialises the root task with a top-level hardware virtual memory object, which is referred to as a <em>VSpace</em>. A capability to this structure is made available in the <code>seL4_CapInitThreadVSpace</code> slot in the root tasks CSpace.</p>
+</blockquote>
+<p>在系统 <code>boot</code> 过程中，<code>seL4</code> 使用一个顶级硬件虚拟内存对象来初始化 <code>root task</code>，这个对象就是 <code>VSpace</code>，索引这个对象的 <code>capability</code> 存放在名为 <code>seL4_CapInitThreadVSpace</code> 的 <code>CSlot</code> 中。</p>
+<blockquote>
+<p>For each architecture, this capability is to a different object type corresponding to the hardware, top-level paging structure. The table below lists the VSpace object type for each supported architecture.</p>
+</blockquote>
+<p>不同体系结构上，<code>VSpace</code> 对象的定义各不相同，具体可见下表：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/mapping/不同体系结构的VSpcae对象.JPG" alt="automatic-scalability">
+    <figcaption >
+        <font size=2>不同体系结构的VSpcae对象</font>
+        <br>
+        <font size=2>
+            表格图片摘自[Mapping|seL4 docs](https://docs.sel4.systems/Tutorials/mapping)
+        </font>
+    </figcaption>
+</div>
+<blockquote>
+<p>In addition to the top-level paging structure, intermediate hardware virtual memory objects are required to map pages. The table below lists those objects, in order, for each architecture.</p>
+</blockquote>
+<p>建立页映射时，一些虚拟内存中间件是必要的。不同体系结构的硬件上，这些中间件页各不相同，可见下表：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/mapping/不同体系结构的虚拟内存中间件.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>不同体系结构的虚拟内存中间件</font>
+        <br>
+        <font size=2>
+            表格图片摘自[Mapping|seL4 docs](https://docs.sel4.systems/Tutorials/mapping)
+        </font>
+    </figcaption>
+</div>
+<p>显见：<code>AArch64</code> 和 <code>x86_64</code> 体系都使用 <code>4</code> 级页表，所以顶级页表页到 <code>0</code> 级页表页供共需 <code>4</code> 种内核对象来描述。<code>IA32</code> 体系采用 <code>2</code> 级页表，它只需要 <code>2</code> 种内核对象：<code>seL4_PageDirectory</code> 和 <code>seL4_PageTable</code>（页目录页和页表页）。</p>
+<p>关于 <code>x86_64</code> 架构处理器上的分段和分页机制，有几篇很好的博文可以参考：</p>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/324210723">x86 段寄存器和分段机制 | 知乎</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/327860921">x86 的分页机制和 Linux 实现 | 知乎</a></li>
+<li><a href="https://blog.csdn.net/Gyc8787/article/details/121878678">x86-分段与分页详解 | CSDN</a></li>
+</ul>
+<blockquote>
+<p>All mapping functions take three arguments:</p>
+<ul>
+<li>the VSpace to map the object into,</li>
+<li>the virtual address to map the object at,</li>
+<li>virtual memory attributes.</li>
+</ul>
+<p>Virtual memory attributes determine the caching attributes of the mapping, which is architecture dependent.</p>
+</blockquote>
+<p>所有的映射函数都需要这 <code>3</code> 个必要参数：所要映射到的虚拟内存空间、所要映射到的虚拟内存地址和所映射的虚拟内存的属性。“属性”参数决定了映射的缓存特性，具体特性和因硬件平台体系结构不同而不同。</p>
+<blockquote>
+<p>If the virtual memory address provided is not aligned to the size of the paging object, seL4 will mask out any unused bits e.g a 4KiB page mapped at 0xDEADBEEF will end up mapped at 0xDEADB000.</p>
+</blockquote>
+<p>如果指定的虚拟内存地址和实际映射的物理内存对象大小不一致，<code>seL4</code> 会屏蔽掉所有未使用的位，比如将一个 <code>4kB</code> 页指定映射到 <code>0xDEADBEEF</code>，页最终会被映射到 <code>0xDEADB000</code>。</p>
+<h3 id="pages">Pages</h3>
+<blockquote>
+<p>For a page mapping to succeed, all mid-level paging structures must be mapped. The <code>libsel4</code> function <code>seL4_MappingFailedLookupLevel()</code> can be used to determine at which level paging structures are missing.</p>
+</blockquote>
+<p>要想成功映射一个物理页，必须保证建立这个最后一级映射之前的所有虚拟内存中间件都完成了映射，比如 <code>x86_64</code> 架构上，必须先给 <code>seL4_PML4</code>、<code>seL4_PDPT</code> 和 <code>seL4_PageDirectory</code> 这前三级页表页建立映射，然后才能在（进程可用的）物理页和虚拟内存页（<code>seL4_PageTable</code>）之间建立映射。</p>
+<p>当发现某一级映射建立失败时，可调用 <code>seL4_MappingFailedLookupLevel()</code> 函数向上查看哪一级映射出了问题，该函数返回的错误码定义在 <code>seL4-tutorials-manifest/kernel/libsel4/sel4_arch_include/x86_64（或aarch64）/sel4/sel4_arch/mapping.h</code>，部分内容如下：</p>
+<pre><code class="language-c">#define SEL4_MAPPING_LOOKUP_LEVEL 2
+#define SEL4_MAPPING_LOOKUP_NO_PT 21
+#define SEL4_MAPPING_LOOKUP_NO_PD 30
+#define SEL4_MAPPING_LOOKUP_NO_PDPT 39
+</code></pre>
+<h4 id="tyeps-and-sizes">Tyeps and sizes</h4>
+<blockquote>
+<p>Page types and sizes are architecture dependent. For both x86 and ARM architectures, each size of page is a different object type with a specific size. On RISC-V, pages are the same object type and variably sized. Configuration and hardware settings alter the available page sizes.</p>
+</blockquote>
+<p>在 <code>x86</code> 和 <code>ARM</code> 体系上，不同尺寸的页被定义为不同类型的对象，在 <code>RISC-V</code> 体系上，页被统一定义为一种对象，只不过拥有可变大小。</p>
+<h2 id="excercises">Excercises</h2>
+<h3 id="map-a-page-table">Map a page table</h3>
+<blockquote>
+<p>The page is successfully mapped and we read a value of 0: as seL4 zeros all non-device pages when they are retyped from untyped memory.</p>
+</blockquote>
+<p><code>seL4</code> 用 <code>0</code> 初始化所有新分配的、非设备内存的物理内存页。</p>
+<blockquote>
+<p>Since the initial task does not have a fault handler (more details in the upcoming threads tutorial), this triggers a subsequent capability fault (cap fault) on slot 0 (nil). Because you are running a debug kernel for the tutorial, the kernel outputs the details of both faults.</p>
+<p>The vm fault is the most interesting: it shows the fault address, fault status register, and the instruction pointer that the fault occured on (address).</p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/mapping/cap_fault.JPG" alt="automatic-scalability">
+    <figcaption font size=2>vm fault</figcaption>
+</div>
+<h3 id="unmapping-pages">Unmapping pages</h3>
+<blockquote>
+<p>Pages can be unmapped by either using <code>Unmap</code> invocations on the page or any intermediate paging structure, or deleting the final capability to any of the paging structure.</p>
+</blockquote>
+<h3 id="final-result">Final result</h3>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/mapping/final_result.JPG" alt="automatic-scalability">
+    <figcaption font size=2>final result</figcaption>
+</div>
+<p>在主程序退出之前，应记得解除所有用户建立的映射，不然可能报错。</p>
+<h2 id="one-more-thing-or-more">One More Thing (or more?)</h2>
+<ul>
+<li>Try unmapping the structures you just mapped in.</li>
+<li>Port this tutorial to another architecture (ARM, RISCV).</li>
+<li>Create a generic function for converting from <code>seL4_MappingFailedLookupLevel</code> to the required seL4 object.</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#virtual-memory">Virtual memory</a></li>
+<li><a href="#paging-structures">Paging structures</a></li>
+<li><a href="#pages">Pages</a>
+<ul>
+<li><a href="#tyeps-and-sizes">Tyeps and sizes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#excercises">Excercises</a>
+<ul>
+<li><a href="#map-a-page-table">Map a page table</a></li>
+<li><a href="#unmapping-pages">Unmapping pages</a></li>
+<li><a href="#final-result">Final result</a></li>
+</ul>
+</li>
+<li><a href="#one-more-thing-or-more">One More Thing (or more?)</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_ipc/">
+              <h3 class="post-title">
+                seL4_IPC
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

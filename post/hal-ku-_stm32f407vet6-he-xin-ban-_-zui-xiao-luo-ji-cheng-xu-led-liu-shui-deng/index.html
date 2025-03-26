@@ -1,0 +1,356 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HAL 库_STM32F407VET6 核心板_最小裸机程序-LED 流水灯 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="HAL 库_STM32F407VET6 核心板_最小裸机程序-LED 流水灯 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="我感到无比的屈辱和悲愤（
+为什么回到软件最小系统，因为尝试了直接去做完整系统（软件加硬件），失败。
+连硬件的时候还因操作失误撅歪了核心板的一只引脚，难受(′⌒`)。
+
+	
+	
+	歪掉的 PD1
+	
+
+Anyway，还是回到最小系统 + 增量..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              HAL 库_STM32F407VET6 核心板_最小裸机程序-LED 流水灯
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>我感到无比的屈辱和悲愤（</p>
+<p>为什么回到软件最小系统，因为尝试了直接去做完整系统（软件加硬件），失败。<br>
+连硬件的时候还因操作失误撅歪了核心板的一只引脚，难受(′⌒`)。</p>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/STM32F407引脚歪了.jpg" width=40%>
+	<font size=1>
+	<figcaption>歪掉的 PD1</figcaption>
+	</font>
+</div>
+<p><code>Anyway</code>，还是回到最小系统 + 增量改进的路子上来。<br>
+感觉结课之前这个东西是做不完了，难受(′⌒`)。</p>
+<p>以下正文。</p>
+<p>本文主要内容是记录在 <code>STM32F407VET6</code> 核心板上用 <code>HAL</code> 构建软件最小系统的过程，最重要的部分自然是一些硬件初始化参数的设置（时钟、引脚等），软件部分只有一个简单的流水灯逻辑，作验证硬件配置正确性之用。</p>
+<h4 id="时钟配置">时钟配置</h4>
+<ul>
+<li>
+<p>系统时钟源选择 <code>SysTick</code>。</p>
+</li>
+<li>
+<p>使用外部 <code>25M</code> 无源晶振作为高速外部时钟源（<code>HSE</code>），分频情况如下：</p>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/YDStudio_STM32F407最小系统板时钟配置.png">
+	<font size=1>
+	<figcaption>系统时钟配置</figcaption>
+	</font>
+</div>
+<ul>
+<li>
+<p>不难看出，蒟蒻的 <code>W</code> 同学还是选择了使用 <code>CubeMX</code> 以使硬件配置过程达到任何意义上的“最简”。</p>
+</li>
+<li>
+<p>对上图的一些解释：</p>
+<ul>
+<li>
+<p><code>Input frequency</code>：外部晶振提供的输入时钟，这个要看硬件设计，比较多见的是 <code>25M Hz</code> 有源/无源晶振。</p>
+<ul>
+<li>关于有源/无源晶振，可参见 <a href="https://blog.csdn.net/songxunwen/article/details/121385560">STM32CubeMX时钟源的选择 | CSDN | blog.csdn.net</a>。</li>
+<li>我的<code>源地工作室 STM32F407VET6 最小系统板</code>，板载 <code>25M Hz</code> <strong>无源</strong>晶振，硬件原理图如下（图中把晶振频率标成了 <code>12M Hz</code>）</li>
+</ul>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/YDStudio_STM32F407晶振电路.png" width=70%>
+	<font size=1>
+	<figcaption >25M Hz 主晶振电路</figcaption>
+	</font>
+</div>
+<ul>
+<li>既然时钟源是外部无源晶振，<code>RCC</code> 配置项中就应选择 <code>Resonator</code> 模式。
+<ul>
+<li>我初次配置看到原理图里晶振四个脚，误认为是有源晶振，选了 <code>BYPASS</code> 时钟源模式，导致处理器完全无法启动。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>PLLCLK</code>：锁相环时钟，因为要使用锁相环对晶振提供的 <code>25M Hz</code> 时钟做一点分频和倍频来把时钟频率拉高（如拉到 <code>168M Hz</code>），所以<strong>选择锁相环时钟的输出作为系统时钟 <code>SYSCLK</code>。</strong></p>
+<ul>
+<li>[latex]/M、*N、/P[/latex] 是锁相环的分/倍频参数，适当设置，使锁相环能输出期望的时钟频率即可。</li>
+</ul>
+</li>
+<li>
+<p><code>AHB Prescaler</code>：<code>AHB</code> 总线时钟预分频器。输入 <code>SYSCLK</code>，输出 <code>HCLK</code>。</p>
+<ul>
+<li><code>HCLK</code> 是提供给挂在 <code>AHB</code> 总线上的<strong>高速设备</strong>的时钟，详细解释可见 <a href="https://blog.csdn.net/edgar_l/article/details/23611901">stm32的各种时钟FCLK、PCLK、HCLK | CSDN | blog.csdn.net</a></li>
+<li><code>HCLK</code> 最终供给了 <code>Ethernet PTP Clock</code>（以太网外设）、<code>AHB bus</code>（<code>AHB</code> 总线）、<code>memory and DMA</code>（内存和 <code>DMA</code>）、<code>Cortex System timer</code>（系统定时器 <code>SysTick</code>）、<code>FCLK Cortex clock</code>（<code>MCU</code> 内核时钟）和 <code>APB Prescalerx</code>。</li>
+</ul>
+</li>
+<li>
+<p><code>APB Prescalerx</code>：<code>APB</code> 总线时钟预分频器，一共两个。输入 <code>HCLK</code>，输出 <code>PCLKx</code>。</p>
+<ul>
+<li><code>PCLK</code> 是提供给挂在 <code>APB</code> 总线上的<strong>低速设备</strong>的时钟。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="gpio-配置"><code>GPIO</code> 配置</h4>
+<ul>
+<li>
+<p>因为使用了无源外部晶振所以会自动分配两个引脚作为 <code>OSC_IN</code> 和 <code>OSC_OUT</code>，本例中分别是 <code>PH0</code> 和 <code>PH1</code>。</p>
+</li>
+<li>
+<p>本例中唯一用到的外设是三个板载的 <code>LED</code>，根据硬件原理图配置相应的 <code>GPIO</code> 即可，<code>LED</code> 硬件原理如下图：</p>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/YDStudio_STM32F407最小系统板指示灯原理图.png" width=45%>
+	<font size=1>
+	<figcaption>LED 硬件原理</figcaption>
+	</font>
+</div>
+<ul>
+<li>配置 <code>PA13、PA14、PA15</code> 为低速、下拉、推挽输出高电平即可。</li>
+</ul>
+</li>
+</ul>
+<h4 id="代码">代码</h4>
+<p>只主要地贴出 <code>LED</code> 的软件逻辑。</p>
+<ul>
+<li>
+<p><code>led.c</code></p>
+<pre><code class="language-c">#include &quot;led.h&quot;
+
+/**
+	* @Author Bouse-w
+	* @Param led_tag：3 个 led 的标号，可以是 0，1，2
+	* 打开指定的一个 LED
+	*/
+void LED_On(uint8_t led_tag)
+{
+	HAL_GPIO_WritePin(GPIOA, (GPIO_PIN_13 &lt;&lt; led_tag), GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOA, (GPIO_PIN_13 &lt;&lt; led_tag), GPIO_PIN_SET);
+
+	return;
+}
+
+/**
+	* @Author Bouse-w
+	* @Param led_tag：3 个 led 的标号，可以是 0，1，2
+	* 关闭指定的一个 LED
+	*/
+void LED_Off(uint8_t led_tag)
+{
+	HAL_GPIO_WritePin(GPIOA, (GPIO_PIN_13 &lt;&lt; led_tag), GPIO_PIN_RESET);
+
+	return;
+}
+</code></pre>
+</li>
+<li>
+<p><code>led.h</code></p>
+<pre><code class="language-c">/**
+	* @Author Bouse-w
+	* Led 外设初始化头文件
+	*/
+
+#ifndef LED_H
+#define LED_H
+
+#include &quot;main.h&quot;
+
+/* 宏定义 */
+/* 简单定义 LED 外设初始化函数 */
+#define LED_Init()   MX_GPIO_Init()
+
+/* 函数声明 */
+/* 打开指定 LED */
+void LED_On(uint8_t led_tag);
+
+/*关闭指定 LED */
+void LED_Off(uint8_t led_tag);
+
+#endif	/* LED_H */
+</code></pre>
+</li>
+</ul>
+<h4 id="最终效果">最终效果</h4>
+<div align="center">
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/4/裸机最小系统点亮LED最终效果.jpg" width="50%">
+	<font size=1>
+	<figcaption>反正它亮了</figcaption>
+	</font>
+</div
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E6%97%B6%E9%92%9F%E9%85%8D%E7%BD%AE">时钟配置</a></li>
+<li><a href="#gpio-%E9%85%8D%E7%BD%AE"><code>GPIO</code> 配置</a></li>
+<li><a href="#%E4%BB%A3%E7%A0%81">代码</a></li>
+<li><a href="#%E6%9C%80%E7%BB%88%E6%95%88%E6%9E%9C">最终效果</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/docker-pei-zhi-mpi-bing-xing-huan-jing-bing-shi-xian-ju-zhen-cheng-bing-xing/">
+              <h3 class="post-title">
+                Docker 配置 MPI 并行环境并实现矩阵乘并行
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

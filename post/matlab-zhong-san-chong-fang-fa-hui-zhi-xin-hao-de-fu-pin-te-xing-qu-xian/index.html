@@ -1,0 +1,388 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Matlab 中三种方法绘制信号的幅频特性曲线 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Matlab 中三种方法绘制信号的幅频特性曲线 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="越发感觉到自己的愚钝，大家随手一写的事情我必须一点一点慢慢去看和想，花费几倍于人的时间也不一定有上佳的效果。
+我起初无法接受这样的愚钝，不过也在慢慢习惯。
+本文中我们用如下信号做演示：
+{f(t)=0.5(1+cos⁡(t)), −π≤t≤..." />
+    <meta name="keywords" content="信号与系统" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Matlab 中三种方法绘制信号的幅频特性曲线
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/JOLqUn5l5N/" class="post-tag">
+                  # 信号与系统
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>越发感觉到自己的愚钝，大家随手一写的事情我必须一点一点慢慢去看和想，花费几倍于人的时间也不一定有上佳的效果。</p>
+<p>我起初无法接受这样的愚钝，不过也在慢慢习惯。</p>
+<p>本文中我们用如下信号做演示：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo fence="true">{</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mn>0.5</mn><mo>(</mo><mn>1</mn><mo>+</mo><mi>cos</mi><mo>⁡</mo><mo>(</mo><mi>t</mi><mo>)</mo><mo>)</mo><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mi>π</mi><mo>≤</mo><mi>t</mi><mo>≤</mo><mi>π</mi></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>↔</mo><mi>F</mi><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mi>sin</mi><mo>⁡</mo><mo>(</mo><mi>π</mi><mi>ω</mi><mo>)</mo></mrow><mrow><mi>ω</mi><mo>(</mo><mn>1</mn><mo>−</mo><msup><mi>ω</mi><mn>2</mn></msup><mo>)</mo></mrow></mfrac></mrow></mstyle></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">\begin{cases}
+&amp;f(t) = 0.5(1 + \cos (t)), \ - \pi \leq t \leq \pi \\\\
+&amp;f(t) \leftrightarrow F(j \omega) = \frac{\sin (\pi \omega)}{\omega (1 - \omega^2)}
+\end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:4.41em;vertical-align:-1.955em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.35002em;"><span style="top:-2.19999em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-2.19999em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎪</span></span></span><span style="top:-3.1500100000000004em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.30001em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎪</span></span></span><span style="top:-4.60002em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.8500199999999998em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.455em;"><span style="top:-4.457000000000001em;"><span class="pstrut" style="height:3.01em;"></span><span class="mord"></span></span><span style="top:-3.017em;"><span class="pstrut" style="height:3.01em;"></span><span class="mord"></span></span><span style="top:-1.5750000000000002em;"><span class="pstrut" style="height:3.01em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.9549999999999996em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.455em;"><span style="top:-4.457000000000001em;"><span class="pstrut" style="height:3.01em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mop">cos</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord">−</span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord mathdefault">t</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span></span></span><span style="top:-1.5749999999999997em;"><span class="pstrut" style="height:3.01em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">↔</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.01em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7463142857142857em;"><span style="top:-2.786em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.485em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mop mtight">sin</span><span class="mopen mtight">(</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">π</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.52em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.955em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<h6 id="分析一下信号">分析一下信号</h6>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mn>0.5</mn><mo>(</mo><mn>1</mn><mo>+</mo><mi>cos</mi><mo>⁡</mo><mo>(</mo><mi>t</mi><mo>)</mo><mo>)</mo><mo separator="true">,</mo><mtext> </mtext><mo>−</mo><mi>π</mi><mo>≤</mo><mi>t</mi><mo>≤</mo><mi>π</mi></mrow><annotation encoding="application/x-tex">f(t) = 0.5(1 + \cos (t)), \ - \pi \leq t \leq \pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0</span><span class="mord">.</span><span class="mord">5</span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">cos</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord">−</span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.7719400000000001em;vertical-align:-0.13597em;"></span><span class="mord mathdefault">t</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span></span></span></span>，时域自变量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.61508em;vertical-align:0em;"></span><span class="mord mathdefault">t</span></span></span></span> 限制在 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>[</mo><mo>−</mo><mi>π</mi><mo separator="true">,</mo><mtext> </mtext><mi>π</mi><mo>]</mo></mrow><annotation encoding="application/x-tex">[- \pi, \ \pi]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">−</span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mspace"> </span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="mclose">]</span></span></span></span>，所以这是一个能量信号而非功率信号。<strong>管致中.《信号与系统》.（第六版上册）.P120</strong> 明确了形如 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">f(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span></span></span></span> 的信号为“升余弦脉冲”:</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mo>[</mo><mn>1</mn><mo>+</mo><mi>cos</mi><mo>⁡</mo><mo>(</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>T</mi></mfrac><mi>t</mi><mo>)</mo><mo>]</mo><mo>⋅</mo><mo>[</mo><mi>ε</mi><mo>(</mo><mi>t</mi><mo>+</mo><mfrac><mi>T</mi><mn>2</mn></mfrac><mo>)</mo><mo>−</mo><mi>ε</mi><mo>(</mo><mi>t</mi><mo>−</mo><mfrac><mi>T</mi><mn>2</mn></mfrac><mo>)</mo><mo>]</mo></mrow><annotation encoding="application/x-tex">f(t) = [1 + \cos (\frac{2 \pi}{T} t)] \cdot [\varepsilon (t + \frac{T}{2}) - \varepsilon (t - \frac{T}{2})]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.00744em;vertical-align:-0.686em;"></span><span class="mop">cos</span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.32144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathdefault">ε</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.04633em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.36033em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">ε</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.04633em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.36033em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mclose">]</span></span></span></span></span></p>
+<p>其傅氏变换直接对应于频域函数：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mn>8</mn><msup><mi>π</mi><mn>2</mn></msup><mi>sin</mi><mo>⁡</mo><mo>(</mo><mi>T</mi><mfrac><mi>ω</mi><mn>2</mn></mfrac><mo>)</mo></mrow><mrow><mi>ω</mi><mo>(</mo><mn>4</mn><msup><mi>π</mi><mn>2</mn></msup><mo>−</mo><msup><mi>T</mi><mn>2</mn></msup><msup><mi>ω</mi><mn>2</mn></msup><mo>)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">F(j \omega) = \frac{8 \pi^2 \sin (T \frac{\omega}{2})}{\omega (4 \pi^2 - T^2 \omega^2)}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.485108em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.549108em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mopen">(</span><span class="mord">4</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.740108em;"><span style="top:-2.9890000000000003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.740108em;"><span style="top:-2.9890000000000003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.740108em;"><span style="top:-2.9890000000000003em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.7350000000000003em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">8</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop">sin</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.13889em;">T</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.695392em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>如果 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">f(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span></span></span></span> 是一个没有时间限制的功率信号，那它的傅里叶变换会完全不同：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo fence="true">{</mo><mtable><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>=</mo><mn>1</mn><mo>+</mo><mi>cos</mi><mo>⁡</mo><mo>(</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>T</mi></mfrac><mi>t</mi><mo>)</mo></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd></mtr><mtr><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow></mrow></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="false"><mrow><mi>F</mi><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo><mo>=</mo><mn>2</mn><mi>π</mi><mi>δ</mi><mo>(</mo><mi>ω</mi><mo>)</mo><mo>+</mo><mi>π</mi><mi>δ</mi><mo>(</mo><mi>ω</mi><mo>−</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>T</mi></mfrac><mo>)</mo><mo>+</mo><mi>π</mi><mi>δ</mi><mo>(</mo><mi>ω</mi><mo>+</mo><mfrac><mrow><mn>2</mn><mi>π</mi></mrow><mi>T</mi></mfrac><mo>)</mo></mrow></mstyle></mtd></mtr></mtable></mrow><annotation encoding="application/x-tex">\begin{cases}
+&amp;f(t) = 1 + \cos (\frac{2 \pi}{T} t)
+\\\\
+&amp;F(j \omega) = 2 \pi \delta (\omega) + \pi \delta (\omega - \frac{2 \pi}{T}) + \pi \delta (\omega + \frac{2 \pi}{T})
+\end{cases}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:4.32em;vertical-align:-1.9100000000000001em;"></span><span class="minner"><span class="mopen"><span class="delimsizing mult"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.35002em;"><span style="top:-2.19999em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎩</span></span></span><span style="top:-2.19999em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎪</span></span></span><span style="top:-3.1500100000000004em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎨</span></span></span><span style="top:-4.30001em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎪</span></span></span><span style="top:-4.60002em;"><span class="pstrut" style="height:3.15em;"></span><span class="delimsizinginner delim-size4"><span>⎧</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.8500199999999998em;"><span></span></span></span></span></span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"></span></span><span style="top:-2.97em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"></span></span><span style="top:-1.5300000000000002em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.9099999999999997em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.41em;"><span style="top:-4.41em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mop">cos</span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">π</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">t</span><span class="mclose">)</span></span></span><span style="top:-1.5299999999999998em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="mord mathdefault" style="margin-right:0.03785em;">δ</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="mord mathdefault" style="margin-right:0.03785em;">δ</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">π</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">π</span><span class="mord mathdefault" style="margin-right:0.03785em;">δ</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">π</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.9100000000000001em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<h6 id="matlab-绘制幅频特性曲线的三种方法"><code>Matlab</code> 绘制幅频特性曲线的三种方法</h6>
+<ol>
+<li>
+<p>直接法：根据傅里叶变换定义式 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo><mo>=</mo><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mrow><mo>+</mo><mi mathvariant="normal">∞</mi></mrow></msubsup><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>⋅</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mi>ω</mi><mi>t</mi></mrow></msup><mi>d</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">F(j \omega) = \int_{- \infty}^{+ \infty} f(t) \cdot e^{-j \omega t} dt</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.380382em;vertical-align:-0.41415100000000005em;"></span><span class="mop"><span class="mop op-symbol small-op" style="margin-right:0.19445em;position:relative;top:-0.0005599999999999772em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9662310000000001em;"><span style="top:-2.34418em;margin-left:-0.19445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">∞</span></span></span></span><span style="top:-3.2579000000000002em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span><span class="mord mtight">∞</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.41415100000000005em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.824664em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span><span class="mord mathdefault mtight">t</span></span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span><span class="mord mathdefault">t</span></span></span></span></p>
+<ul>
+<li>源代码</li>
+</ul>
+<pre><code class="language-shell">	clear;
+	clc;
+	syms t f_t F_jw
+
+	j = sqrt(-1);
+
+	% 时域自变量
+	dt = 0.001;
+	t = -pi:dt:pi;
+	% 频域自变量
+	w = -20:0.001:20;
+
+	% 原始信号时域表示
+	f_t = 0.5 * (1 + cos(t));
+
+	% 傅里叶变换
+	F_jw = f_t * exp(-1 * j * t' * w) * dt;
+
+	% 图像
+	figure;
+	% 时域图
+	subplot(2, 1, 1);
+	plot(t, f_t);
+	title(&quot;Time Domain&quot;);
+	xlabel(&quot;t&quot;);
+	ylabel(&quot;f(t)&quot;);
+	% 幅频特性图
+	F_jw = abs(F_jw);
+	subplot(2, 1, 2);
+	plot(w, F_jw);
+	title(&quot;Frequency Domain&quot;);
+	xlabel(&quot;w&quot;);
+	ylabel(&quot;F(jw)&quot;);
+</code></pre>
+<ul>
+<li>
+<p>分析一下</p>
+<ul>
+<li>数字域上计算积分只能是用小量求和代劳，步长越小近似效果越好。这里是用 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msubsup><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mrow><mi>N</mi><mo>−</mo><mn>1</mn></mrow></msubsup><mi>f</mi><mo>(</mo><mi>n</mi><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>)</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mi>ω</mi><mo>(</mo><mi>n</mi><mi mathvariant="normal">Δ</mi><mi>t</mi><mo>)</mo></mrow></msup><mo>⋅</mo><mi mathvariant="normal">Δ</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">\sum_{n=0}^{N-1} f(n \Delta t) e^{-j \omega (n \Delta t)} \cdot \Delta t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2809409999999999em;vertical-align:-0.29971000000000003em;"></span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.981231em;"><span style="top:-2.40029em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">n</span><span class="mrel mtight">=</span><span class="mord mtight">0</span></span></span></span><span style="top:-3.2029em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.10903em;">N</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.29971000000000003em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mord">Δ</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8879999999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span><span class="mopen mtight">(</span><span class="mord mathdefault mtight">n</span><span class="mord mtight">Δ</span><span class="mord mathdefault mtight">t</span><span class="mclose mtight">)</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord">Δ</span><span class="mord mathdefault">t</span></span></span></span> 代替 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mrow><mo>+</mo><mi mathvariant="normal">∞</mi></mrow></msubsup><mi>f</mi><mo>(</mo><mi>t</mi><mo>)</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><mi>ω</mi><mi>t</mi></mrow></msup><mi>d</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">\int_{- \infty}^{+ \infty} f(t) e^{-j \omega t} dt</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.380382em;vertical-align:-0.41415100000000005em;"></span><span class="mop"><span class="mop op-symbol small-op" style="margin-right:0.19445em;position:relative;top:-0.0005599999999999772em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9662310000000001em;"><span style="top:-2.34418em;margin-left:-0.19445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">∞</span></span></span></span><span style="top:-3.2579000000000002em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">+</span><span class="mord mtight">∞</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.41415100000000005em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.824664em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span><span class="mord mathdefault mtight">t</span></span></span></span></span></span></span></span></span><span class="mord mathdefault">d</span><span class="mord mathdefault">t</span></span></span></span>，用向量与矩阵的点乘便利计算这个求和式：</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/1/傅氏变换向量矩阵乘.png" alt="automatic-scalability">
+</div>
+<p>不难看出，频域自变量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>ω</mi></mrow><annotation encoding="application/x-tex">\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span></span></span></span> 的每个值对应 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>j</mi><msup><mi>t</mi><mi>T</mi></msup><mo>⋅</mo><mover accent="true"><mi>ω</mi><mo>⃗</mo></mover></mrow></msup></mrow><annotation encoding="application/x-tex">e^{-j t^T \cdot \vec \omega}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.006365em;vertical-align:0em;"></span><span class="mord"><span class="mord mathdefault">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.006365em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathdefault mtight" style="margin-right:0.05724em;">j</span><span class="mord mtight"><span class="mord mathdefault mtight">t</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9190928571428572em;"><span style="top:-2.931em;margin-right:0.07142857142857144em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathdefault mtight" style="margin-right:0.13889em;">T</span></span></span></span></span></span></span></span><span class="mbin mtight">⋅</span><span class="mord accent mtight"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.714em;"><span style="top:-2.714em;"><span class="pstrut" style="height:2.714em;"></span><span class="mord mathdefault mtight" style="margin-right:0.03588em;">ω</span></span><span style="top:-2.714em;"><span class="pstrut" style="height:2.714em;"></span><span class="accent-body" style="left:-0.2355em;"><span class="overlay mtight" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span> 中的一组列向量，与行向量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mover accent="true"><mi>f</mi><mo>⃗</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">\vec f(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2274399999999999em;vertical-align:-0.25em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9774399999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span></span><span style="top:-3.26344em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.06882999999999997em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width='0.471em' height='0.714em' style='width:0.471em' viewBox='0 0 471 714' preserveAspectRatio='xMinYMin'><path d='M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z'/></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span></span></span></span> 点积求和后得到一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">F(j \omega)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span></span></span></span> 的值。</p>
+</li>
+<li>
+<p>时域图和幅频图</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/1/向量矩阵乘时频图.png" alt="automatic-scalability" width=80%>
+</div>
+</li>
+</ul>
+</li>
+<li>
+<p>使用 <code>for</code> 循环：方法 <code>1</code> 的另一种形式而已</p>
+<ul>
+<li>
+<p>源代码</p>
+<pre><code class="language-shell">% 单边指数信号的频谱数值求解实现代码
+clc;
+syms t dt w dw n w_n f_t F_jw;             % 定义变量
+
+j = sqrt(-1);           % 定义虚数
+dt = 0.001;
+t = -pi: dt :pi;          % 从 0 到 10 截取 1000 个点。注意因果信号时间起点从 0.01 开始。
+f_t = 0.5 * (1 + cos(t));
+
+N = length(t);
+dw = 0.001;
+w = [-20 : dw: 20]';
+F_jw = zeros(length(w), 1);      % 需要定义Fw为一个向量，向量维度需要与自变量w的维度相同
+
+for n = 1 : length(w)            % 对于每一个w，利用离散求和可以计算获得一个Fw
+	w_n = w(n);
+	%%-------------------------------------------------------------------------------------
+	 % 编写程序。对于每一个给定的角频率w，计算积分，也就是对所有的时间对应的量进行离散求和
+	 % F_jw (n) = sum (dt * f_t .* exp (-j * w_n * t));
+	 F_jw (n) = dt * f_t * （exp (-j * w_n * t)');
+	 %%-----------------------------------------------------------------------------------
+end
+
+subplot (3, 1, 1);
+plot (t, f_t);
+xlabel ('时域自变量 t');
+ylabel ('时域因变量 f(t)');
+grid on;
+title ('时域 wave');
+
+amplitude = abs (F_jw);   % 求幅度谱
+subplot (3, 1, 2);
+plot (w, amplitude)     % 展示幅度谱
+xlabel ('角频率/弧度');
+ylabel('幅度谱')
+grid on
+title ('Amplitude Spectrum')
+
+phase=angle (F_jw);   % 求相位谱
+subplot (3, 1, 3);
+plot (w, phase);    % 展示相位谱
+xlabel ('角频率/弧度');
+ylabel('相位谱/弧度')
+grid on
+title ('Phase Spectrum')
+</code></pre>
+<p>原理上和方法 <code>1</code> 没有本质不同。给出了一种绘制相频图的方法，值得参考。</p>
+</li>
+<li>
+<p>时域图，幅频图，相频图</p>
+</li>
+</ul>
+<div align=center>
+		<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/1/向量for乘时频图.png" alt="automatic-scalability" width=80%>
+</div>
+</li>
+<li>
+<p>先射箭后画靶：求出傅里叶变换的理论表达式 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">F(j \omega)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span></span></span></span>，以 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>ω</mi></mrow><annotation encoding="application/x-tex">\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span></span></span></span> 为自变量，绘制图像。</p>
+<ul>
+<li>
+<p>源代码</p>
+<pre><code class="language-shell">clc;
+syms t dt w dw f_t F_jw;
+
+dt = 0.001;
+t = -pi : dt : pi;
+f_t = 0.5 * (1 + cos(t));
+subplot (211);
+plot (t, f_t);
+xlabel ('t');
+ylabel ('f(t)');
+title ('f(t) 的时域波形图');
+
+dw = 0.001;
+w = -20 : dw : 20;
+F_jw = sin(pi * w) ./ (w .* (1 - w.*w));
+subplot (212);
+plot (w, F_jw);
+xlabel ('ω');
+ylabel ('F(jω)');
+title ('f(t) 的幅频特性曲线');
+</code></pre>
+<p>根据前文信号分析部分直接写出 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>F</mi><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">F(j \omega)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">F</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.05724em;">j</span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span><span class="mclose">)</span></span></span></span> 的解析式，以 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>ω</mi></mrow><annotation encoding="application/x-tex">\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03588em;">ω</span></span></span></span> 为自变量，像画时域图一样画图即可。这样并不好，并不是所有信号都能写出时域解析式，更多时候可能只能拿到一个时点值构成的向量，更不消说基于此求出傅里叶变化的解析式。</p>
+</li>
+<li>
+<p>时域图和幅频图</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/1/直接写解析式时频图.png" alt="automatic-scalability" width=80%>
+</div>
+</li>
+</ul>
+<p>总之还是前两种方法来得好些。</p>
+</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%88%86%E6%9E%90%E4%B8%80%E4%B8%8B%E4%BF%A1%E5%8F%B7">分析一下信号</a></li>
+<li><a href="#matlab-%E7%BB%98%E5%88%B6%E5%B9%85%E9%A2%91%E7%89%B9%E6%80%A7%E6%9B%B2%E7%BA%BF%E7%9A%84%E4%B8%89%E7%A7%8D%E6%96%B9%E6%B3%95"><code>Matlab</code> 绘制幅频特性曲线的三种方法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/markdown-zi-ti-se-cai/">
+              <h3 class="post-title">
+                Markdown 字体色彩
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

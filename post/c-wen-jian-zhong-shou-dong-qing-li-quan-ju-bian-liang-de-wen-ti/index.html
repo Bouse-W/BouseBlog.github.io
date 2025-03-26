@@ -1,0 +1,354 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>C文件中手动清理全局变量的问题 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="C文件中手动清理全局变量的问题 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="全局变量的声明、定义和使用
+GPT 3.5
+
+
+静态存储区中的全局变量通常会被分配在程序文件的 bss 段（Block Started by Symbol）。
+bss 段是可执行文件或共享库的一部分，用于存储未初始化的全局变量和静态变量。这..." />
+    <meta name="keywords" content="C-C++" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              C文件中手动清理全局变量的问题
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/cI4HnL3vJA/" class="post-tag">
+                  # C-C++
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="全局变量的声明-定义和使用">全局变量的声明、定义和使用</h4>
+<h5 id="gpt-35">GPT 3.5</h5>
+<blockquote>
+<ul>
+<li>静态存储区中的全局变量通常会被分配在程序文件的 <code>bss</code> 段（Block Started by Symbol）。</li>
+<li><code>bss</code> 段是可执行文件或共享库的一部分，用于存储未初始化的全局变量和静态变量。这些变量在编译时并没有具体的初始值，因此它们在程序执行之前会被默认初始化为零或空值。</li>
+<li>需要注意的是，已初始化的全局变量通常会被分配在数据段而不是 <code>bss</code> 段。而是分配到数据段。 总结起来，静态存储区中的<strong>未初始化、部分初始化的全局变量（如数组初始化部分元素）和静态变量通常会被分配在程序文件的 <code>bss</code> 段</strong>，而<strong>已初始化的全局变量和静态变量则会被分配在数据段</strong>。</li>
+</ul>
+</blockquote>
+<p><code>GPT</code> 所言有不少错误，上面呈现的内容已经过修改。</p>
+<h6 id="提一小问">提一小问</h6>
+<p>分配到 .bss 段的变量，在使用时如何获得内存空间？</p>
+<h6 id="答一小问">答一小问</h6>
+<p><code>.bss</code> 段用来记录未初始化的、部分初始化的全局变量和静态变量及其<strong>段长</strong>。</p>
+<p>在编译时，这些变量被默认初始化为 0，编译器不会扩展 <code>.data</code> 段来存储他们的值（全 0 没必要存储），而只是在 <code>.bss</code> 段中留下一条记录，保存其段长。程序装载运行时，解析器或操作系统根据 <code>.bss</code> 段中的记录为其分配等于段长的内存空间。</p>
+<h5 id="代码分析">代码分析</h5>
+<p><font color=orange><code>file name: esp8266.c</code></font></p>
+<pre><code class="language-c">// 使用未初始化的的全局变量
+unsigned char esp8266_buf[128];
+
+unsigned short esp8266_cnt = 0, esp8266_cntPre = 0;
+
+/**
+  * @brief  向 ESP8266 发送 AT 命令
+  * @param  cmd：命令、res：预期的响应值
+  * @retval 0：成功、1：失败
+  */
+_Bool ESP8266_SendCmd(char *cmd, char *res)
+{
+
+	unsigned char timeOut = 200;
+
+	Usart_SendString(USART2, (unsigned char *)cmd, strlen((const char *)cmd));
+
+	while(timeOut--)
+	{
+		if(ESP8266_WaitRecive() == REV_OK)							//如果收到数据
+		{
+			if(strstr((const char *)esp8266_buf, res) != NULL)		//如果检索到关键词
+			{
+				ESP8266_Clear();									//清空缓存
+
+				return 0;
+			}
+		}
+
+		DelayXms(10);
+	}
+
+	return 1;
+
+}
+
+/**
+  * @brief  清空缓存区 &quot;&quot;esp8266_buf
+  * @param  无
+  * @retval 无
+  */
+void ESP8266_Clear(void)
+{
+	memset(esp8266_buf, 0, sizeof(esp8266_buf));		// memset() 函数向指定内存空间填充指定 int 值
+	esp8266_cnt = 0;
+}
+</code></pre>
+<p><font color=red><code>file name: bsp_esp8266.h</code></font></p>
+<pre><code class="language-c">// 声明一个全局的结构体变量，名为 &quot;strEsp8266_Fram_Record&quot;，注意是声明而没有定义
+extern struct  STRUCT_USARTx_Fram                                  //串口数据帧的处理结构体
+{
+	char  Data_RX_BUF [ RX_BUF_MAX_LEN ];
+
+	union
+	{
+		__IO u16 InfAll;
+		struct
+		{
+			__IO u16 FramLength : 15;                               // 14:0 位有效
+			__IO u16 FramFinishFlag : 1;                          // 15 位有效
+		} InfBit;
+  	};
+} strEsp8266_Fram_Record;
+
+</code></pre>
+<p><font color=red><code>file name: bsp_esp8266.c</code></font></p>
+<pre><code class="language-c">#include &quot;bsp_esp8266.h&quot;
+
+// 对头文件 &quot;bsp_esp8266.h&quot; 中声明的全局结构体进行定义，然后可以在其他包含了 &quot;bsp_esp8266.h&quot; 的文件中随意使用
+// 这里的全局变量属于显式初始化，在编译时被分配到 .data 段
+struct  STRUCT_USARTx_Fram strEsp8266_Fram_Record = {0};
+struct  STRUCT_USARTx_Fram strUSART_Fram_Record = {0};
+
+/**
+  * @brief  对WF-ESP8266模块发送AT指令
+  * @param  cmd：待发送的指令；reply1，reply2：期待的响应，为NULL表不需响应，两者为或逻辑关系；waittime：等待响应的时间
+  * @retval 1：指令发送成功；0：指令发送失败
+  */
+bool ESP8266_Cmd ( char * cmd, char * reply1, char * reply2, u32 waittime )
+{
+	strEsp8266_Fram_Record .InfBit .FramLength = 0;               //从新开始接收新的数据包
+
+	macESP8266_Usart ( &quot;%srn&quot;, cmd );
+
+	if ( ( reply1 == 0 ) &amp;&amp; ( reply2 == 0 ) )                      //不需要接收数据
+		return true;
+
+	Delay_ms ( waittime );                 //延时
+
+	strEsp8266_Fram_Record .Data_RX_BUF [ strEsp8266_Fram_Record .InfBit .FramLength ]  = '空字符';		// 网页上无法正常显示，用汉字代替
+
+	macPC_Usart ( &quot;%s&quot;, strEsp8266_Fram_Record .Data_RX_BUF );
+
+	if ( ( reply1 != 0 ) &amp;&amp; ( reply2 != 0 ) )
+		return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply1 ) ||
+				( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply2 ) );
+	else if ( reply1 != 0 )
+		return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply1 ) );
+	else
+		return ( ( bool ) strstr ( strEsp8266_Fram_Record .Data_RX_BUF, reply2 ) );
+}
+</code></pre>
+<p>分析完两块代码，遂明白重点不在于全局变量的清理，而在于全局变量的声明、定义、初始化不同带来的内存分配方式不同的问题。</p>
+<h5 id="胡乱总结">胡乱总结</h5>
+<p><font color=blue>需要建立存储空间，是变量定义</font></p>
+<p><font color=blue>不需要建立存储空间，是变量声明</font></p>
+<pre><code class="language-c">char test_char_0;
+char test_char_1 = 'a';
+
+char * test_string_0;
+char * test_string_1 = &quot;hello&quot;;
+
+struct test_struct
+{
+    int member_0;
+    char member_1;
+} test_struct_0;
+</code></pre>
+<p>以上所示，均为变量定义，不管有没有初始化，它们都是定义，在程序装载运行时，会为他们分配内存空间</p>
+<pre><code class="language-c">extern char test_char_0;
+
+extern char [100] test_string_0;
+
+extern struct test_struct
+{
+    int member_0;
+    char member_1;
+} test_struct_0;
+</code></pre>
+<p>以上所示，均为变量声明。变量在使用 <code>extern</code> 关键字声明后，不允许赋值，否则编译告警。</p>
+<p>上面使用 <code> extern</code> 的写法通常出现在<strong>头文件</strong>中，可以防止无意中多次引用头文件后造成变量重复定义错误。</p>
+<p>无意中多次引用头文件，就比如直接引用了一次目标头文件，然后在直接引用的另一个头文件中又有一次对目标头文件的引用。重复定义错误，就是一个变量可以多次声明、赋值，但只能有一次定义，否则出错。</p>
+<p>在头文件中使用 <code>extern</code> 声明变量，在 C 文件中正式定义变量，这样一来就算多次引用头文件，也只是重复声明，不会报错。</p>
+<p>上面使用 <code> extern</code> 的写法还可出现在 <strong>C 文件</strong>中，引用在<strong>同一工程</strong>的其他文件中定义的变量或函数，而不必 <code>include</code> 整个文件。</p>
+<h5 id="补充资料">补充资料</h5>
+<p><a href="https://zhuanlan.zhihu.com/p/646053645">C++ 在头文件中声明全局结构变量 - 知乎 (zhihu.com)</a></p>
+<p><a href="https://www.runoob.com/w3cnote/extern-head-h-different.html">extern 与头文件(*.h)的区别和联系 | 菜鸟教程 (runoob.com)</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E7%9A%84%E5%A3%B0%E6%98%8E-%E5%AE%9A%E4%B9%89%E5%92%8C%E4%BD%BF%E7%94%A8">全局变量的声明、定义和使用</a>
+<ul>
+<li><a href="#gpt-35">GPT 3.5</a>
+<ul>
+<li><a href="#%E6%8F%90%E4%B8%80%E5%B0%8F%E9%97%AE">提一小问</a></li>
+<li><a href="#%E7%AD%94%E4%B8%80%E5%B0%8F%E9%97%AE">答一小问</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90">代码分析</a></li>
+<li><a href="#%E8%83%A1%E4%B9%B1%E6%80%BB%E7%BB%93">胡乱总结</a></li>
+<li><a href="#%E8%A1%A5%E5%85%85%E8%B5%84%E6%96%99">补充资料</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/c_0/">
+              <h3 class="post-title">
+                C++_0
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

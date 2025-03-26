@@ -1,0 +1,326 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>C函数中使用可变参数列表 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="C函数中使用可变参数列表 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="太🐂了太🐂了太🐂了
+可变参数函数
+详细讲解
+C 可变参数 | 菜鸟教程 (runoob.com)C 可变参数 | 菜鸟教程 (runoob.com)
+我的实验代码
+#include &lt;stdio.h&gt;
+#include &..." />
+    <meta name="keywords" content="C-C++" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              C函数中使用可变参数列表
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/cI4HnL3vJA/" class="post-tag">
+                  # C-C++
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>太🐂了太🐂了太🐂了</p>
+<h4 id="可变参数函数">可变参数函数</h4>
+<h5 id="详细讲解">详细讲解</h5>
+<p><a href="https://www.runoob.com/cprogramming/c-variable-arguments.html">C 可变参数 | 菜鸟教程 (runoob.com)</a><a href="https://www.runoob.com/cprogramming/c-variable-arguments.html">C 可变参数 | 菜鸟教程 (runoob.com)</a></p>
+<h5 id="我的实验代码">我的实验代码</h5>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+
+void test_change_param (char *, int, ...);
+
+int main()
+{
+    char * test_string = &quot;test changing params&quot;;
+    unsigned int test_int = 98765;
+
+    test_change_param (test_string, test_int);
+
+    return 0;
+}
+
+void test_change_param (char * args, ...)
+{
+    va_list param_list;         // 定义参数列表变量
+
+    va_start (param_list, args);    // 将列表变量 param_list 指向参数列表的第一个元素 &quot;args&quot; 
+
+    // va_arg (ap, type) 获取可变参数列表中的下一个参数。
+    // ap 是一个 va_list 类型的变量，type 是下一个参数的类型。该宏返回参数列表中类型为 type 的参数的值，并将 ap 指向下一个参数。
+    printf (&quot;the first unsined int parameter = %d&quot;, va_arg (param_list, unsigned int));
+
+    // 清理为 valist 保留的内存，避免内存泄露
+    va_end(param_list);
+
+    return;
+}
+</code></pre>
+<h5 id="运行结果">运行结果</h5>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/10/可变参数列表.png"/ alt="automatic-scalability" width=90%>
+	<figcaption >
+        <font size=2>可变参数列表</font>
+    </figcaption>
+</div>
+<h5 id="一点说明">一点说明</h5>
+<ul>
+<li>含有可变参数的函数，在声明、定义时，<code>&quot;...&quot;</code>（省略号）出现即代表着：和它紧邻的前一个参数会是可变参数列表的第一个元素，在函数体中使用 <code>v_start ()</code> 初始化列表变量时，必须将此紧邻参数作为列表变量的第一个元素，如若不然，编译即告警 <code>[Warning] second parameter of 'va_start' not last named argument [-Wvarargs]</code></li>
+<li>使用可变参数函数大法，可以显著提高函数定义的灵活性，丰富函数功能，非常的新鲜，非常的美味</li>
+<li>有可变参数，自然有<a href="#anchor_0">可变参数宏</a></li>
+</ul>
+<h4 id="大义觉迷">大义觉迷</h4>
+<h5 id="特别注意">特别注意</h5>
+<p><a href="#anchor_1">实验代码</a>中的写法是<strong>风险极高、危害极大、非常幼稚</strong>的😒，它会无可避免地造成<strong>内存访问越界</strong>的漏洞。</p>
+<p>示例</p>
+<pre><code class="language-c">test_change_param (test_string, test_int);
+
+...
+
+void test_change_param (char * args, ...)
+{
+    va_list param_list;         // 定义参数列表变量
+
+    va_start (param_list, args);    // 将列表变量 &quot;param_list&quot; 指向参数列表的第一个元素 &quot;args&quot; 
+
+    printf (&quot;the first unsined int parameter = %d&quot;, va_arg (param_list, unsigned int));
+    // 从这里开始越界访问。可变参数列表里只有一个元素，但还能继续向后访问
+    printf (&quot;the second unsigned int parameter = %d&quot;, va_arg (param_list, unsigned int));
+    printf (&quot;the third unsigned int parameter = %d&quot;, va_arg (param_list, unsigned int));
+
+    va_end(param_list);
+
+    return;
+}
+</code></pre>
+<p>以上示例代码中，编译、执行都不会报错，但事实上对内存进行了越界访问。内存很容易就被看光了（虽然不会被改掉）</p>
+<p>怎么办呢？</p>
+<blockquote>
+<p><em>我们的目标，是想造成一个又有集中又有民主，又有纪律又有自由，又有统一意志、又有个人心情舒畅、生动活泼，那样一种局面。</em> <em>——《一九五七年夏季的形势》</em></p>
+</blockquote>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;stdarg.h&gt;
+
+void test_change_param (char *, int, ...);          // 函数声明和定义时，约定俗成地显式传递可变参数的个数
+
+int main()
+{
+    char * test_string = &quot;test changing params&quot;;
+    unsigned int test_int = 98765;
+
+    test_change_param (test_string, 1, test_int);
+
+    return 0;
+}
+
+void test_change_param (char * args, int argv, ...)
+{
+    va_list param_list;
+
+    va_start (param_list, argv);
+
+    if (0 != argv)          // 在访问可变参数列表时，进行每一跳前首先判断是否已到达末尾
+    {
+        printf (&quot;the first unsined int parameter = %d&quot;, va_arg (param_list, unsigned int));
+        argv--;             // 每一跳进行后，立刻使未访问参数个数自减
+    }
+
+    // 清理为 valist 保留的内存，避免内存泄露
+    va_end(param_list);
+
+    return;
+}
+</code></pre>
+<p>只能对变参函数的用法做出一些约束，在上述示例可以简要归为 4 点</p>
+<ul>
+<li>函数声明和定义时，约定俗成地显式传递可变参数的个数，作为最后一个固定参数。</li>
+<li>在一次调用中，传递可变参数时，尽量，尽量，尽量要求其类型相同。
+<ul>
+<li>若可变参数列表中存在多种不同类型的元素，则在使用 <code>va_start()</code> 访问时每一跳的步进值可能不为 1，先前传递的可变参数个数就用不上了，该越界还是会越界。</li>
+<li>比如前两个是 <code>int</code>，第三个是 <code>char</code>，然后第一步就去找 <code>char</code></li>
+<li>我说的是尽量相同，因为要迎合 <code>va_start ()</code>。艺高人胆大的同学，或者胆大的同学，可以抛弃 <code>va_start()</code>，手动操纵指针访问目标元素 ，也就不太需要在意这条约束了。</li>
+</ul>
+</li>
+<li>在访问可变参数列表时，进行每一跳前首先判断是否已到达末尾</li>
+<li>每一跳进行后，立刻使未访问参数个数自减</li>
+<li>可变参数列表使用完毕，立刻清理为列表变量保留的内存，避免内存泄露</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0%E5%87%BD%E6%95%B0">可变参数函数</a>
+<ul>
+<li><a href="#%E8%AF%A6%E7%BB%86%E8%AE%B2%E8%A7%A3">详细讲解</a></li>
+<li><a href="#%E6%88%91%E7%9A%84%E5%AE%9E%E9%AA%8C%E4%BB%A3%E7%A0%81">我的实验代码</a></li>
+<li><a href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C">运行结果</a></li>
+<li><a href="#%E4%B8%80%E7%82%B9%E8%AF%B4%E6%98%8E">一点说明</a></li>
+</ul>
+</li>
+<li><a href="#%E5%A4%A7%E4%B9%89%E8%A7%89%E8%BF%B7">大义觉迷</a>
+<ul>
+<li><a href="#%E7%89%B9%E5%88%AB%E6%B3%A8%E6%84%8F">特别注意</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/c-wen-jian-zhong-shou-dong-qing-li-quan-ju-bian-liang-de-wen-ti/">
+              <h3 class="post-title">
+                C文件中手动清理全局变量的问题
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

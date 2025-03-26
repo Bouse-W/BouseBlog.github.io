@@ -1,0 +1,250 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>处理Wordpress基于PHP魔术引号特性的编辑器的巨大问题 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="处理Wordpress基于PHP魔术引号特性的编辑器的巨大问题 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="WP 如何用一大坨 \ 攻击我
+一大坨 \ 是说 ' \\\\\\ '，现在看到还是会有不好的回忆涌上心头。
+每次输入特殊字符如 '', &quot;&quot;, \, &lt;&gt;，WP 就会自动在前面添加一个反斜线 \，而且这个添..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              处理Wordpress基于PHP魔术引号特性的编辑器的巨大问题
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h6 id="wp-如何用一大坨-攻击我">WP 如何用一大坨 \ 攻击我</h6>
+<p>一大坨 \ 是说 ' \\\\\\ '，现在看到还是会有不好的回忆涌上心头。</p>
+<p>每次输入特殊字符如 <code>'', &quot;&quot;, \, &lt;&gt;</code>，WP 就会自动在前面添加一个反斜线 \，而且这个添加操作是<strong>非幂等</strong>的，也就是说添加完后会在已添加的 \ 基础上继续叠加，使 \ 的含量和我的血压一起急遽上升。</p>
+<p>WP 自作主张添加一大坨 \，文章的 text 内容会立刻崩坏，插入的代码块由于经常含有大量特殊字符也成为重灾区，插入的 Latex 公式完全崩溃，装什么插件都渲染不出来，因为 raw 文本本身已经爆炸了，插入网页和文件链接时更是无语。。。</p>
+<h6 id="wp-为什么要用一大坨-攻击我">WP 为什么要用一大坨 \ 攻击我</h6>
+<p><strong>详细原理</strong>：<a href="https://m.wpjam.com/article/wordpress-slashes/">WordPress 数据转义是怎么处理的</a></p>
+<p>是一个 PHP 的古早特性（魔术引号 Magic Quotes），<strong>当魔术引号打开时，所有的 '（单引号），&quot;（双引号），\（反斜线）和 NULL 等特殊字符都会被自动加上一个反斜线进行转义</strong>。</p>
+<p>PHP 自 5.4.0 开始废除了该特性，但 WP 的开发者们依然在配置文件中保留并默认开启了魔术引号功能，以保证产品具有良好的移植性和兼容性。</p>
+<p>反正没考虑易用性和舒适性（</p>
+<h6 id="我如何对-wp-打出鼻青脸肿的防守反击鼻青脸肿的是我">我如何对 WP 打出鼻青脸肿的防守反击（鼻青脸肿的是我）</h6>
+<p><strong>救命教程</strong>：<a href="https://m.wpjam.com/article/php-magic-quotes-and-wordpress/">PHP 魔术引号（Magic Quotes）以及 WordPress 的处理方式</a></p>
+<p>如果完全按照教程里 “WordPress 怎么处理魔术引号”节的代码操作，会导致网页直接崩坏无法打开，更不消说取消魔术括号了。</p>
+<p>但其实教程里的说明已经很清楚了，“WordPress 怎么处理魔术引号”节是在解释如何手动开启魔术引号功能：在函数定义块 <code>function wp_magic_quotes () {...}</code> 中，先调用 <code>stripslashes_deep ()</code> 对数据反转义，获得干净的未转义数据，再调用 <code>add_magic_quotes ()</code> 对数据转义。</p>
+<p>我们反其道而行之，<strong>在函定义块的结尾处对目标数据反转义即可</strong>。</p>
+<p>在 WordPress 的源文件目录中执行 <code>grep -rn 'wp_magic_quotes' ./</code></p>
+<p>检索到 WP 开启魔术引号功能的函数定义块在 <code>/wp-includes/load.php</code>，摘录如下</p>
+<pre><code class="language-php">function wp_magic_quotes() {
+        // Escape with wpdb.
+        $_GET    = add_magic_quotes( $_GET );
+        $_POST   = add_magic_quotes( $_POST );
+        $_COOKIE = add_magic_quotes( $_COOKIE );
+        $_SERVER = add_magic_quotes( $_SERVER );
+
+        // Force REQUEST to be GET + POST.
+        $_REQUEST = array_merge( $_GET, $_POST );
+}
+</code></pre>
+<p>一行小小的 <code>add_magic_quotes ()</code> 竟能把 👴 对付得七荤八素。</p>
+<p>修改如下</p>
+<pre><code class="language-php">function wp_magic_quotes() {
+        // Escape with wpdb.
+        $_GET    = add_magic_quotes( $_GET );
+        $_POST   = add_magic_quotes( $_POST );
+        $_COOKIE = add_magic_quotes( $_COOKIE );
+        $_SERVER = add_magic_quotes( $_SERVER );
+
+        //$_GET  = stripslashes_deep( $_GET    );
+        $_POST   = stripslashes_deep( $_POST   );
+        //$_COOKIE = stripslashes_deep( $_COOKIE );
+
+        // Force REQUEST to be GET + POST.
+        $_REQUEST = array_merge( $_GET, $_POST );
+}
+</code></pre>
+<p>注意到，👴只对 <code>$_POST</code> 变量内容作了反转义，因为👴大概猜到这是博客文章（POST）的数据。（对应 <code>$_COOKIE</code> 是缓存，<code>$_GET</code> 是 <code>HTTP</code> 请求数据。都是👴猜的）</p>
+<p>修改完成后，插入代码块变得干净又卫生，plain text 也不崩坏了，Latex 公式也能渲染了，PDF 文件也能页内嵌入了，👴终于变成了成功的 man。</p>
+<h6 id="我的意外收获和溅射伤害">我的意外收获和溅射伤害：</h6>
+<ol>
+<li>下载了 PDF Poster 插件用来在页内嵌入 PDF 查看器，灰常好用。</li>
+<li>在主题文件的 functions.php 中添加部分内容，设置了禁止文章内容自动转义，其实和禁止魔术括号不相干，属于急眼了之后错进错出，相关链接见下<br>
+<a href="https://x-imagine.com/wordpress-disallow-partial-escaping.html">WordPress 禁止文章自动转义教程</a><br>
+<a href="https://cloud.tencent.com/developer/article/1024539">彻底解决WordPress 中 半角全角字符转义 的问题</a><br>
+<a href="https://www.duoluodeyu.com/1583.html">禁止WordPress文章自动转义字符</a></li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#wp-%E5%A6%82%E4%BD%95%E7%94%A8%E4%B8%80%E5%A4%A7%E5%9D%A8-%E6%94%BB%E5%87%BB%E6%88%91">WP 如何用一大坨 \ 攻击我</a></li>
+<li><a href="#wp-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E4%B8%80%E5%A4%A7%E5%9D%A8-%E6%94%BB%E5%87%BB%E6%88%91">WP 为什么要用一大坨 \ 攻击我</a></li>
+<li><a href="#%E6%88%91%E5%A6%82%E4%BD%95%E5%AF%B9-wp-%E6%89%93%E5%87%BA%E9%BC%BB%E9%9D%92%E8%84%B8%E8%82%BF%E7%9A%84%E9%98%B2%E5%AE%88%E5%8F%8D%E5%87%BB%E9%BC%BB%E9%9D%92%E8%84%B8%E8%82%BF%E7%9A%84%E6%98%AF%E6%88%91">我如何对 WP 打出鼻青脸肿的防守反击（鼻青脸肿的是我）</a></li>
+<li><a href="#%E6%88%91%E7%9A%84%E6%84%8F%E5%A4%96%E6%94%B6%E8%8E%B7%E5%92%8C%E6%BA%85%E5%B0%84%E4%BC%A4%E5%AE%B3">我的意外收获和溅射伤害：</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/chou-yang-xin-hao-de-pin-pu-zhi-shi-hu-nong-xue/">
+              <h3 class="post-title">
+                抽样信号的频谱（知识糊弄学）
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

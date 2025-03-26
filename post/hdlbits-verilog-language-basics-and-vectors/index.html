@@ -1,0 +1,326 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HDLBits-Verilog Language-Basics and Vectors | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="HDLBits-Verilog Language-Basics and Vectors | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="引用内容均直接或间接皆来自 Problem sets - HDLBits | HDLBits | hdlbits.01xz.net
+部分文段做了微小增删使句子通顺。
+HDLBits 是一个极好的网站。
+Getting started
+
+Fu..." />
+    <meta name="keywords" content="Verilog" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              HDLBits-Verilog Language-Basics and Vectors
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/WydVhsUdGH/" class="post-tag">
+                  # Verilog
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>引用内容均直接或间接皆来自 <a href="https://hdlbits.01xz.net/wiki/Main_Page">Problem sets - HDLBits | HDLBits | hdlbits.01xz.net</a><br>
+部分文段做了微小增删使句子通顺。<br>
+<code>HDLBits</code> 是一个极好的网站。</p>
+<h5 id="getting-started">Getting started</h5>
+<blockquote>
+<p><em>Fun fact: For Quartus synthesis, not assigning a value to a signal usually results in 0. This problem is actually easier than the previous one</em>.</p>
+</blockquote>
+<p><code>Intel</code> 家的仿真器 <code>Quartus</code> 在综合过程中，给从未赋值的信号默认赋 <code>0</code>。这似乎是发现了一个获取 <code>0</code> 电平的捷径，但强烈不建议这么做。</p>
+<h4 id="verilog-language">Verilog Language</h4>
+<h5 id="basics">Basics</h5>
+<blockquote>
+<p><em>Input and output declarations actually declare a wire unless otherwise specified. Writing input wire a is the same as input a.</em></p>
+</blockquote>
+<p>若无特殊说明，<code>input</code> 和 <code>output</code> 关键字实际上就声明了一条 <code>wire</code>，在写法上，<code> input a</code> 等价于 <code>input wire a</code>。</p>
+<h6 id="assign-语句">assign 语句</h6>
+<blockquote>
+<p><em>In a Verilog &quot;continuous assignment&quot; (assign left_side = right_side;), the value of the signal on the right side is driven onto the wire on the left side</em>.</p>
+</blockquote>
+<p><code>Verilog</code> 中以 <code>assign</code> 定义的连续赋值语句将右边信号的值赋给左边信号。</p>
+<blockquote>
+<p><em>The assignment is &quot;continuous&quot; because the assignment continues all the time even if the right side's value changes</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>A continuous assignment is not a one-time event</em>.</p>
+</blockquote>
+<p><code>assign</code> 定义的<strong>连续赋值语句中，赋值是“连续”发生的</strong>，就算右值改变，赋值过程也不会终止，也即左值和右值始终保持一致，就像拿导线（<code>wire</code>）把它们连起来了。</p>
+<blockquote>
+<p><em>Note that wires are directional, so &quot;assign in = out;&quot; is not equivalent to &quot;assign out = in;&quot;</em>.</p>
+</blockquote>
+<p>在 <code>verilog</code> 语法中，一个 <code>assign</code> 就综合出一条“有方向”的 <code>wire</code>，不同于物理世界两头通的“导线”。比如，“令 入 = 出” ≠ “令 出 = 入”，这又有点像软件开发时的赋值语句。</p>
+<blockquote>
+<p><em>Thus, the assign statements are not creating wires, they are creating the connections between the wires that already exist</em>.</p>
+</blockquote>
+<p>实际上，<code>assign</code> 语句不定义 <code>wire</code>，只是定义 <code>wire</code> 之间的连接。</p>
+<blockquote>
+<p><em>When you have multiple assign statements, the order in which they appear in the code does not matter.</em></p>
+</blockquote>
+<p>并列的多条 <code>assign</code> 语句之间是并行关系，其实际作用效果与它们出现的顺序无关。</p>
+<blockquote>
+<p><em>As you might expect, a wire cannot have more than one driver (what is its logic level if there is?), and a wire that has no drivers will have an undefined value (often treated as 0 when synthesizing hardware).</em></p>
+</blockquote>
+<p>一条 <code>wire</code> 最多只被一个信号赋值（驱动），或说最多只能有一个输入，没有信号驱动的 <code>wire</code> 的值是“未定义的”（在综合时常被当作 <code>0</code>）</p>
+<h5 id="vectors">Vectors</h5>
+<blockquote>
+<p><em>Vectors are used to group related signals using one name to make it more convenient to manipulate. For example, wire [7:0] w; declares an 8-bit vector named w that is functionally equivalent to having 8 separate wires.</em></p>
+</blockquote>
+<p>向量用来组织一些相关联的信号，将它们统一命名便于操作。比如 <code>wire [7:0] w</code> 声明了一个 <code>8</code> 位向量 <code>w</code>，它相当于 8 根独立的 <code>wire</code>。</p>
+<blockquote>
+<p><em>Notice that the declaration of a vector places the dimensions before the name of the vector, which is unusual compared to C syntax. However, the part select has the dimensions after the vector name as you would expect.</em></p>
+</blockquote>
+<p>声明向量时，将维度值放在向量名之前，使用向量时，将位选值放在向量名之后。比如：</p>
+<pre><code class="language-verilog">// 声明
+vector [7:0] w;
+// 调用
+assign output = w[1:0]
+</code></pre>
+<blockquote>
+<p><em>Vectors must be declared:</em></p>
+<pre><code class="language-verilog">type [upper:lower] vector_name;
+</code></pre>
+<p><em>type specifies the datatype of the vector. This is usually wire or reg. If you are declaring a input or output port, the type can additionally include the port type (e.g., input or output) as well.</em></p>
+</blockquote>
+<p>上述文段规定了 <code>vector</code> 型变量的声明方式，应当注意到：<code>vector</code> 型变量是有 <code>datatype</code> 的。下面是一些变量声明的例子：</p>
+<pre><code class="language-verilog">// 全部引用自 HDLBits
+wire [7:0] w;         // 8-bit wire
+reg  [4:1] x;         // 4-bit reg
+output reg [0:0] y;   // 1-bit reg that is also an output port (this is still a vector)
+input wire [3:-2] z;  // 6-bit wire input (negative ranges are allowed)
+output [3:0] a;       // 4-bit output wire. Type is 'wire' unless specified otherwise.
+wire [0:7] b;         // 8-bit wire where b[0] is the most-significant bit.
+</code></pre>
+<blockquote>
+<p><em>The endianness (or, informally, &quot;direction&quot;) of a vector is whether the the least significant bit has a lower index (little-endian, e.g., [3:0]) or a higher index (big-endian, e.g., [0:3]).</em></p>
+</blockquote>
+<p>向量是有“端序”的，向量声明表达式中，数据的最低有效位有高索引还是低索引在决定了向量的“端序”，最低有效位在高索引是为“大端序”，如 <code>wire [7:0] w;</code>。</p>
+<p>向量端序在声明时确定，后续使用时不允许更改或错用。</p>
+<blockquote>
+<p><em>In Verilog, net-type signals can be implicitly created by an assign statement or by attaching something undeclared to a module port. Implicit nets are always one-bit wires and causes bugs if you had intended to use a vector.</em></p>
+</blockquote>
+<blockquote>
+<p><em>Disabling creation of implicit nets can be done using the `default_nettype none directive.</em></p>
+</blockquote>
+<p>直接使用未声明的变量（给它赋值或用作模块的端口参数）可能会创造一个隐式网型信号（<code>implicit net-type signals</code>），这很容易引发 <code>bug</code>。</p>
+<blockquote>
+<p><em>A bitwise operation between two N-bit vectors replicates the operation for each bit of the vector and produces a N-bit output, while a logical operation treats the entire vector as a boolean value (true = non-zero, false = zero) and produces a 1-bit output.</em></p>
+</blockquote>
+<p>按位操作有别于逻辑操作，如按位 <code>OR</code> 和逻辑 <code>OR</code>，前者对两个操作数的每一位两两执行或运算，后者将两个操作数各自当作一个整体进行或运算，输出 <code>1</code> 位运算结果。这在引入 <code>Vector</code> 之后很有必要作出区分。</p>
+<h6 id="对向量使用逻辑操作和按位操作的例题">对向量使用逻辑操作和按位操作的例题</h6>
+<blockquote>
+<p><em>Build a circuit that has two 3-bit inputs that computes the bitwise-OR of the two vectors, the logical-OR of the two vectors, and the inverse (NOT) of both vectors. Place the inverse of b in the upper half of out_not (i.e., bits [5:3]), and the inverse of a in the lower half.</em></p>
+</blockquote>
+<blockquote>
+<pre><code class="language-verilog">module top_module(
+input [2:0] a,
+input [2:0] b,
+output [2:0] out_or_bitwise,
+output out_or_logical,
+output [5:0] out_not
+);
+assign out_or_bitwise = a | b;
+assign out_or_logical = a || b;
+assign out_not[2:0] = ~a;	// Part-select on left side is o.
+assign out_not[5:3] = ~b;	//Assigning to [5:3] does not conflict with [2:0]
+endmodule
+</code></pre>
+</blockquote>
+<pre><code>注意到：对两个同维同端序的向量进行逻辑或运算，使用了 `||` 作为运算符，直接输出一位结果。
+
+&gt; *The concatenation operator {a,b,c} is used to create larger vectors by concatenating smaller portions of a vector together*.
+
+&gt; *Concatenation needs to know the width of every component (or how would you know the length of the result?). Thus, {1, 2, 3} is illegal*.
+
+并列运算符 `{}` 用于将几个向量拼接起来。进行拼接运算时，必须知道各向量的位宽，显式声明或标记进制即可。
+
+&gt; *The replication operator allows repeating a vector and concatenating them together:*
+```verilog
+{num{vector}};
+</code></pre>
+<p><em>This replicates vector by num times. num must be a constant. Both sets of braces are required.</em></p>
+<p>重复运算符可以将一个向量赋值指定多次并连接起来。这在<strong>对变量进行有符号扩展</strong>时是有用的。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#getting-started">Getting started</a></li>
+</ul>
+</li>
+<li><a href="#verilog-language">Verilog Language</a>
+<ul>
+<li><a href="#basics">Basics</a>
+<ul>
+<li><a href="#assign-%E8%AF%AD%E5%8F%A5">assign 语句</a></li>
+</ul>
+</li>
+<li><a href="#vectors">Vectors</a>
+<ul>
+<li><a href="#%E5%AF%B9%E5%90%91%E9%87%8F%E4%BD%BF%E7%94%A8%E9%80%BB%E8%BE%91%E6%93%8D%E4%BD%9C%E5%92%8C%E6%8C%89%E4%BD%8D%E6%93%8D%E4%BD%9C%E7%9A%84%E4%BE%8B%E9%A2%98">对向量使用逻辑操作和按位操作的例题</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/hal-ku-_stm32f407vet6-he-xin-ban-_-zui-xiao-luo-ji-cheng-xu-led-liu-shui-deng/">
+              <h3 class="post-title">
+                HAL 库_STM32F407VET6 核心板_最小裸机程序-LED 流水灯
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

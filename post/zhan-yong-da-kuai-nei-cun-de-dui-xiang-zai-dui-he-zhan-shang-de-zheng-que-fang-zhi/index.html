@@ -1,0 +1,245 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>占用大块内存的对象在堆和栈上的正确放置 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="占用大块内存的对象在堆和栈上的正确放置 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+Learn C The Hard Way
+
+
+如果你从malloc获取了一块内存，并且把指针放在了栈上，那么当函数退出时，指针会被弹出而丢失。
+如果你在栈上存放了大量数据（比如大结构体和数组），那么会产生“栈溢出”并且程序会中止。这种情况..." />
+    <meta name="keywords" content="C-C++" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              占用大块内存的对象在堆和栈上的正确放置
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/cI4HnL3vJA/" class="post-tag">
+                  # C-C++
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <blockquote>
+<p>Learn C The Hard Way</p>
+</blockquote>
+<ul>
+<li>如果你从malloc获取了一块内存，并且把指针放在了栈上，那么当函数退出时，指针会被弹出而丢失。</li>
+<li>如果你在栈上存放了大量数据（比如大结构体和数组），那么会产生“栈溢出”并且程序会中止。这种情况下应该通过malloc放在堆上。</li>
+<li>如果你获取了指向栈上变量的指针，并且将它用于传参或从函数返回，接收它的函数会产生“段错误”。因为实际的数据被弹出而消失，指针也会指向被释放的内存。</li>
+</ul>
+<p>上述第三条手把手教你造野指针。</p>
+<p>为了防止占用大块栈内存的对象（大象🐘），如大结构体、大数组，引发爆栈，应当尽量少或不将他们作为局部变量，只是作为全局变量<strong>声明一次</strong>，确定其大小，函数中使用 🐘 时调用 <code>malloc</code> 等方法从堆上为其申请内存。这样也同时避免了函数退栈后资源被自动释放，🐘丢失的问题。当然，永远不要忘记使用完毕后释放资源，否则堆也会爆。</p>
+<p>示例代码</p>
+<pre><code class="language-c">/* from Learn C The Hard Way.Chapter 18 */
+
+#define MAX_DATA 512
+#define MAX_ROWS 100
+
+/* 声明为全局变量，永远不作局部变量之用 */
+struct Address {
+    int id;
+    int set;
+    char name[MAX_DATA];
+    char email[MAX_DATA];
+};
+
+struct Database {
+    struct Address rows[MAX_ROWS];
+};
+
+struct Connection {
+    FILE * file;
+    struct Database *db;
+};
+
+......
+
+/* 在使用大内存对象时再手动申请堆内存资源 */
+struct Connection * Database_open(const char * filename, char mode)
+{
+    struct Connection *conn = malloc(sizeof(struct Connection));
+    if(!conn) die(&quot;Memory error&quot;);
+
+    conn-&gt;db = malloc(sizeof(struct Database));
+    if(!conn-&gt;db) die(&quot;Memory error&quot;);
+
+    if(mode == 'c') {
+        conn-&gt;file = fopen(filename, &quot;w&quot;);
+    } else {
+        conn-&gt;file = fopen(filename, &quot;r+&quot;);
+
+        if(conn-&gt;file) {
+            Database_load(conn);
+        }
+    }
+
+    if(!conn-&gt;file) die(&quot;Failed to open the file&quot;);
+
+    return conn;
+}
+
+......
+
+/* 永远不要忘记释放申请的资源和打开的文件流 */
+void Database_close(struct Connection * conn)
+{
+    if(conn) {
+        if(conn-&gt;file) fclose(conn-&gt;file);
+        if(conn-&gt;db) free(conn-&gt;db);
+        free(conn);
+    }
+}
+
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/you-casex-yu-ju-er-qi-de-yu-fa-bu-xi/">
+              <h3 class="post-title">
+                由 casex 语句而起的语法补习
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

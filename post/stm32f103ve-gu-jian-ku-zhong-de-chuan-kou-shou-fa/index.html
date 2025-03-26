@@ -1,0 +1,238 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>STM32F103VE 固件库中的串口收发 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="STM32F103VE 固件库中的串口收发 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="其实是因为在龙芯杯的时候和串口有过激烈的交锋最后失败了一半所以产生了比较深的执念
+代码示例
+file: stm32f10x_usart.c
+串口发
+/**
+  * @brief  Transmits single data through ..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              STM32F103VE 固件库中的串口收发
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p><font size=2>其实是因为在龙芯杯的时候和串口有过激烈的交锋最后失败了一半所以产生了比较深的执念</font></p>
+<h5 id="代码示例">代码示例</h5>
+<p><code>file: stm32f10x_usart.c</code></p>
+<h6 id="串口发">串口发</h6>
+<pre><code class="language-c">/**
+  * @brief  Transmits single data through the USARTx peripheral.
+  * @param  USARTx: Select the USART or the UART peripheral. 
+  *   This parameter can be one of the following values:
+  *   USART1, USART2, USART3, UART4 or UART5.
+  * @param  Data: the data to transmit.
+  * @retval None
+  */
+void USART_SendData(USART_TypeDef * USARTx, uint16_t Data)
+{
+  /* Check the parameters */
+  assert_param(IS_USART_ALL_PERIPH(USARTx));
+  assert_param(IS_USART_DATA(Data)); 
+    
+  /* Transmit Data */
+  USARTx-&gt;DR = (Data &amp; (uint16_t)0x01FF);
+}
+</code></pre>
+<h6 id="串口收">串口收</h6>
+<pre><code class="language-c">/**
+  * @brief  Returns the most recent received data by the USARTx peripheral.
+  * @param  USARTx: Select the USART or the UART peripheral. 
+  *   This parameter can be one of the following values:
+  *   USART1, USART2, USART3, UART4 or UART5.
+  * @retval The received data.
+  */
+uint16_t USART_ReceiveData(USART_TypeDef* USARTx)
+{
+  /* Check the parameters */
+  assert_param(IS_USART_ALL_PERIPH(USARTx));
+  
+  /* Receive Data */
+  return (uint16_t)(USARTx-&gt;DR &amp; (uint16_t)0x01FF);
+}
+</code></pre>
+<p>根据串口初始化配置，串口数据格式为 8 位数据 + 1 位停止位，共 9 位有效，故使用 <code>0X01FF</code> 做与运算提取。</p>
+<p><code>DR</code> 是 <code>Data Register</code>，串口数据寄存器，访问方式十分朴素，直接使用串口结构体指针引出即可。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B">代码示例</a>
+<ul>
+<li><a href="#%E4%B8%B2%E5%8F%A3%E5%8F%91">串口发</a></li>
+<li><a href="#%E4%B8%B2%E5%8F%A3%E6%94%B6">串口收</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/ssl-zheng-shu-bu-shu/">
+              <h3 class="post-title">
+                SSL 证书部署
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

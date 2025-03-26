@@ -1,0 +1,389 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_C-Libraries_tutorials-Initialisation_and_thread | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_C-Libraries_tutorials-Initialisation_and_thread | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Libraries initialasion &amp; threading
+部分文段做了微小增删使句子通顺。
+Exercise..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_C-Libraries_tutorials-Initialisation_and_thread
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-19
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/libraries-1"><code>seL4</code> Docs/Tutorials/Libraries initialasion &amp; threading</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="exercises">Exercises</h2>
+<h3 id="obtain-bootinfo">Obtain BootInfo</h3>
+<blockquote>
+<p>After bootstrapping the system, the seL4 kernel hands over control to the root task, to an init thread.</p>
+</blockquote>
+<p>系统引导启动完成后，内核将控制权交给 <code>root task</code>，也就是初始进程（<code>intial thread</code>）。</p>
+<blockquote>
+<p>This thread receives a structure from the kernel that describes all the resources available on the machine.</p>
+<p>This structure is called the BootInfo structure.</p>
+</blockquote>
+<p>初始线程将从内核接收一个描述机器上所有可用资源的结构体，这个结构体称为 <code>BootInfo structure</code>。</p>
+<blockquote>
+<p>It includes information on all IRQs, memory, and IO-Ports (x86). This structure also tells the init thread where certain important capability references are</p>
+</blockquote>
+<p><code>BootInfo structure</code> 存有一切中断、内存和 <code>IO</code> 接口（<code>x86</code> platform only）的信息，同时它也告诉初始进程某些重要的 <code>capability</code> 存放在哪里。</p>
+<blockquote>
+<p><code>seL4_BootInfo * platsupport_get_bootinfo(void)</code> is a function that returns the BootInfo structure.</p>
+<p>It also sets up the IPC buffer so that it can perform some syscalls such as <code>seL4_DebugNameThread</code> used by <code>name_thread</code>.</p>
+</blockquote>
+<p><code>seL4_BootInfo * platsuport_get_bootinfo(void)</code> 返回一个 <code>BootInfo</code> 结构体，同时为调用者进程设置一个 <code>IPC</code> 缓冲区，这样诸如 <code>name_thread</code> 一类进程就可以使用 <code>seL4_DebugNameThread</code> 等系统调用。</p>
+<h3 id="initialise-simple">Initialise simple</h3>
+<blockquote>
+<p><code>libsel4simple</code> provides an abstraction for the boot environment of a thread.  You need to initialize it with some default state before using it.</p>
+</blockquote>
+<p><code>libsel4simple</code> 库为线程引导启动环境（<code>boot environment</code>）中的信息提供了一个抽象，封装在 <code>simplt_t</code> 类型的结构体中，在使用该结构体获得一些信息之前，必须先将它初始化。</p>
+<p><code>void simple_default_init_bootinfo(simple_t * simple, seL4_BootInfo * bi);</code> 用来初始化环境信息结构体。</p>
+<p><code>void simple_print(simple_t * simple);</code> 用来打印 <code>simple_t</code> 结构体中的信息。</p>
+<h3 id="initialise-an-allocator">Initialise an allocator</h3>
+<blockquote>
+<p>In seL4, memory management is delegated in large part to userspace, and each thread manages its own page faults with a custom pager.</p>
+</blockquote>
+<p><code>seL4</code> 中，内存管理基本上是由用户层程序负责的，每个线程使用一个自定义的页管理器（<code>pager</code>）来处理遇到的页错误（<code>page faults</code>）</p>
+<blockquote>
+<p>Without the use of the <code>allocman</code> library and the <code>VKA</code> library, you would have to manually allocate a frame, then map the frame into a page-table, before you could use new memory in your address space.</p>
+<p>The allocman library requires some initial memory to bootstrap its metadata.</p>
+</blockquote>
+<p>如果不使用库提供的 <code>allocman</code> 和 <code>VKA</code>，那就需要手动申请物理内存并将其映射到页表中，然后才能在虚拟地址空间中使用相应的虚拟内存。</p>
+<p>使用 <code>allocman</code> 时必须首先提供一些内存空间来引导它的元数据。</p>
+<p><code>allocman_t * bootstrap_use_current_simple(simple_t * simple, uint32_t pool_size, char * pool);</code> 用来获取 <code>allocman_t</code> 类型结构体。</p>
+<h3 id="obtain-a-generic-allocation-interface-vka">Obtain a generic allocation interface (vka)</h3>
+<blockquote>
+<p><code>libsel4vka</code> is an seL4 type-aware object allocator that will allocate new kernel objects for you.</p>
+<p>The VKA library simplifies the &quot;untyped retyping&quot; process for you.</p>
+</blockquote>
+<p><code>vka</code> 是内核对象分配器，它简化了“无类型内存重新类型化”（<code>untyped retyping</code>）的过程。</p>
+<p><code>void allocman_make_vka(vka_t *vka, allocman_t *alloc);</code> 用来创建 <code>vka</code> 对象。</p>
+<h3 id="find-the-cspace-root-cap">Find the CSpace root cap</h3>
+<blockquote>
+<p>The seL4 kernel keeps multiple trees of these capabilities. Each separate tree of capabilities is called a “CSpace”.</p>
+<p>Each thread can have its own CSpace, or a CSpace can be shared among multiple threads.</p>
+</blockquote>
+<p><code>seL4</code> 内核管理着多个 <code>capabilities tree</code>，每棵独立的树被称为 <code>CSpace</code>。每个线程都可以有自己私有的 <code>CSpace</code>，一个  <code>CSpace</code> 也可以在多个线程间共享。</p>
+<blockquote>
+<p>The delineations between “Processes” aren’t well-defined, since seL4 doesn’t have any real concept of “processes”. It deals with threads.</p>
+</blockquote>
+<p><code>seL4</code> 中没有“进程”的概念，内核的调度对象是“线程”。</p>
+<p><code>seL4_CPtr simple_get_cnode(simple_t *simple);</code> 用于获取调用者的 <code>CSpace</code> 的 <code>root CNode</code>：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/获取线程启动信息并设置allocman和vka的基本流程.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>获取线程启动信息、设置 allocman 和 VKA 的基本流程</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/新建allocman结构体的API.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>新建 allocman 结构体的API</font>
+    </figcaption>
+</div>
+<p>可以窥见：<code>allocman</code> 所管理的物理内存空间是线程启动前就分配好的所谓 <code>Untyped object</code>。“启动前就分配好” 可以反映在 <code>seL4</code> 上只能构建静态系统这一特点。</p>
+<h3 id="find-the-vspace-root-cap">Find the VSpace root cap</h3>
+<p><code>seL4_CPtr simple_get_pd(simple_t *simple);</code> 用于获取调用者线程的 <code>VSpace</code> 的 <code>root CNode</code>。</p>
+<p><code>VSpace</code> 就是顶级页表，不同平台上的定义不同，比如在 <code>x86_64</code> 上定义为 <code>seL4_PML4</code>，在 <code>aarch64</code> 上定义为 <code>seL4_PageGlobalDirectory</code>。</p>
+<h3 id="allocate-a-tcb-object">Allocate a TCB Object</h3>
+<blockquote>
+<p>In order to manage the threads that are created in seL4, the seL4 kernel keeps track of TCB (Thread Control Block) objects.</p>
+</blockquote>
+<p><code>seL4</code> 内核使用 <code>TCB</code> 对象跟踪和管理所创建的线程。</p>
+<p><code>int vka_alloc_tcb(vka_t * vka, vka_object_t * result);</code> 用于<u>便捷地创建 <code>TCB</code> 对象</u>。</p>
+<p>（最原始的方法是调用 <code>seL4_Untyped_Retype()</code>）类型化一个 <code>seL4_TCBObject</code>）</p>
+<blockquote>
+<p>Unlike other contemporary kernels, seL4 <strong>doesn’t</strong> allocate a stack, virtual-address space (VSpace) and other metadata on your behalf.</p>
+</blockquote>
+<p>用户创建 <code>TCB</code> 对象后，只获得一个最初级的内核对象，<code>seL4</code> 不会自动为用户新建的线程分配栈空间和虚拟内存，这一切都要用户手动完成。</p>
+<h3 id="configure-the-new-tcb">Configure the new TCB</h3>
+<blockquote>
+<p>You must create a new VSpace for your new thread if you need it to execute in its own isolated address space, and tell the kernel which VSpace you plan for the new thread to execute in. This opens up the option for threads to share VSpaces.</p>
+</blockquote>
+<p>如果用户希望新建线程能拥有独立的 <code>VSpace</code> 和 <code>CSPace</code>，就需要手动创建之，同时告知内核以相关信息。当然，新建线程也可以和其他线程共享 <code>VSpace</code> 和 <code>CSpace</code>，而这也需要手动设置并告知内核。</p>
+<p>本教程中新建的线程和 <code>main</code> 线程共享 <code>CSpace</code> 和 <code>VSpace</code>。</p>
+<pre><code class="language-c">int seL4_TCB_Configure(seL4_TCB _service, seL4_Word fault_ep, seL4_CNode cspace_root, seL4_Word cspace_root_data, seL4_CNode vspace_root, seL4_Word vspace_root_data, seL4_Word buffer, seL4_CPtr bufferFrame);
+</code></pre>
+<p><code>seL_TCB_Configure</code> 用于设置线程的：错误处理消息端点（<code>fault endpoint</code>）、<code>CSpace</code>、<code>CSpace</code> 初始数据、<code>VSpace</code>、<code>VSpace</code> 初始数据、<code>IPC buffer</code> 的虚拟地址和 <code>IPC buffer</code> 使用的物理页的 <code>caability</code>。</p>
+<blockquote>
+<p>In addition, a thread needs to have a priority set on it in order for it to run.</p>
+</blockquote>
+<p>除了设置 <code>VSpace</code> 和 <code>CSpace</code> 外，还要为新建线程设置优先级。<code>seL4</code> 对线程执行优先级轮转调度。</p>
+<p><code>static inline int seL4_TCB_SetPriority(seL4_TCB _service, seL4_TCB	authority, seL4_Word priority);</code> 用于设置线程优先级。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/和调用者线程同优先级.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>将新建线程的优先级设为和调用者线程相同</font>
+    </figcaption>
+</div>
+<h3 id="name-the-new-tcb">Name the new TCB</h3>
+<p><code>NAME_THREAD((seL4_TCB _service, const char * tcb_name);</code> 用于重命名线程。</p>
+<h3 id="set-the-instruction-pointer">Set the instruction pointer</h3>
+<blockquote>
+<p>seL4 requires you to fill out the Thread Control Block manually. That includes the new thread’s initial register contents.</p>
+<p>You can set the value of <font color=red>the stack pointer</font>, <font color=red>the instruction pointer</font>, and if you want to get a little creative, you can pass <font color=red>some initial data</font> to your new thread through its registers.</p>
+</blockquote>
+<p><code>seL4</code> 需要用户自行填充 <code>TCB</code> 中的内容，这其中就包括一些初始化的寄存器值（也叫线程上下文），有栈指针 （<code>SP</code>）、程序计数器（<code>IP</code> 或称 <code>PC</code>）和一些其他的自定义的初始化值。</p>
+<p><code>void sel4utils_set_instruction_pointer(seL4_UserContext *regs, seL4_Word value);</code> 用于设置线程上下文结构体中的程序计数器值。</p>
+<p><code>seL4_UserContex * regs</code> 是线程上下文结构体指针。</p>
+<h3 id="set-the-stack-pointer">Set the stack pointer</h3>
+<blockquote>
+<p>Processor stacks push new values toward decreasing addresses, so give it some thought.</p>
+</blockquote>
+<p><code>seL4</code> 规定栈从高地址向低地址“增长”，所以新入栈的数据会朝地址减小的方向排列下去。</p>
+<p><code>void sel4utils_set_stack_pointer(seL4_UserContext * regs, seL4_Word value);</code> 用来设置线程上下文结构体中的栈地址。</p>
+<p><code>seL4</code> 要求线程的栈空间严格对齐：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/栈空间对齐要求.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>栈空间对齐要求和对齐检查</font>
+    </figcaption>
+</div>
+<h3 id="write-the-registers">Write the registers</h3>
+<pre><code class="language-c">int seL4_TCB_WriteRegisters(seL4_TCB service, seL4_Bool resume_target, seL4_Uint8 arch_flags, seL4_Word count, seL4_UserContext * regs);
+</code></pre>
+<p><code>seL4_TCB_WriteRegisters</code> 用来向进程 <code>TCB</code> 中写入上下文数据：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/seL4_TCB_WriteRegisters.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>函数原型——seL4_TCB_WriteRegisters(...);</font>
+    </figcaption>
+</div>
+<h3 id="start-the-new-thread">Start the new thread</h3>
+<p><code>int seL4_TCB_Resume(seL4_TCB service);</code> 用来告知内核可以恢复对指定线程的调度。内核将根据调度策略决定何时启动该线程。</p>
+<h3 id="comprehensive-process-of-creating-and-launching-a-new-thread">Comprehensive process of creating and launching a new thread</h3>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/新建TCB对象.JPG" alt="automatic-scalability" width=75%>
+	<figcaption >
+        <font size=2>step_0——新建 TCB 对象</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/Initial_configurations_for_new_tcb.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>step_1——初始化 TCB 的必要参数</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/Initial_configurations_for_new_tcb.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>step_2——初始化 TCB 的必要参数</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/set_priority_and_name_for_tcb.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>step_3——设置 TCB 优先级和名字</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/set_context_register_for_new_tcb.JPG" alt="automatic-scalability" width=80%>
+	<figcaption >
+        <font size=2>step_4——设置 TCB 上下文信息寄存器，不能缺省的两个：SP 和 IP</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/write_context_info_to_new_tcb.JPG" alt="automatic-scalability">
+	<figcaption >
+        <font size=2>step_5——向 TCB 写入上下文信息</font>
+    </figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4_CLibraries_tutorials/img/dynamic1/start_new_thread.JPG" alt="automatic-scalability" width=80%>
+	<figcaption >
+        <font size=2>step_6——启动新线程</font>
+    </figcaption>
+</div>
+<h2 id="links-to-source">Links to source</h2>
+<ul>
+<li><code>sel4_BootInfo</code>: https://github.com/seL4/seL4/blob/master/libsel4/include/sel4/bootinfo_types.h</li>
+<li><code>simple_t</code>: https://github.com/seL4/seL4_libs/blob/master/libsel4simple/include/simple/simple.h</li>
+<li><code>vka_t</code>: https://github.com/seL4/seL4_libs/blob/master//libsel4vka/include/vka/vka.h</li>
+<li><code>allocman_t</code>: https://github.com/seL4/seL4_libs/blob/master/libsel4allocman/include/allocman/allocman.h</li>
+<li><code>name_thread()</code>: https://github.com/seL4/sel4-tutorials/blob/master/libsel4tutorials/src/constructors.c</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#exercises">Exercises</a>
+<ul>
+<li><a href="#obtain-bootinfo">Obtain BootInfo</a></li>
+<li><a href="#initialise-simple">Initialise simple</a></li>
+<li><a href="#initialise-an-allocator">Initialise an allocator</a></li>
+<li><a href="#obtain-a-generic-allocation-interface-vka">Obtain a generic allocation interface (vka)</a></li>
+<li><a href="#find-the-cspace-root-cap">Find the CSpace root cap</a></li>
+<li><a href="#find-the-vspace-root-cap">Find the VSpace root cap</a></li>
+<li><a href="#allocate-a-tcb-object">Allocate a TCB Object</a></li>
+<li><a href="#configure-the-new-tcb">Configure the new TCB</a></li>
+<li><a href="#name-the-new-tcb">Name the new TCB</a></li>
+<li><a href="#set-the-instruction-pointer">Set the instruction pointer</a></li>
+<li><a href="#set-the-stack-pointer">Set the stack pointer</a></li>
+<li><a href="#write-the-registers">Write the registers</a></li>
+<li><a href="#start-the-new-thread">Start the new thread</a></li>
+<li><a href="#comprehensive-process-of-creating-and-launching-a-new-thread">Comprehensive process of creating and launching a new thread</a></li>
+</ul>
+</li>
+<li><a href="#links-to-source">Links to source</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_untyped/">
+              <h3 class="post-title">
+                seL4_Untyped
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,365 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Python3.11 on Debian-Bullseye | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Python3.11 on Debian-Bullseye | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="在 DebianBullseye-slim 上配置 Python3.11。
+原 Dockerfile 出自 docker-library/python。
+# NOTE: THIS DOCKERFILE IS GENERATED VIA &q..." />
+    <meta name="keywords" content="Dockerfiles" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Python3.11 on Debian-Bullseye
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/8Uii00ncTo/" class="post-tag">
+                  # Dockerfiles
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>在 <code>DebianBullseye-slim</code> 上配置 <code>Python3.11</code>。</p>
+<p>原 <code>Dockerfile</code> 出自 <a href="https://github.com/docker-library/python/blob/8bc80d1109001365559eded16423ba3692eff1ff/3.11/slim-bullseye/Dockerfile">docker-library/python</a>。</p>
+<pre><code class="language-Dockerfile"># NOTE: THIS DOCKERFILE IS GENERATED VIA &quot;apply-templates.sh&quot;
+# PLEASE DO NOT EDIT IT DIRECTLY.
+
+# 虽然人家说 &quot;DO NOT EDIT IT DIRECTLY&quot;，但是由于一些令人无奈的客观原因，我不得不对一些下载源、下载方式做了改动，得此更适合中国同志的 Dockerfile for &quot;python3.11.5 on Debian:bullseye--slim&quot;
+
+FROM debian:bullseye-slim
+
+# ensure local python is preferred over distribution python
+ENV PATH /usr/local/bin:$PATH
+
+# http://bugs.python.org/issue19846
+# &gt; At the moment, setting &quot;LANG=C&quot; on a Linux system *fundamentally breaks Python 3*, and that's not OK.
+ENV LANG C.UTF-8
+
+# runtime dependencies
+RUN set -eux; \
+    # 开篇首先切换 debian 源，这是一个大陆的镜像源，可放心使用
+    sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    netbase \
+    tzdata \
+    ; \
+    rm -rf /var/lib/apt/lists/*
+
+ENV GPG_KEY A035C8C19219BA821ECEA86B64E628F8D684696D
+ENV PYTHON_VERSION 3.11.5
+
+RUN set -eux; \
+    \
+    savedAptMark=&quot;$(apt-mark showmanual)&quot;; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+    dpkg-dev \
+    gcc \
+    gnupg \
+    libbluetooth-dev \
+    libbz2-dev \
+    libc6-dev \
+    libdb-dev \
+    libexpat1-dev \
+    libffi-dev \
+    libgdbm-dev \
+    liblzma-dev \
+    libncursesw5-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libssl-dev \
+    make \
+    tk-dev \
+    uuid-dev \
+    wget \
+    xz-utils \
+    zlib1g-dev \
+    ; \
+    \
+    # 这里使用华为的 python 镜像源，感谢华为
+    wget -O python.tar.xz &quot;https://mirrors.huaweicloud.com/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz&quot;; \
+    wget -O python.tar.xz.asc &quot;https://mirrors.huaweicloud.com/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc&quot;; \
+    GNUPGHOME=&quot;$(mktemp -d)&quot;; export GNUPGHOME; \
+    gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys &quot;$GPG_KEY&quot;; \
+    gpg --batch --verify python.tar.xz.asc python.tar.xz; \
+    gpgconf --kill all; \
+    rm -rf &quot;$GNUPGHOME&quot; python.tar.xz.asc; \
+    mkdir -p /usr/src/python; \
+    tar --extract --directory /usr/src/python --strip-components=1 --file python.tar.xz; \
+    rm python.tar.xz; \
+    cd /usr/src/python; \
+    gnuArch=&quot;$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)&quot;; \
+    ./configure \
+    --build=&quot;$gnuArch&quot; \
+    --enable-loadable-sqlite-extensions \
+    --enable-optimizations \
+    --enable-option-checking=fatal \
+    --enable-shared \
+    --with-lto \
+    --with-system-expat \
+    --without-ensurepip \
+    ; \
+    nproc=&quot;$(nproc)&quot;; \
+    EXTRA_CFLAGS=&quot;$(dpkg-buildflags --get CFLAGS)&quot;; \
+    LDFLAGS=&quot;$(dpkg-buildflags --get LDFLAGS)&quot;; \
+    LDFLAGS=&quot;${LDFLAGS:--Wl},--strip-all&quot;; \
+    make -j &quot;$nproc&quot; \
+    &quot;EXTRA_CFLAGS=${EXTRA_CFLAGS:-}&quot; \
+    &quot;LDFLAGS=${LDFLAGS:-}&quot; \
+    &quot;PROFILE_TASK=${PROFILE_TASK:-}&quot; \
+    ; \
+    # https://github.com/docker-library/python/issues/784
+    # prevent accidental usage of a system installed libpython of the same version
+    rm python; \
+    make -j &quot;$nproc&quot; \
+    &quot;EXTRA_CFLAGS=${EXTRA_CFLAGS:-}&quot; \
+    &quot;LDFLAGS=${LDFLAGS:--Wl},-rpath='$$ORIGIN/../lib'&quot; \
+    &quot;PROFILE_TASK=${PROFILE_TASK:-}&quot; \
+    python \
+    ; \
+    make install; \
+
+    cd /; \
+    rm -rf /usr/src/python; \
+
+    find /usr/local -depth \
+    \( \
+    \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \
+    -o \( -type f -a \( -name '*.pyc' -o -name '*.pyo' -o -name 'libpython*.a' \) \) \
+    \) -exec rm -rf '{}' + \
+    ; \
+
+    ldconfig; \
+
+    apt-mark auto '.*' &gt; /dev/null; \
+    apt-mark manual $savedAptMark; \
+    find /usr/local -type f -executable -not ( -name '*tkinter*' ) -exec ldd '{}' ';' \
+    | awk '/=&gt;/ { so = $(NF-1); if (index(so, &quot;/usr/local/&quot;) == 1) { next }; gsub(&quot;^/(usr/)?&quot;, &quot;&quot;, so); print so }' \
+    | sort -u \
+    | xargs -r dpkg-query --search \
+    | cut -d: -f1 \
+    | sort -u \
+    | xargs -r apt-mark manual \
+    ; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+    rm -rf /var/lib/apt/lists/*; \
+
+    python3 --version
+
+# make some useful symlinks that are expected to exist (&quot;/usr/local/bin/python&quot; and friends)
+RUN set -eux; \
+    for src in idle3 pydoc3 python3 python3-config; do \
+    dst=&quot;$(echo &quot;$src&quot; | tr -d 3)&quot;; \
+    [ -s &quot;/usr/local/bin/$src&quot; ]; \
+    [ ! -e &quot;/usr/local/bin/$dst&quot; ]; \
+    ln -svT &quot;$src&quot; &quot;/usr/local/bin/$dst&quot;; \
+    done
+
+# if this is called &quot;PIP_VERSION&quot;, pip explodes with &quot;ValueError: invalid truth value '&lt;VERSION&gt;'&quot;
+ENV PYTHON_PIP_VERSION 23.2.1
+# https://github.com/docker-library/python/issues/365
+ENV PYTHON_SETUPTOOLS_VERSION 65.5.1
+# https://github.com/pypa/get-pip
+
+# 原版，从 github 获取 raw 文件。构建镜像的时候很难走代理，所以获取一次要很久，很久，永久。。。
+# ENV PYTHON_GET_PIP_URL https://github.com/pypa/get-pip/raw/9af82b715db434abb94a0a6f3569f43e72157346/public/get-pip.py
+
+# 改成从 gitee.com 获取，感谢 Gitee
+ENV PYTHON_GET_PIP_URL https://gitee.com/ezmore/get-pip/raw/master/get-pip.py
+
+# 对 raw 文件进行 checksum 验证
+ENV PYTHON_GET_PIP_SHA256 45a2bb8bf2bb5eff16fdd00faef6f29731831c7c59bd9fc2bf1f3bed511ff1fe
+
+RUN set -eux; \
+
+    savedAptMark=&quot;$(apt-mark showmanual)&quot;; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends wget; \
+
+    wget -O get-pip.py &quot;$PYTHON_GET_PIP_URL&quot;; \
+
+    # 亲测，如果是直接获取 py 文件而非 raw 文件，下面 python 解释执行会出大问题，报告文件语法错误，逆天
+    # wget  -o get-pip.py http://mirrors.aliyun.com/pypi/get-pip.py;
+
+    echo &quot;$PYTHON_GET_PIP_SHA256 *get-pip.py&quot; | sha256sum -c -; \
+
+    apt-mark auto '.*' &gt; /dev/null; \
+    [ -z &quot;$savedAptMark&quot; ] || apt-mark manual $savedAptMark &gt; /dev/null; \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+    rm -rf /var/lib/apt/lists/*; \
+
+    export PYTHONDONTWRITEBYTECODE=1; \
+
+    python get-pip.py \
+    --disable-pip-version-check \
+    --no-cache-dir \
+    --no-compile \
+    &quot;pip==$PYTHON_PIP_VERSION&quot; \
+    &quot;setuptools==$PYTHON_SETUPTOOLS_VERSION&quot; \
+    -i https://pypi.tuna.tsinghua.edu.cn/simple/ \
+    # 亲测，如果不指定镜像，从 get-pip.py 中的默认地址是找不到 setuptools 的，更不要说指定版本的 setuptools
+    # 这里使用清华的 pip 源，感谢清华
+    # 首先尝试的豆瓣源，报告找不到 setuptools65.5.1，无语
+    ; \
+
+    # 如果 pip 的基础套件如 setuptools、wheel 在使用 get-pip.py 下载时有困难，可以先单独装 pip，然后 pip 装其他套件
+    # pip install setuptools==${PYTHON_SETUPTOOLS_VERSION} -i https://pypi.tuna.tsinghua.edu.cn/simple/;
+
+    rm -f get-pip.py; \
+
+    pip --version
+
+# 搭载本镜像的容器启动后，默认执行此指令，此处是运行 python3
+# CMD [&quot;python3&quot;]
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/nvic-yu-exti-de-qu-bie-yu-lian-xi/">
+              <h3 class="post-title">
+                NVIC 与 EXTI 的区别与联系
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

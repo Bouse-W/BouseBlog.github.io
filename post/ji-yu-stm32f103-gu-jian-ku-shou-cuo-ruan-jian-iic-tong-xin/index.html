@@ -1,0 +1,582 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>基于 STM32F103 固件库手搓软件 IIC 通信 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="基于 STM32F103 固件库手搓软件 IIC 通信 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="基于 STM32F103 固件库手搓软件 IIC 通信
+我可真🐂
+这篇的重点是相关的代码，即基于 STM 系列固件库进行寄存器编程，以初始化软件 IIC、配置并使用软件 IIC 在设备间通信。
+软件 IIC 功能层
+初始化
+/**
+  *..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              基于 STM32F103 固件库手搓软件 IIC 通信
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="基于-stm32f103-固件库手搓软件-iic-通信">基于 STM32F103 固件库手搓软件 IIC 通信</h4>
+<p>我可真🐂</p>
+<p>这篇的重点是相关的代码，即基于 STM 系列固件库进行寄存器编程，以初始化软件 IIC、配置并使用软件 IIC 在设备间通信。</p>
+<h5 id="软件-iic-功能层">软件 IIC 功能层</h5>
+<h6 id="初始化">初始化</h6>
+<pre><code class="language-c">/**
+  * @brief I2C初始化配置
+  * @param None
+  * @retval None
+  */
+
+// 基于 STM32F103VE 指南者开发板的软件 IIC 引脚组 GPIOB
+#define macI2C_GPIO_PORT GPIOB
+
+// 基于 STM32F103VE 指南者开发板的软件 IIC 引脚时钟
+#define macI2C_GPIO_CLK 	RCC_APB2Periph_GPIOB
+
+void I2CInit(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure = {0};
+	
+	// 打开GPIO时钟	
+	RCC_APB2PeriphClockCmd (RCC_APB2Periph_GPIOB, ENABLE);
+	
+	GPIO_InitStructure.GPIO_Pin = macI2C_SCL_PIN | macI2C_SDA_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	
+	GPIO_Init(macI2C_GPIO_PORT, &amp;GPIO_InitStructure);
+	
+	// 给一个停止信号, 复位 I2C 总线上的所有设备到待机模式
+	I2CStop ();
+    
+    return;
+}
+</code></pre>
+<h6 id="发送起始信号">发送起始信号</h6>
+<pre><code class="language-c">/**
+  * @brief I2C起始信号
+  * @param None
+  * @retval None
+  */
+void I2CStart(void)
+{
+	// 当 SCL 高电平时，SDA 出现一个下跳沿表示 I2C 总线启动信号
+	
+	// 拉高 SDA
+	I2C_SDA_Output(1);
+	delay1(DELAY_TIME);
+	
+	// 拉高 SCL
+	I2C_SCL_Output(1);
+	delay1(DELAY_TIME);
+	
+	// 下跳 SDA
+	I2C_SDA_Output(0);
+	delay1(DELAY_TIME);
+	
+	// SCL 下跳，关闭
+	I2C_SCL_Output(0);
+	delay1(DELAY_TIME);
+    
+    return;
+}
+</code></pre>
+<h6 id="发送停止信号">发送停止信号</h6>
+<pre><code class="language-c">/**
+  * @brief I2C结束信号
+  * @param None
+  * @retval None
+  */
+void I2CStop(void)
+{
+	
+	// 当 SCL 高电平时，SDA 出现一个上跳沿表示 I2C 总线停止信号
+	
+	// 拉低 SCL
+	I2C_SCL_Output(0);
+	delay1(DELAY_TIME);
+	
+	// 拉低 SDA
+	I2C_SDA_Output(0);
+	delay1(DELAY_TIME);
+	
+	// 拉高 SCL
+	I2C_SCL_Output(1);
+	delay1(DELAY_TIME);
+	
+	// SDA 上跳
+	I2C_SDA_Output(1);
+	delay1(DELAY_TIME);
+    
+    return;
+}
+</code></pre>
+<h6 id="发送一个字节">发送一个字节</h6>
+<pre><code class="language-c">/**
+  * @brief I2C发送一个字节
+  * @param cSendByte 需要发送的字节
+  * @retval None
+  */
+void I2CSendByte(uint8_t cSendByte)
+{
+	uint8_t  i = 8;
+	
+	while (i--)
+	{
+		I2C_SCL_Output(0);
+		delay1(DELAY_TIME);
+		
+		I2C_SDA_Output(cSendByte &amp; 0x80);				// 发送 1bit，总计 8bit
+		delay1(DELAY_TIME);
+		
+		cSendByte += cSendByte;			// 手法清奇，和移位效果相同而不改变参数值
+		delay1(DELAY_TIME);
+		
+		I2C_SCL_Output(1);
+		delay1(DELAY_TIME);
+	}
+	I2C_SCL_Output(0);
+	delay1(DELAY_TIME);
+}
+</code></pre>
+<h6 id="接收一个字节">接收一个字节</h6>
+<pre><code class="language-c">/**
+  * @brief I2C接收一个字节
+  * @param None
+  * @retval 接收到的字节
+  */
+uint8_t I2CReceiveByte(void)
+{
+	uint8_t i = 8;
+	uint8_t cR_Byte = 0;
+	
+	I2C_SDA_Input_Mode ();
+	
+	while (i--)
+	{
+		cR_Byte += cR_Byte;
+		I2C_SCL_Output(0);
+		delay1(DELAY_TIME);
+		delay1(DELAY_TIME);
+		
+		I2C_SCL_Output(1);
+		delay1(DELAY_TIME);
+		
+		cR_Byte |=  I2C_SDA_Input();
+	}
+	I2C_SCL_Output(0);
+	delay1(DELAY_TIME);
+	
+	I2C_SDA_Output_Mode();
+    
+	return cR_Byte;
+}
+</code></pre>
+<h6 id="发送确认信号">发送确认信号</h6>
+<pre><code class="language-c">/**
+  * @brief I2C发送确认信号
+  * @param None
+  * @retval None
+  */
+void I2CSendAck(void)
+{
+	I2C_SDA_Output(0);
+	delay1(DELAY_TIME);
+	delay1(DELAY_TIME);
+    
+	I2C_SCL_Output(1);
+	delay1(DELAY_TIME);
+    
+	I2C_SCL_Output(0);
+	delay1(DELAY_TIME);
+    
+    return;
+}
+</code></pre>
+<h6 id="发送非确认信号">发送非确认信号</h6>
+<pre><code class="language-c">/**
+  * @brief I2C发送确认信号
+  * @param None
+  * @retval None
+  */
+void I2CSendAck(void)
+{
+	I2C_SDA_Output(0);
+	delay1(DELAY_TIME);
+	delay1(DELAY_TIME);
+    
+	I2C_SCL_Output(1);
+	delay1(DELAY_TIME);
+    
+	I2C_SCL_Output(0);
+	delay1(DELAY_TIME);
+    
+    return;
+}
+</code></pre>
+<h6 id="等待确认信号">等待确认信号</h6>
+<pre><code class="language-c">/**
+  * @brief I2C等待确认信号
+  * @param None
+  * @retval None
+  */
+uint8_t I2CWaitAck(void)
+{
+	unsigned short cErrTime = 5;		// 等待时间
+	ErrorStatus state;
+
+	I2C_SDA_Input_Mode();				// SDA 输入模式，准备接受 ACK
+
+	I2C_SCL_Output(1);			// 驱动SCL，此时器件会返回ACK应答
+	delay1(DELAY_TIME);
+  
+  while(I2C_SDA_Input())		// 读取 SDA 线状态。若返回值非 0，则 SDA 上可能有设备正在通信
+	{
+		cErrTime--;
+		delay1(DELAY_TIME);
+	
+		if (0 == cErrTime)			// 等待时间结束，SDA 上仍为高电平，可能存在通信错误（手法清奇）
+		{
+			I2C_SDA_Output_Mode();			// 设置 SDA 引脚为开漏输出，CPU 释放 SDA 引脚，允许外设控制 SDA 引脚的电平。（CPU在开漏模式下不主动控制引脚电平，而是侦测总线上的电平变化。）
+			I2CStop();
+			state = ERROR;
+			break;
+		}
+	}
+	I2C_SCL_Output(0);
+	delay1(DELAY_TIME);
+	
+	I2C_SDA_Output_Mode();
+	state = SUCCESS;
+	
+	return state;
+}
+</code></pre>
+<h6 id="软件-iic-通用延时函数">软件 IIC 通用延时函数</h6>
+<pre><code class="language-c">/**
+  * @brief I2C的短暂延时
+  * @param None
+  * @retval None
+  */
+
+#define DELAY_TIME	20
+
+static void delay1(unsigned int n)
+{
+    uint32_t i;
+    for ( i = 0; i &lt; n; ++i);
+    
+    return;
+}
+
+</code></pre>
+<h5 id="软件-iic-底层寄存器编程">软件 IIC 底层寄存器编程</h5>
+<h6 id="简要说明">简要说明</h6>
+<p>硬件 IIC 的本质是通过 SDA 线和 SCL 线上电平有规律地交替变化实现设备连接和数据传输</p>
+<p>软件模拟 IIC 就通过寄存器设置相关 GPIO 引脚电平的高低，模拟硬件 IIC 的 SDA 线和 SCL 线上的电平变化，实现连接和传输</p>
+<h6 id="配置模拟-sda-线为输入模式">配置模拟 SDA 线为输入模式</h6>
+<pre><code class="language-c">/**
+  * @brief SDA线输入模式配置
+  * @param None
+  * @retval None
+  */
+
+// 基于 STM32F103VE 指南者开发板的软件 IIC_SDA 引脚号 GPIOB7
+#define macI2C_SDA_PIN		GPIO_Pin_7
+
+void I2C_SDA_Input_Mode()
+{
+	
+	GPIO_InitTypeDef GPIO_InitStructure = {0};
+
+	GPIO_InitStructure.GPIO_Pin = macI2C_SDA_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;			// 引脚设置为上拉输入，确保SDA总线上没有设备拉低SDA引脚时，引脚能够保持在高电平，SDA 保持释放状态
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	
+	// 调用固件函数完成初始化
+	GPIO_Init(macI2C_GPIO_PORT, &amp;GPIO_InitStructure);
+    
+    return;
+}
+</code></pre>
+<h6 id="配置模拟-sda-线为输出模式">配置模拟 SDA 线为输出模式</h6>
+<pre><code class="language-C">/**
+  * @brief SDA线输出模式配置
+  * @param None
+  * @retval None
+  */
+void I2C_SDA_Output_Mode()
+{
+  GPIO_InitTypeDef GPIO_InitStructure = {0};
+		
+	GPIO_InitStructure.GPIO_Pin = macI2C_SDA_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;			// 引脚设置为开漏输出
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    
+	GPIO_Init(macI2C_GPIO_PORT, &amp;GPIO_InitStructure);
+}
+</code></pre>
+<h6 id="由模拟-sda-输出-1-bit-数据">由模拟 SDA 输出 1 bit 数据</h6>
+<pre><code class="language-C">/**
+  * @brief SDA线输出一个位
+  * @param val 输出的数据
+  * @retval None
+  */
+void I2C_SDA_Output( uint16_t val )
+{
+	if (val)
+	{
+			macI2C_GPIO_PORT-&gt;BSRR = macI2C_SDA_PIN;					// SDA 高电平，输出 1
+	}
+	else
+	{
+			macI2C_GPIO_PORT-&gt;BRR = macI2C_SDA_PIN;					// SDA 低电平，输出 0
+	}
+    
+    return;
+}
+</code></pre>
+<h6 id="由模拟-sda-接收-1-bit-数据">由模拟 SDA 接收 1 bit 数据</h6>
+<pre><code class="language-c">/**
+  * @brief SDA输入一位
+  * @param None
+  * @retval gpio_state，输入数据
+  */
+uint8_t I2C_SDA_Input(void)
+{
+	uint8_t gpio_state;
+	
+	if((macI2C_GPIO_PORT-&gt;IDR &amp; macI2C_SDA_PIN) != 0x00U)				// 拿 32 位值，跟 16 位值与，然后和 8 位值比较。服了
+	{
+		gpio_state = 1U;
+	}
+	else
+	{
+		gpio_state = 0U;
+	}
+	
+	return gpio_state;
+}
+</code></pre>
+<h6 id="由模拟-scl-输出-1-bit-数据">由模拟 SCL 输出 1 bit 数据</h6>
+<pre><code class="language-c">/**
+  * @brief SCL线输出一个位
+  * @param val 输出的数据
+  * @retval None
+  */
+
+// 基于 STM32F103VE 指南者开发板的软件 IIC_SDA 引脚号 GPIOB6
+#define macI2C_SCL_PIN		GPIO_Pin_6
+
+void I2C_SCL_Output( uint16_t val )
+{
+	if (val)
+	{
+		
+		macI2C_GPIO_PORT-&gt;BSRR = macI2C_SCL_PIN;				// 通过 BSRR 寄存器，设置 GPIO 引脚电平的高低
+	}
+	else
+	{
+		macI2C_GPIO_PORT-&gt;BRR = macI2C_SCL_PIN;
+	}
+    
+    return;
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8E-stm32f103-%E5%9B%BA%E4%BB%B6%E5%BA%93%E6%89%8B%E6%90%93%E8%BD%AF%E4%BB%B6-iic-%E9%80%9A%E4%BF%A1">基于 STM32F103 固件库手搓软件 IIC 通信</a>
+<ul>
+<li><a href="#%E8%BD%AF%E4%BB%B6-iic-%E5%8A%9F%E8%83%BD%E5%B1%82">软件 IIC 功能层</a>
+<ul>
+<li><a href="#%E5%88%9D%E5%A7%8B%E5%8C%96">初始化</a></li>
+<li><a href="#%E5%8F%91%E9%80%81%E8%B5%B7%E5%A7%8B%E4%BF%A1%E5%8F%B7">发送起始信号</a></li>
+<li><a href="#%E5%8F%91%E9%80%81%E5%81%9C%E6%AD%A2%E4%BF%A1%E5%8F%B7">发送停止信号</a></li>
+<li><a href="#%E5%8F%91%E9%80%81%E4%B8%80%E4%B8%AA%E5%AD%97%E8%8A%82">发送一个字节</a></li>
+<li><a href="#%E6%8E%A5%E6%94%B6%E4%B8%80%E4%B8%AA%E5%AD%97%E8%8A%82">接收一个字节</a></li>
+<li><a href="#%E5%8F%91%E9%80%81%E7%A1%AE%E8%AE%A4%E4%BF%A1%E5%8F%B7">发送确认信号</a></li>
+<li><a href="#%E5%8F%91%E9%80%81%E9%9D%9E%E7%A1%AE%E8%AE%A4%E4%BF%A1%E5%8F%B7">发送非确认信号</a></li>
+<li><a href="#%E7%AD%89%E5%BE%85%E7%A1%AE%E8%AE%A4%E4%BF%A1%E5%8F%B7">等待确认信号</a></li>
+<li><a href="#%E8%BD%AF%E4%BB%B6-iic-%E9%80%9A%E7%94%A8%E5%BB%B6%E6%97%B6%E5%87%BD%E6%95%B0">软件 IIC 通用延时函数</a></li>
+</ul>
+</li>
+<li><a href="#%E8%BD%AF%E4%BB%B6-iic-%E5%BA%95%E5%B1%82%E5%AF%84%E5%AD%98%E5%99%A8%E7%BC%96%E7%A8%8B">软件 IIC 底层寄存器编程</a>
+<ul>
+<li><a href="#%E7%AE%80%E8%A6%81%E8%AF%B4%E6%98%8E">简要说明</a></li>
+<li><a href="#%E9%85%8D%E7%BD%AE%E6%A8%A1%E6%8B%9F-sda-%E7%BA%BF%E4%B8%BA%E8%BE%93%E5%85%A5%E6%A8%A1%E5%BC%8F">配置模拟 SDA 线为输入模式</a></li>
+<li><a href="#%E9%85%8D%E7%BD%AE%E6%A8%A1%E6%8B%9F-sda-%E7%BA%BF%E4%B8%BA%E8%BE%93%E5%87%BA%E6%A8%A1%E5%BC%8F">配置模拟 SDA 线为输出模式</a></li>
+<li><a href="#%E7%94%B1%E6%A8%A1%E6%8B%9F-sda-%E8%BE%93%E5%87%BA-1-bit-%E6%95%B0%E6%8D%AE">由模拟 SDA 输出 1 bit 数据</a></li>
+<li><a href="#%E7%94%B1%E6%A8%A1%E6%8B%9F-sda-%E6%8E%A5%E6%94%B6-1-bit-%E6%95%B0%E6%8D%AE">由模拟 SDA 接收 1 bit 数据</a></li>
+<li><a href="#%E7%94%B1%E6%A8%A1%E6%8B%9F-scl-%E8%BE%93%E5%87%BA-1-bit-%E6%95%B0%E6%8D%AE">由模拟 SCL 输出 1 bit 数据</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/hu-xiang-zhe-mo-zhi-wei-wang-zhan-bu-shu-ssl-zheng-shu/">
+              <h3 class="post-title">
+                互相折磨之为网站部署 SSL 证书
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

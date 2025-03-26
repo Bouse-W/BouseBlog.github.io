@@ -1,0 +1,347 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Introdution_to_CAmkES | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Introdution_to_CAmkES | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Introduction to CAmkES
+部分文段做了微小增删使句子通顺。
+Background
+
+The fundamen..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Introdution_to_CAmkES
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-24
+              </span>
+              <span>
+                8 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/hello-camkes-1"><code>seL4</code> Docs/Tutorials/Introduction to CAmkES</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="background">Background</h2>
+<blockquote>
+<p>The fundamentals of CAmkES are the component, the interface and the connection.</p>
+</blockquote>
+<h3 id="components">Components</h3>
+<blockquote>
+<p><em>Components</em> are logical groupings of code and resources. They communicate with other component instances via well-defined interfaces which must be statically defined, over communication channels.</p>
+</blockquote>
+<h3 id="connections">Connections</h3>
+<blockquote>
+<p>A connection is the representation of a method of communication between two software components in CAmkES.</p>
+<p>The underlying implementation may be shared memory, synchronous IPC, notifications or some other implementation-provided means.</p>
+</blockquote>
+<p>一个连接（<code>connection</code>）是对两个组件之间通信连接的抽象，通信的具体实现可使用共享内存、同步 <code>IPC</code>、通知和其他方式。</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#connection</p>
+<p>An instantiation of a connector. Connections connect two <em>instances</em>.</p>
+</blockquote>
+<p><code>connection</code> 是 <code>connector</code> 类型的实例对象。</p>
+<h3 id="interfaces">Interfaces</h3>
+<blockquote>
+<p>All communications over a CAmkES connection must be well defined: static systems’ communications should be able to be reasoned about at build time.</p>
+<p>All the function calls which will be delivered over a communication channel then, also are well defined, and logically grouped</p>
+</blockquote>
+<p><code>CAmkES</code> 构建的静态系统要求所有组件、资源和连接都具有确定性，它们必须在编译时就被确定好，比如：在 <code>connection</code> 的一个常见的应用场景——不同组件间通过 <code>connection channel</code> 进行函数调用（<code>Procedure Call</code>），所调用的函数必须在编译时就确定并组织好。</p>
+<p><code>seL4</code> 使用 <code>interface</code>来组织和管理组件间对各种资源的（跨组件）调用。</p>
+<blockquote>
+<p>There are different kinds of interfaces: -Dataports, -Procedural interfaces, -and Notifications.</p>
+</blockquote>
+<p>主要有 <code>3</code> 种 <code>interface</code>：数据接口（<code>Dataports</code>）、过程接口（<code>Procedural interface</code>）和通知接口（<code>Notification</code>）。</p>
+<blockquote>
+<p>extarcted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#procedure</p>
+<p>Procedure is an interface with function call semantics. Procedures consist of a series of methods that can be invoked independently.</p>
+</blockquote>
+<p><code>Procedure</code> 是一个带有函数调用语义的接口，它由一系列可以独立调用的函数的函数原型组成。</p>
+<h3 id="component-source">Component source</h3>
+<blockquote>
+<p>Based on the ADL, CAmkES generates boilerplate which conforms to your system’s architecture, and enables you to fill in the spaces with your program’s logic.</p>
+</blockquote>
+<p><code>CAmkES</code> 根据 <code>ADL</code> 文件描述的系统结构自动生成模板文件，用户可以在模板文件中填充一些更具体的程序实现用户逻辑。</p>
+<blockquote>
+<p>When it comes to invoking the functions that were defined in the Interface specification , you must prefix the API function name with the name of the Interface instance that you are exposing over the particular connection.</p>
+</blockquote>
+<blockquote>
+<p>extarcted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#creating-an-application</p>
+<p>The <code>control</code> keyword indicates that Client is what is called an active component. This means it will contain a main function (prototyped as <code>run</code>) and have an active thread of control.</p>
+</blockquote>
+<p><code>ADL</code> 文件中，用关键字 <code>control</code> 标记的组件被定义为“活跃组件”（<code>active component</code>），系统的入口函数（<code>main</code> 函数，或说 <code>run</code> 函数）必须放到活跃组件中。</p>
+<p><code>ADL</code> 文件中，在组件块内使用 <code>provides</code> 关键字表示组件提供某被调用资源，用 <code>use</code> 关键字表示组件需要使用某资源。比如我们这样定义一对在 <code>HelloSimple</code> 接口上形成供需关系的组件：</p>
+<pre><code class="language-c">/* file: hello-camkes-1/hello-1.camkes */
+/* Consumer component */
+component Client
+{
+    /* Declare an active component */
+    control;
+    /* Uses &lt;interface-name&gt; &lt;interface_instantiation-name&gt; */
+    uses HelloSimple interf_u_0;
+}
+
+/* Porducer component */
+component Echo
+{
+    provides HelloSimple interf_p_0;
+}
+</code></pre>
+<p><font color=red>在组件的源代码中<strong>实现或调用</strong>  <code>procedure interface</code> 中声明的函数前，必须在具体的函数名前添加接口实例的名字作为前缀，<code>i.e.: &lt;interface-instance-name&gt;_&lt;function-name&gt;</code>。</font>这主要是考虑到一个 <code>interface</code> 实例化出多个不同对象的场景。</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#creating-an-application</p>
+<p>Interfaces are defined with abstract types that have equivalents in all target languages.</p>
+</blockquote>
+<p><code>interface</code> 中的函数原型是用抽象类型定义的，所有目标语言都有对应抽象类型的具体关键字，比如抽象类型 <code>string</code> 对应 <code>C</code> 语言中的 <code>char *</code>。我们这样定义上面代码中使用的 <code>HelloSimple</code> 过程接口：</p>
+<pre><code class="language-c">/* file: hello-camkes-1/interfaces/hello-1.camkes */
+procedure HelloSimple
+{
+    void say_hello(in string str);
+};
+</code></pre>
+<p>所定义的 <code>interface</code> 名为 <code>HelloSimple</code>，类型为 <code>procedure</code>，有一个函数 <code>say_hello</code>。</p>
+<p>举例说明 <code>say_hello</code> 函数的具体实现：在组件 <code>Echo</code> 的 <code>ADL</code> 文件中定义了 <code>component Echo{provides HelloSimple interf_p_0;}</code>，则在组件源代码 <code>echo.c</code> 中实现 <code>void interf_p_0_say_hello(...);</code> 函数，可选实现 <code>void interf_p_0__init(...);</code> 函数用于初始化 <code>HelloSimple</code> 实例。</p>
+<blockquote>
+<p>The components' interfaces are connected via a connection.</p>
+</blockquote>
+<p><code>ADL</code> 文件中，用关键字 <code>connection</code> 声明一个连接，连接类型（如 <code>RPC</code> 方式或共享内存方式）通常选用 <code>CAmkES</code> 提供的 <code>built-in things</code>（内置内容）。本 <code>quiz</code> 中，我们分别定义一个 <code>Client</code> 和 <code>Echo</code> 的组件实例，在实例间建立连接，最终形成一个简单的 <code>static project system on seL4</code>：</p>
+<pre><code class="language-c">/* file: hello-camkes-1/hello-1.camkes */
+/* &quot;std_connector&quot; is a built-in content in CAmkES */
+#import &lt;std_connector.camkes&gt;
+#import &quot;interface/HelloSimple.idl4&quot;
+
+assembly
+{
+    composition
+    {
+        /* Instantiate two component object */
+        component Client client;
+        component Echo echo;
+        /* Define a connction named &quot;conn&quot; between two component object using a &quot;built-in thing&quot; named &quot;seL4RPCCall&quot; in CAmkES */
+        cconnection seL4RPCCall conn(from client.interf_u_0, to echo.interf_p_0);
+    }
+}
+</code></pre>
+<blockquote>
+<p>The header camkes.h is generated by the CAmkES build system and contains prototypes for functions related to MyInterface that this component needs to implement.</p>
+</blockquote>
+<p>头文件 <code>camkes.h</code> 由 <code>CAmkES</code> 自动生成，包含了和当前组件相关的所有函数的函数原型。</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#creating-an-application</p>
+<p>The function <code>inf__init</code> is for this component to do any required initialisation.</p>
+</blockquote>
+<p><font color=red>函数 <code>&lt;interface_instance-name&gt;__init()</code> 用于初始化组件中的 <code>interface</code>（如果需要初始化）</font>，最常见的用法是初始化 <code>event interface</code>，在初始化函数中绑定 <code>notification handler</code>；或初始化 <code>procedure interface</code>，在 <code>procedure</code> 中的函数被调用前准备一些资源。</p>
+<p>下面是一个初始化 <code>event interface</code> 的示例：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Echo/Echo.camkes */
+component Echo
+{
+    /* include definitions of typedefs for the dataports */
+    include &quot;str_buf.h&quot;;
+    
+    emits EventEcho event_emit_0;
+    consumes EventClient event_consume_0;
+    
+    ...
+}
+
+/* file: hello-camkes-2/components/Echo/src/echo.c */
+void callback_handler_1(void *);
+void event_consume_0__init(void)
+{
+    int error = event_consume_0_reg_callback(callback_handler_1, NULL);
+    ZF_LOGF_IF(error != 0, &quot;Failed to register callback_handler_1 in component echo&quot;);
+    printf(&quot;echo handler 1 register done.\n&quot;);
+}
+</code></pre>
+<p>我们像这样实现 <code>Echo</code> 和 <code>Client</code> 组件的源代码：</p>
+<pre><code class="language-c">/* file: hello-camkes-1/components/Echo/src/echo.c */
+#include &lt;stdio.h&gt;
+
+#include &lt;camkes.h&gt;
+
+void interf_p_0_say_hello(const char * message)
+{
+    printf(&quot;Component %s saying: %s\n&quot;, get_instance_name(), message);
+}
+
+/* file: hello-camkes-1/components/Client/src/client.c */
+#include &lt;stdio.h&gt;
+
+#include &lt;camkes.h&gt;
+
+int run(void)
+{
+    printf(&quot;Starting the client\n&quot;);
+    
+    char * str = &quot;hello world.&quot;;
+    interf_u_0_say_hello(str);
+    
+    printf(&quot;After the client\n&quot;);
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#components">Components</a></li>
+<li><a href="#connections">Connections</a></li>
+<li><a href="#interfaces">Interfaces</a></li>
+<li><a href="#component-source">Component source</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/hello_cankes/">
+              <h3 class="post-title">
+                Hello_CAmkES
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

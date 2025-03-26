@@ -1,0 +1,227 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>互相折磨之为网站部署 SSL 证书 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="互相折磨之为网站部署 SSL 证书 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="磨难
+如果是直接在主机上配置 LAPM 环境并运行 WordPress，那到没什么难部署的，安置好证书文件，再小修一下 apache 配置文件即可。
+苦就苦在我一开始就选择使用 docker container for WP &amp; M..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              互相折磨之为网站部署 SSL 证书
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                5 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h5 id="磨难">磨难</h5>
+<p>如果是直接在主机上配置 LAPM 环境并运行 WordPress，那到没什么难部署的，安置好证书文件，再小修一下 apache 配置文件即可。</p>
+<p>苦就苦在我一开始就选择使用 docker container for WP &amp; Mysql，最开始还不会用 Docker Compose，是两个相互隔离的容器通过进程端口连起来。要把证书文件找地方放好，再找到并修改 apache 配置文件，个中甘苦，尝者自知。</p>
+<p>也许有用的链接：<br>
+<a href="https://ethanblog.com/tips/install-wordpress-and-enable-ssl-with-docker.html">使用 Docker 搭建 WordPress 并启用 HTTPS 访问</a></p>
+<h5 id="妥协">妥协</h5>
+<p>最终的配置效果并不好，每次先需要用户添加信任，然后才能正常使用 HTTPS 浏览网页内容。<br>
+我也羡慕人家行云流水地配出来一个 SSL 评级为 A+ 的博客网站。<br>
+但还是不要为我的小破站感到不安吧。</p>
+<p>最后使用 Git 作版本控制，把网站文件做成了支持 HTTP 访问和支持 HTTPS 访问两个版本。<br>
+作为一个博客网站，不开启评论，不支持用户注册登陆等，不用 HTTPS 其实也没啥吧（<br>
+所以之后一般就用 HTTP 版了。<br>
+也许吧。<br>
+也许。<br>
+其实希望可以不一定。<br>
+不一定喔。</p>
+<h5 id="后续">后续</h5>
+<p>没错还有后续。</p>
+<p>回退到 HTTP 版后，使用域名访问本站死活解析不到公网 IP 上（这个表达不准确，详见下文），使用浏览器开发者工具查看调试器栏，发现解析域名的的时候把域名和 IP 当作了两个不相干的地址，域名解析只能获得一个主机 <code>cache</code> 里的 <code>index.php</code> 文件，这个是首页文件，是可以显示的，所以直接访问域名时，虽然没有解析到公网 IP 上，浏览器也不至于什么都不显示。<br>
+但显示出来的首页中，文章分类标签按钮、文章详情按钮，点击后都不能正常访问。</p>
+<p>以文章分类标签按钮访问异常为例，使用浏览器开发者工具检查（firefox 按 F12 开启），在调试器栏发现：</p>
+<p>按钮的访问链接是 <code>http://IPAddress/category/category_id/source_id</code>，申请文章分类详情页资源。点击按钮后<strong>向本站的裸公网 IP</strong>发送 <code>POST</code> 请求。和我的预想不一致</p>
+<p>我预想的是：访问链接是 <code>http://本站域名/category/...</code>，点击按钮后<strong>向本站域名</strong>发送 <code>POST</code> 请求。</p>
+<p>以上，请求一经发出即被认定为<strong>跨域访问：从本站域名地址跨到公网 IP 地址</strong>去，因为请求源是本站域名地址下的 <code>index.php</code>，请求目标是 IP 地址下的 <code>/category/...</code>。<br>
+实际上域名解析开通后，域名所指的和 IP 所指的都是同一台服务器，但站点上的一些错误设置导致浏览器认为它们不是同一地址，此时我还没找到问题在哪。</p>
+<p>申请被认定为跨域访问后，立即<strong>报告跨域访问错误</strong>： <code>CORS header 'Access-Control-Allow-Origin' missing</code>，同时 <code>POST</code> 请求被拦截，资源访问失败。</p>
+<p>同样在调试器栏，左侧资源列表更清楚地看到浏览器认为自己是在向两个地址申请资源：向本站域名 www.rerevolution 申请到了一个 <code>index.php</code>和一个啥 <code>sandbox</code> 啥的记不清了；向本站公网 IP 申请到了站点主题的样式文件（御三家）和侧边栏资源（近期文章标题、摘要、链接）之类的。从域名到 IP 的访问被认为跨域然后被拦截。</p>
+<p>给爷气笑了。</p>
+<p>然后就改啊。。。改，改啊。。。改，到处戳戳碰碰，甚至跑去数据库里改和网站地址有关的记录，还要非常注意对重要文件如 <code>.htaccess</code> 的备份，避免因一念之差毁掉整个网站。越是这种艰难时刻，<code>Git</code> 的光辉就越发闪耀。</p>
+<p>后来的后来，爷被镜中面有菜色双眼血红的哥们震醒，决计暂时放弃挣扎，就权且用裸 IP 作为公开访问地址顶一顶吧。</p>
+<p>失败总是贯穿人生始终。</p>
+<p>也就顶了一天。</p>
+<p>走在路上突然想起来：之前一直在 DashBoard 的“设置”里对 <strong>“站点地址（URL）”</strong>、<strong>“WordPress地址（URL）”</strong> 的前缀改来该去，从 <code>http</code> 该到 <code>https</code>，从 <code>https</code> 改到三味书屋，就是<strong>没有改具体的地址内容，所以地址一直写的裸公网 IP</strong>。也难怪访问资源的时候人家老是要跨域跨到公网 IP 上去。</p>
+<p>真是求锤得锤。</p>
+<p>然后就把地址的具体内容从裸公网 IP 该成实际域名，然后就通了。</p>
+<p>行吧，先这样吧。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%A3%A8%E9%9A%BE">磨难</a></li>
+<li><a href="#%E5%A6%A5%E5%8D%8F">妥协</a></li>
+<li><a href="#%E5%90%8E%E7%BB%AD">后续</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/gao-xing-neng-ji-suan-2023_10_25/">
+              <h3 class="post-title">
+                高性能计算2023_10_25
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,300 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>基于Python3_6_9使用 platformio 插件的问题 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="基于Python3_6_9使用 platformio 插件的问题 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="VSCode 是一款有几千万用户的大编辑器（意味深）
+别的插件没探究过，反正 platfomio 这种大家伙，VSCode 插件市场里所谓的“安装”，只是轻飘飘地下载一个安装脚本，体现在编辑器中就是插件列表里那个启动用的蚂蚁头 logo。
+..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              基于Python3_6_9使用 platformio 插件的问题
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>VSCode 是一款有几千万用户的大编辑器（意味深）</p>
+<p>别的插件没探究过，反正 platfomio 这种大家伙，VSCode 插件市场里所谓的“安装”，只是轻飘飘地下载一个安装脚本，体现在编辑器中就是插件列表里那个启动用的蚂蚁头 logo。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/插件市场.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>插件市场</font></figcaption>
+</div>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/插件列表.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>插件列表</font></figcaption>
+</div>
+<p>当用户点击 logo 启动插件时，脚本首先在根目录（默认目录）下创建 <code>.platformio</code> 目录，之后所有框架、工具、例程、下载缓存、虚拟环境都放在这里。然后脚本调用 virtualenv 创建一个虚拟环境，命名为 <code>penv</code> 并启动，在此环境中使用 pip 安装 platfomioCore 和相关依赖。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/虚拟环境安装core.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>安装虚拟环境</font></figcaption>
+</div>
+<p>到这里，在本地机上自行安装高版本 Python 的同学可能会遇到第一处报错：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/python版本报错.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>python版本报错</font></figcaption>
+</div>
+<p>这里就算真诚地点击 &quot;I have Python&quot; 并输入当前 Python 解释器的路径也无济于事（我是这样）。只有先终止安装进程，切回本机原生的 Python（我这里是 Python 3.6.9 on Ubuntu 18.04）重新安装才能成功。</p>
+<p>安装完成并启动后，点击 <code>Open</code> 按钮打开 <code>home</code> 界面，进行项目创建和管理。</p>
+<p><font size=2 color=green>注 1：点击 <code>Open</code> 按钮的本质是在虚拟环境中执行 <code>pio home &lt;options&gt;</code>，并使用一些不可名状的方法将 <code>home</code> 界面映射到 VSCode 的窗口中（我猜想可能是走端口映射或者进程通信），这样就算在 VSCode 中启动了 platformio。</font></p>
+<p><font size=2 color=green>注 2：没错，真正的 platformio 其实是一个 pip 包，用户在编辑器里看到的图形化界面也并非 VSCode 创建，而只是一条 <code>pio</code> 命令执行结果的映射，这条命令甚至允许用户在浏览器里打开 <code>home</code> 界面，只需要加一点执行参数。</font></p>
+<p><font size=2 color=green>注 3：所谓的 platfomioIDE，就是 VSCode 在界面中添加一些对应虚拟环境中 <code>pio</code> 命令的小按钮 + <code>pio home &lt;options&gt;</code> 映射到 VSCode 窗口 + VSCode 原生的项目文件管理</font></p>
+<p>到这里，一些坚持在本地机上配置的铁头娃可能会遇到第二处报错：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/python版本报错.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>python版本报错</font></figcaption>
+</div>
+<p>详细的报错信息，点击右下角 &quot;Report a problem&quot;，跳转到 <a href="https://github.com/platformio">platfomio 的 github 仓库</a>的 Issues 专区就能看到，并且可以作为 Issue 向社区提交。</p>
+<pre><code class="language-shell">  ...
+
+  Error: AttributeError: Traceback (most recent call last):
+  File &quot;.platformio/penv/lib/python3.6/site-packages/platformio/__main__.py&quot;, line 103, in main
+    cli()  %23 pylint: disable=no-value-for-parameter
+  File &quot;.platformio/penv/lib/python3.6/site-packages/click/core.py&quot;, line 1128, in __call__
+    return self.main(*args, **kwargs)
+  File &quot;.platformio/penv/lib/python3.6/site-packages/click/core.py&quot;, line 1053, in main
+    rv = self.invoke(ctx)
+  File &quot;.platformio/penv/lib/python3.6/site-packages/platformio/cli.py&quot;, line 85, in invoke
+    return super().invoke(ctx)
+  File &quot;.platformio/penv/lib/python3.6/site-packages/click/core.py&quot;, line 1659, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File &quot;.platformio/penv/lib/python3.6/site-packages/click/core.py&quot;, line 1395, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File &quot;.platformio/penv/lib/python3.6/site-packages/click/core.py&quot;, line 754, in invoke
+    return __callback(*args, **kwargs)
+  File &quot;.platformio/penv/lib/python3.6/site-packages/platformio/home/cli.py&quot;, line 97, in cli
+    home_url=home_url,
+  File &quot;.platformio/penv/lib/python3.6/site-packages/platformio/home/run.py&quot;, line 102, in run_server
+    log_level=&quot;warning&quot;,
+  File &quot;.platformio/penv/lib/python3.6/site-packages/uvicorn/main.py&quot;, line 461, in run
+    server.run()
+  File &quot;.platformio/penv/lib/python3.6/site-packages/uvicorn/server.py&quot;, line 67, in run
+    return asyncio.run(self.serve(sockets=sockets))
+AttributeError: module 'asyncio' has no attribute 'run'
+
+============================================================
+
+An unexpected error occurred. Further steps:
+
+* Verify that you have the latest version of PlatformIO using
+  `python -m pip install -U platformio` command
+
+* Try to find answer in FAQ Troubleshooting section
+  https://docs.platformio.org/page/faq/index.html
+
+* Report this problem to the developers
+  https://github.com/platformio/platformio-core/issues
+
+============================================================
+
+    at .vscode/extensions/platformio.platformio-ide-3.  31-linux-x64/node_modules/platformio-node-helpersdist/    index.js:1:10851
+    at ChildProcess.c (.vscode/extensions/  platformioplatformio-ide-3.3.1-linux-x64/ node_modulesplatformio-node-helpers/dist/index.js:1:4598)
+    at ChildProcess.emit (node:events:513:28)
+    at ChildProcess.emit (node:domain:489:12)
+    at maybeClose (node:internal/child_process:1121:16)
+    at Socket.&lt;anonymous&gt; (node:internalchild_process:479:11)
+    at Socket.emit (node:events:513:28)
+    at Socket.emit (node:domain:489:12)
+    at Pipe.&lt;anonymous&gt; (node:net:757:14)
+</code></pre>
+<p>这种调用栈报错，根因都在最后一行。这里是说 <code>uvicorn</code> 包里的 <code>server.py</code> 调用的模块 <code>asyncio</code> 没有名为 <code>run</code> 的属性。</p>
+<p>怎么解决呢？</p>
+<p>我不知道。🤡这种时候就要多翻翻已经解决的 Issues，找和自己相同或形似的问题，尝试前人的方法。</p>
+<p>最后很幸运地翻到了一个方法，只需要降低虚拟环境中 <code>uvicorn</code> 包的版本即可。执行 <code>pip install uvicorn==0.16.0</code>（默认安装的是 <code>uvicorn 0.17.0</code>），安装成功后重启插件。</p>
+<p>成功辣～</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/重装依赖.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>重装依赖</font></figcaption>
+</div>
+<p>现在可以点击 <code>New Project</code> 新建工程开始 coding 了，详细的可以去找 platformioIDE 使用教程。</p>
+<p>真的如此🐎？</p>
+<p>接下来不会用魔法的同学会遇到第三处不是报错但也能让你走不下去的问题：</p>
+<p>概括地说就是 “转圈”，此时 platformio 会根据你的项目要求下载相关的开发框架和编译工具链，这些东西一般没有国内镜像源，就算有，VSCode 也不会主动用，它只愿意从它爹微软的源下载这些东西，而微软源已经被悄咪咪地放在墙外了，如果没有魔法可能一万年也弄不完。</p>
+<p><font size=2 color=green>注1：不论是使用 platformioIDE 还是 使用 platformioCore，都会遇到这个网络问题，所以尽量想点办法先把网络配置好吧</font></p>
+<p><font size=2 color=green>注2：鉴于 VSCode 的半黑盒特性，很难通过一些简单操作修改它的网络设置，所以建议准备好魔法之后直接在终端使用 pio 命令安装框架和工具链</font></p>
+<p>锲而不舍的努力之后，我们终于装好了 pltfomioIDE、配好了网络、装好了开发框架和工具、成功创建了第一个 <code>hello_world</code> 项目，现在可以点击底部的 <code>√(PlatfomIo: Build)</code> 编译生成二进制文件，然后烧录到开发板里看看效果辣！</p>
+<p>能坚持到这里的同学，都已经历了几次三番的捶打，意志已经趋于坚不可摧，肉质也变得筋道 Q 弹。接下来，一部分人（反正不是我）会编译成功并愉快地烧录运行，端的是“昔日龌龊不足夸”，恨不能策马疾驰一百里。另一部分人（比如我）则会遇到足以击溃所有心理防线的最后一处报错：</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/12/cryptography报错.png" alt="automatic-scalability" width=70%>
+	<figcaption><font size=1>重装依赖</font></figcaption>
+</div>
+<p>这里只是展示一下错误信息，出错的场景大致就是：高版本的 platfomioCore 运行 <code>pio build &lt;options&gt;</code> 命令时需要依赖 <code>cryptography 41.01</code>，而基于 Python3.6.9 的 pip 最高只能安装 <code>cryptography 40.0.2</code>，就算是指定版本安装也不能成行。</p>
+<p>可能有同学想到，换个高版本的 Python。不行，具体参见第一处报错。</p>
+<p>也可能有同学想到，换个低版本的 platfomioCore。也许可行，但我没有尝试所以不知道低到哪个版本才能和 Python3.6.9 适配。而且，低版本的 platformioCore 不能支持一些新框架和新特性，这对于硬件更新换代很快的嵌入式项目而言是无法接受的。</p>
+<p>怎么办呢？</p>
+<p>。。。。。。。。。。</p>
+<p>再多想一分钟就会陷入绝望。</p>
+<p>但还是硬着头皮想了，搓出来以下几个方法，供斟酌：</p>
+<ol>
+<li>
+<p>重装更高版本的系统，像 Debian11、Ubuntu22 都挺好的。装一次大概可以安稳两三年？</p>
+</li>
+<li>
+<p>使用 Conda 配置高版本 Python 环境，想办法和 VSCode 组合起来。我没试过，可行性未知。</p>
+<ol>
+<li>直接用 virtualenv 基于本地安装的高版本 Python 创建虚拟环境也行，但不能一劳永逸地解决 Python 的版本问题</li>
+</ol>
+</li>
+<li>
+<p>使用 Docker 配置高版本系统镜像、高版本 Python 镜像、高版本 platfomioCore 镜像，一次性为这三位都找到解决方案，并想办法和 VSCode 组合起来。</p>
+</li>
+</ol>
+<p>上面都提到了“想办法和VSCode 组合起来”，因为 VSCode 作为编辑器的跳转、补全、语法检查等功能非常好用，图形化界面去看文件结构也是一目了然。</p>
+<p>但我没能找到组合起来的方法。🤡</p>
+<p>还有一个点是，我已经把 VSCode 配置成一个好用的 Python IDE 了，我不希望再用它去做一些 C/C++ 的项目，最后七改八改搞出一个笨重的 &quot;All In One&quot; IDE。</p>
+<p>我最终的解决方案是：使用 Docker 配置 platformioCore 镜像，使用 <code>Vim + ctags + 相关插件</code> 作为编辑器。在本地保存、编辑，在镜像临时容器编译、烧录、Debug。</p>
+<p>platfomio 官方也给出了将 Vim 配置成 platformioIDE 的<a href="https://docs.platformio.org/en/latest/integration/ide/vim.html">指导文档</a>，但我参考得不多。</p>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/ji-yu-stm32f103-gu-jian-ku-shou-cuo-ruan-jian-iic-tong-xin/">
+              <h3 class="post-title">
+                基于 STM32F103 固件库手搓软件 IIC 通信
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

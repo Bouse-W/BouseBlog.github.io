@@ -1,0 +1,301 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>晶振与时钟信号 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="晶振与时钟信号 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="晶振（Crystal oscillator）
+
+分类
+
+晶振，即晶体振荡器，在单片机中可分为‘ 外部晶振 ’和‘ 内部晶振 ’
+
+
+外部晶振，常见的有石英晶振，通过电路设计，将压电材料石英晶体制成：通电可以发生机械共振的器件，通过每次振动产..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              晶振与时钟信号
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                4 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="晶振crystal-oscillator">晶振（Crystal oscillator）</h4>
+<ul>
+<li>分类
+<ul>
+<li>晶振，即晶体振荡器，在单片机中可分为‘ <strong>外部晶振</strong> ’和‘ <strong>内部晶振</strong> ’
+<ul>
+<li>
+<p>外部晶振，常见的有石英晶振，通过电路设计，将压电材料石英晶体制成：通电可以发生机械共振的器件，通过每次振动产生并为设备提供时钟信号</p>
+</li>
+<li>
+<p>内部晶振，是一个晶振器件的的等效电路，单片机一般采用‘ 三端式（考毕兹）交流等效振荡电路 ’，使用二极管，电容等器件操作电压变化，以产生并提供时钟信号</p>
+</li>
+<li>
+<p>仅含内部晶振的 MCU 的的优点</p>
+<ul>
+<li>
+<p>功耗低</p>
+</li>
+<li>
+<p>电路板上只需要更少的零件，可以缩小尺寸</p>
+</li>
+<li>
+<p>节省引脚，原外部晶振的引脚可以另作他用。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>缺点</p>
+<ul>
+<li>
+<p>内部晶振对外界干扰极其敏感，非常容易受到环境温度等的影响，不稳定，精度较低，而外部石英晶振通常比内部 RC 振荡电路稳定数倍</p>
+</li>
+<li>
+<p>内部晶振不能按照需要随时停止，而外部晶振可以停下并进入休眠状态</p>
+</li>
+<li>
+<p>内部振荡器通常只有一个固定频率，而外部晶振的频率选择范围更丰富</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>作用
+<ul>
+<li>为系统提供基本的时钟信号，通常一个系统共用一个晶振，以此保持各部分同步<br>
+<font size=2, color=blue> 注：有些通信系统的基频和射频使用不同的晶振，通过电子调整频率的方法保持同步 </font></li>
+<li>晶振提供的时钟信号频率越高，单片机运行速度越快</li>
+</ul>
+</li>
+</ul>
+<h4 id="时钟信号clock">时钟信号（Clock）</h4>
+<ul>
+<li>
+<p>定义</p>
+<ul>
+<li>时钟信号是有固定周期并与运行无关的信号量，是时序逻辑的基础，用于决定逻辑单元中的状态何时更新</li>
+<li>基本的时钟信号由晶振产生和</li>
+</ul>
+</li>
+<li>
+<p>MCU_51 (based on 8051) 的时钟方式</p>
+<ul>
+<li>标准 MCU_51 内部是没有 RC 振荡电路</li>
+<li>MCU_51 的引脚中
+<ul>
+<li>19 脚：XTAL1，片内振荡电路输入端</li>
+<li>18 脚：XTAL2，片内振荡电路输出</li>
+</ul>
+</li>
+<li>片内时钟振荡方式：在 XTAL1 和 XTAL2 处接石英晶振和外接电容，借晶体振动获得时钟信</li>
+<li>外部时钟方式：XTAL1 接地，外部已经产生的时钟信号从 XTAL2 输入，供给</li>
+</ul>
+</li>
+<li>
+<p>CPU 时序有关概念的说明<br>
+<font size=2, color=blue>注：周期是描述时间的概念，指完成一次往复运动所需的时间</font></p>
+<ul>
+<li>
+<p>时钟周期：提供时钟信号的振荡源的周期，即晶振周期或外加振荡周期，又叫振荡周</p>
+</li>
+<li>
+<p>状态周期：2 个时钟周期为 1 个状态周期，用 S 表示，又称 S 周</p>
+</li>
+<li>
+<p>机器周期：6 个状态周期，即 12 个时钟周期为一个机器周</p>
+</li>
+<li>
+<p>指令周期：完成一条指令所需要的全部时间，它以机器周期为单位描</p>
+</li>
+<li>
+<p>晶振频率：单位时间内可完成完整振动的次数，常见的有：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>f</mi><mo>=</mo><mn>12</mn><mi>M</mi><mi>h</mi><mi>z</mi><mo separator="true">,</mo><mn>11.0592</mn><mi>M</mi><mi>h</mi><mi>z</mi></mrow><annotation encoding="application/x-tex">f = 12 Mhz, 11.0592 Mhz</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault">h</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">1</span><span class="mord">1</span><span class="mord">.</span><span class="mord">0</span><span class="mord">5</span><span class="mord">9</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault">h</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span></span></p>
+</li>
+<li>
+<p>晶振频率与各种周期（时间）的换算</p>
+<ul>
+<li>假如外接晶振为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>12</mn><mi>M</mi><mi>h</mi><mi>z</mi></mrow><annotation encoding="application/x-tex">12 Mhz</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord">2</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault">h</span><span class="mord mathdefault" style="margin-right:0.04398em;">z</span></span></span></span>，则：<br>
+时钟周期 = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mn>1</mn><mn>12</mn></mfrac><mi>u</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">\frac{1}{12} us</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.190108em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">u</span><span class="mord mathdefault">s</span></span></span></span><br>
+状态周期 = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mn>1</mn><mn>6</mn></mfrac><mi>u</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">\frac{1}{6} us</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.190108em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">u</span><span class="mord mathdefault">s</span></span></span></span><br>
+机器周期 = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mn>1</mn><mn>1</mn></mfrac><mi>u</mi><mi>s</mi><mo>=</mo><mn>1</mn><mi>u</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">\frac{1}{1} us = 1 us</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.190108em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">u</span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span><span class="mord mathdefault">u</span><span class="mord mathdefault">s</span></span></span></span><br>
+指令周期 = <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mfrac><mn>1</mn><mn>4</mn></mfrac><mi>u</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">\frac{1}{4} us</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.190108em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.845108em;"><span style="top:-2.6550000000000002em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">u</span><span class="mord mathdefault">s</span></span></span></span></li>
+</ul>
+</li>
+<li>
+<p>晶振频率即：单位时间内即振荡器能完成的振动次数</p>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E6%99%B6%E6%8C%AFcrystal-oscillator">晶振（Crystal oscillator）</a></li>
+<li><a href="#%E6%97%B6%E9%92%9F%E4%BF%A1%E5%8F%B7clock">时钟信号（Clock）</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/ji-yu-python3_6_9-shi-yong-platformio-cha-jian-de-wen-ti/">
+              <h3 class="post-title">
+                基于Python3_6_9使用 platformio 插件的问题
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,198 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>使用 GitHubIo 的子域名建立个人博客 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="使用 GitHubIo 的子域名建立个人博客 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="首先
+GitHub pages 分为个人主页、组织主页（organization）和项目主页，前二者的域名是最简便直接的 &lt;user-name&gt;.github.io、&lt;organization-name&gt;.githu..." />
+    <meta name="keywords" content="Cats_and_Dogs" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              使用 GitHubIo 的子域名建立个人博客
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/pJI3R47eCE/" class="post-tag">
+                  # Cats_and_Dogs
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="首先">首先</h4>
+<p><code>GitHub pages</code> 分为个人主页、组织主页（<code>organization</code>）和项目主页，前二者的域名是<strong>最简便直接</strong>的 <code>&lt;user-name&gt;.github.io</code>、<code>&lt;organization-name&gt;.github.io</code>，显然<strong>此类域名与个人或组织的 <code>github</code> 账号一一对应</strong>，如果直接拿来作为博客主页似乎有点浪费......（这么简便的网址更应该拿来索引一个精彩的个人简介页面之类的🤪）。<strong>项目主页没有个数限制，且项目主页的地址也只比前两者多了一级索引而已</strong>，因此我们完全可以用它来建立个人博客网站。</p>
+<h4 id="然后">然后</h4>
+<p>项目主页的建立流程和个人主页完全相同，只需注意两点：</p>
+<ol>
+<li>新建仓库时，将仓库命名为 <code>projectname.github.io</code>，不要和个人主页或组织主页重名。以我的博客项目为例，仓库名为 <code>BouseBlog.github.io</code></li>
+<li>要注意将配置文件 <code>_config.yml</code> 中的 <code>baseurl</code> 设置为你的项目名，以我的博客项目为例，设置为 <code>baseurl: BouseBlog.github.io/</code>。
+<ol>
+<li>配置文件是 <code>_config.yml</code>，因为我默认读者都是按照 <code>GitHub</code> 官网给的教程使用 <code>Jekyll</code> 创建静态页面。</li>
+<li>若不设置，在此项目仓库中发布的网页对同仓库其他页面的索引将默认从个人主页开始，通过设置 <code>baseurl</code> 将默认的 <code>&lt;user-name&gt;.github.io/</code> 修改为 <code>&lt;user-name&gt;.github.io/projectname.github.io/</code>），这就是上面说的 “多了一级索引”。</li>
+</ol>
+</li>
+</ol>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E9%A6%96%E5%85%88">首先</a></li>
+<li><a href="#%E7%84%B6%E5%90%8E">然后</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/ruan-jian-mo-ni-iic-kua-ye-xie-eeprom-de-wen-ti/">
+              <h3 class="post-title">
+                软件模拟 IIC 跨页写 EEPROM 的问题
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

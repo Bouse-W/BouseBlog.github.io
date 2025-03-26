@@ -1,0 +1,335 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_Capabilities | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_Capabilities | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Capabilities
+部分文段做了微小增删使句子通顺。
+Background
+What is a capability?
+
+..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_Capabilities
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/capabilities"><code>seL4</code> Docs/Tutorials/Capabilities</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="background">Background</h2>
+<h3 id="what-is-a-capability">What is a capability?</h3>
+<blockquote>
+<p>There are three kinds of capabilities in seL4:</p>
+<ul>
+<li>capabilities that control <strong>access to kernel objects</strong> such as thread control blocks.</li>
+<li>capabilities that control <strong>access to abstract resources</strong> such as <code>IRQControl</code>.</li>
+<li>untyped capabilities, <strong>that are responsible for memory ranges and allocation from those</strong> (see also the <a href="https://docs.sel4.systems/Tutorials/untyped.html">Untyped</a> tutorial).</li>
+</ul>
+</blockquote>
+<p><code>capability</code> 可以用来索引线程控制块（<code>TCB</code>）。</p>
+<blockquote>
+<p><strong>In seL4, capabilities to all resources controlled by the kernel are given to the root task on initialisation</strong>. To change the state of any resource, user code can use the kernel API, available in <code>libsel4</code> to request an operation on the resource a specific capability points to.</p>
+</blockquote>
+<h3 id="cnodes-and-cslots">CNodes and CSlots</h3>
+<blockquote>
+<p><strong>A <em>CNode</em> (capability-node) is an object full of capabilities: you can think of a CNode as an array of capabilities</strong>.</p>
+</blockquote>
+<p><strong>一个 <code>CNode</code> 首先是一个内核对象（a kernel object）</strong>，可以被一个或几个 <code>capability</code> 索引。</p>
+<p>在 <code>CNode</code> 中保存着许多 <code>capabilities</code>，<code>CNode</code> 就像一个 <code>capability</code> 数组。</p>
+<blockquote>
+<p>We refer to slots as <em>CSlots</em> (capability-slots). Each CSlot in a CNode can be in the following state:</p>
+<ul>
+<li>empty: the CNode slot contains a null capability,</li>
+<li>full: the slot contains a capability to a kernel resource.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>By convention the 0th CSlot is kept empty, for the same reasons as keeping NULL unmapped in process virtual address spaces</strong>: to avoid errors when uninitialised slots are used unintentionally.</p>
+</blockquote>
+<blockquote>
+<p>The field <code>info-&gt;CNodeSizeBits</code> gives a measure of the size of the initial CNode: it will have <code>1 &lt;&lt; CNodeSizeBits</code> CSlots. A CSlot has <code>1 &lt;&lt; seL4_SlotBits</code> bytes, so the size of a CNode in bytes is <code>1 &lt;&lt; (CNodeSizeBits + seL4_SlotBits)</code></p>
+</blockquote>
+<p>在实现中，we define <code>CSlot</code> as the practical data structure of <code>capability </code>, and  take <code>CNode</code> as an array of multiple <code>CSlots</code>。</p>
+<p>按惯例，通常将 <code>0</code> 号 <code>CSlot</code> 置空。</p>
+<p>汉语表达能力并不好，英语学得更是不行，两个一混合，发现好一些。</p>
+<h3 id="cspaces">CSpaces</h3>
+<blockquote>
+<p><strong>A <em>CSpace</em> (capability-space) is the full range of capabilities accessible to a thread, which may be formed of one or more CNodes</strong>.</p>
+</blockquote>
+<p><code>CSpace</code> 规定了一个线程可用的所有 <code>capability</code>，可以类比 <code>C++</code> 中的 <code>namespace</code> 进行理解。一个 <code>CSpace</code> 可能由一个或多个 <code>CNodes</code> 组成。</p>
+<h3 id="cspace-addressing">CSpace addressing</h3>
+<blockquote>
+<p>To refer to a capability and perform operations on it, you must <em>address</em> the capability. <strong>There are two ways to address capabilities in the seL4 API. First is by invocation, the second is by direct addressing</strong>. <strong>Invocation is a shorthand and it is what we used to manipulate the registers of the root task’s TCB</strong>, which we now explain in further detail.</p>
+</blockquote>
+<p>操作一个 <code>capability</code> 主要有“引用”（<code>invocation</code>）和“直接调用”（<code>direct addressing</code>）两种寻址方式。</p>
+<p><code>invocation</code> 方式更为简便，但它只用于操作一个线程自己的 <code>root capability</code> （直接寻址）及其索引的 <code>CNode</code> 中包含的一些 <code>capability</code>（间接寻址）。</p>
+<p><strong>另请注意</strong>：<code>invocation</code> 和 <code>direct address</code> 都只是 <code>policy</code> 而非 <code>mechanism</code>，没有哪些具体的 <code>API</code> 实现了这两种寻址方式，而是不同 <code>API</code> 对 <code>capabiliy</code> 的寻址都遵循这两种基本策略。比如：</p>
+<pre><code class="language-c">/*
+ * 调用此 API 将源 CNode 复制到 目的 CNode，并设置权限
+ * */
+static inline int seL4_CNode_Copy(seL4_CNode, seL4_Word, seL4_Uint8,		// Destination
+                                  seL4_CNode, seL4_Word, seL4_Uint8, 		// Source
+                                  seL4_CapRights_t);
+</code></pre>
+<h4 id="invocation">Invocation</h4>
+<blockquote>
+<p><strong>Each thread has a special CNode capability installed in its TCB as its <em>CSpace root</em></strong>. This root can be empty (a null cap), for instance when the thread is not authorised to invoke any capabilities at all, or it can be a capability to a CNode. The root task always has a CSpace root capability that points to a CNode.</p>
+</blockquote>
+<p>每个线程的 <code>TCB</code> 中都保存了一个特殊的 <code>capability</code>：它可以为空（不索引任何对象），或索引一个特殊的 <code>CNode</code>：此时这个 <code>capability</code> 是这个线程的能力空间的根（<code> CSpace root</code>），这个特殊的 <code>CNode</code> 我且称其为该线程的 <code>root CNode</code>。</p>
+<blockquote>
+<p><strong>In an <em>invocation</em>, a CSlot is addressed by implicitly invoking the CSpace root of the thread that is performing the invocation</strong>. In the code example above, we use an invocation on the <code>seL4_CapInitThreadTCB</code> CSlot to read from and write to the registers of the TCB represented by the capability in that specific CSlot.</p>
+<pre><code>seL4_TCB_WriteRegisters(seL4_CapInitThreadTCB, 0, 0, num_registers, &amp;registers);
+</code></pre>
+<p><strong>This implicitly looks up the <code>seL4_CapInitThreadTCB</code> CSlot in the CNode pointed to by the CSpace root capability of the calling thread</strong>, which here is the root task.</p>
+</blockquote>
+<p>一次 <code>invocation</code> 中，线程隐式访问它的 <code>CSpace root</code>，通过 <code>CSpace root</code> 找到它的 <code>root CNode</code>（也就相当于找到了该线程的 <code>CSpace</code>），再在 <code>root CNode</code> 中找它要找的目标 <code>CSlot</code>。</p>
+<ul>
+<li>
+<p><code>root CNode</code> 中保存着一些重要的 <code>capability</code>，它们索引一些与线程自身数据有关的内核对象，比如线程 <code>TCB</code>。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/capabilities/RootCapability.JPG" alt="automatic-scalability">
+	<figcaption ><font size=2></font></figcaption>
+</div>
+</li>
+</ul>
+<p>在 <font color="blue"><em>write <code>TCB</code> register</em></font> 例程中，就用 <code>invocation</code> 方式查找并修改了一个 <code>capability</code>：</p>
+<p><code>initial thread</code> 要写自己的 <code>TCB register</code>，故而要寻址 <code>seL4_CapInitThreadTCB</code>——这个 <code>capability</code> 索引着 <code>initial thread</code> 的 <code>TCB</code>。</p>
+<p><u><code>initial thread</code></u> 调用 <code>seL4_TCB_WriteRegisters()</code>，默认从自己的 <code>root CNode</code> 中查找所要寻址的 <code>capability</code>，也就是参数 <code>seL4_CapInitThreadTCB</code>。</p>
+<blockquote>
+<p><em>seL4-manual. P 50</em></p>
+<blockquote>
+<p><strong>The initial thread’s CSpace consists of exactly one CNode which contains capabilities to the initial thread’s own resources as well as to all available global resources</strong>.</p>
+</blockquote>
+</blockquote>
+<p><code>initial thread</code> 的 <code>CSpace</code> 仅有一个 <code>CNode</code>，其中保存的 <code>capabilities</code> 索引到 <code>initial thread</code> 自己的资源对象和一些全局对象。</p>
+<blockquote>
+<p>When it is clear by context and not otherwise relevant, <strong>we sometimes identify the capability with the object it points to. So, instead of saying “the CNode pointed to by the CSpace root capability”</strong>, we sometimes say “the CSpace root”</p>
+</blockquote>
+<blockquote>
+<p>Like structs and pointers in C, <strong>objects and capabilities are not actually interchangeable: one object can be pointed to by multiple capabilities</strong>, and each of these capabilities could have a different level of permissions to that object.</p>
+</blockquote>
+<p><code>capabilities</code> * n ----&gt; <code>kernel object</code> * 1，多对一关系。</p>
+<h4 id="direct-cspace-addressing">Direct CSpace addressing</h4>
+<blockquote>
+<p>In contrast to invocation addressing, <strong><em>direct addressing</em> allows you to specify the CNode to look up in, rather than implicitly using the CSpace root</strong>.</p>
+<p>This form of addressing is primarily used <strong>to construct and manipulate the shape of CSpaces – potentially the CSpace of another thread</strong>.</p>
+<p><strong>Note that direct addressing also requires invocation: the operation occurs by invoking a CNode capability, which itself is indexed from the CSpace root.</strong></p>
+</blockquote>
+<p>不同于“引用寻址”是隐式寻址到当前线程自己的 <code>CSpace root</code>，“直接寻址”允许用户指定要查找的 <code>CNode</code>，在操作其他线程的 <code>CNode</code> 时，这无疑是很有必要的。</p>
+<p>需要注意的是，在“直接寻址”过程中，也存在着“引用寻址”的操作：对任何 <code>CNode</code> 的寻址都是从该 <code>CNode</code> 所在 <code>CSpace</code> 的 <code>root CNode</code> 开始的。</p>
+<blockquote>
+<p>The following fields are used when directly addressing CSlots:</p>
+<ul>
+<li><em>_service/root</em>: A capability to the CNode to operate on.</li>
+<li><em>index</em>: The index of the CSlot in the CNode to address.</li>
+<li><em>depth</em>:  How far to traverse the CNode before resolving the CSlot.</li>
+</ul>
+</blockquote>
+<p>“直接寻址”目标 <code>CSlot</code> 时，这 <code>3</code> 个参数是必要的：</p>
+<ol>
+<li><code>_service/root</code>，目标 <code>CNode</code> 的 <code>capability</code>。</li>
+<li><code>index</code>，目标 <code>CSlot</code> 在目标 <code>CNode</code> 中的 <code>index</code>。</li>
+<li><code>depth</code>，<font color=red>语焉不详，是个大坑</font>，在 <code>Untyped</code> 章节还会遇到，后面再详述。现在只要知道这是个指定 <code>index</code> 有效位宽的参数。</li>
+</ol>
+<h3 id="initial-cspace">Initial CSpace</h3>
+<blockquote>
+<p>The root task has a CSpace, set up by seL4 during boot, which contains capabilities to all resources managed by seL4.</p>
+<p>We have already seen several capabilities in the root CSpace: <code>seL4_CapInitThreadTCB</code>, and <code>seL4_CapInitThreadCNode</code>. Both of these are specified by constants in <code>libsel4</code>, however not all initial capabilities are statically specified.</p>
+<p>Other capabilities are described by the <code>seL4_BootInfo</code> data structure, described in <code>libsel4</code> and initialised by seL4. <code>seL4_BootInfo</code> describes ranges of initial capabilities, including free slots available in the initial CSpace.</p>
+</blockquote>
+<h2 id="exercises">Exercises</h2>
+<h3 id="final-result">Final result</h3>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/capabilities/Capabilities测试结束.JPG" alt="automatic-scalability">
+	<figcaption ><font size=2></font></figcaption>
+</div>
+<h2 id="one-more-thing-or-more">One More Thing (or more?)</h2>
+<ul>
+<li>Use a data structure to track which CSlots in a CSpace are free.</li>
+<li>Make copies of the entire CSpace described by <code>seL4_BootInfo</code></li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#background">Background</a>
+<ul>
+<li><a href="#what-is-a-capability">What is a capability?</a></li>
+<li><a href="#cnodes-and-cslots">CNodes and CSlots</a></li>
+<li><a href="#cspaces">CSpaces</a></li>
+<li><a href="#cspace-addressing">CSpace addressing</a>
+<ul>
+<li><a href="#invocation">Invocation</a></li>
+<li><a href="#direct-cspace-addressing">Direct CSpace addressing</a></li>
+</ul>
+</li>
+<li><a href="#initial-cspace">Initial CSpace</a></li>
+</ul>
+</li>
+<li><a href="#exercises">Exercises</a>
+<ul>
+<li><a href="#final-result">Final result</a></li>
+</ul>
+</li>
+<li><a href="#one-more-thing-or-more">One More Thing (or more?)</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/yosys_ista/">
+              <h3 class="post-title">
+                yosys_ista
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

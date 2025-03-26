@@ -1,0 +1,216 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>seL4_Hello, world | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="seL4_Hello, world | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容均直接或间接皆来自 seL4 Docs/Tutorials/Hello, world
+部分文段做了微小增删使句子通顺。
+Building your first program
+
+seL4 is a m..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              seL4_Hello, world
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容均直接或间接皆来自 <a href="https://docs.sel4.systems/Tutorials/hello-world"><code>seL4</code> Docs/Tutorials/Hello, world</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h2 id="building-your-first-program">Building your first program</h2>
+<blockquote>
+<p><code>seL4</code> is a microkernel, not an operating system, and as a result only provides very minimal services.</p>
+<p><strong>After the kernel boots, an initial thread called the <em>root task</em> is started, which is then responsible for setting up the user-level system.</strong></p>
+<p><strong>When the root task starts there are no available drivers, however a minimal C library is provided.</strong></p>
+</blockquote>
+<h2 id="looking-at-the-sources">Looking at the sources</h2>
+<blockquote>
+<p>In your tutorial directory, you will find the following files:</p>
+<ul>
+<li><code>CMakeLists.txt</code> - the file that incorporates the root task into the wider seL4 build system.</li>
+<li><code>src/main.c</code> - the single source file for the initial task.</li>
+<li><code>hello-world.md</code> - A generated README for the tutorial.</li>
+</ul>
+</blockquote>
+<h3 id="cmakeliststxt"><code>CMakeLists.txt</code></h3>
+<p><code>CMakeLists</code> 中，<code>cmake</code> 本身支持的函数会高亮，以此和自定义的函数区分开。</p>
+<p><code>seL4</code> 系统启动时，首先运行一个 <code>root task</code>，这个根任务通常在 <code>CMakeLists</code> 中调用函数 <code>DeclareRootserver()</code> 进行声明。</p>
+<h3 id="mainc"><code>main.c</code></h3>
+<blockquote>
+<p>For a basic root server application, the only requirement is that a <code>main</code> function is provided.</p>
+</blockquote>
+<h2 id="final-result">Final Result</h2>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/seL4Tutorials/img/hello_world/HelloWorld测试结束.JPG" alt="automatic-scalability" width=70%>
+	<figcaption ><font size=2></font></figcaption>
+</div>
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#building-your-first-program">Building your first program</a></li>
+<li><a href="#looking-at-the-sources">Looking at the sources</a>
+<ul>
+<li><a href="#cmakeliststxt"><code>CMakeLists.txt</code></a></li>
+<li><a href="#mainc"><code>main.c</code></a></li>
+</ul>
+</li>
+<li><a href="#final-result">Final Result</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/sel4_fault-handling/">
+              <h3 class="post-title">
+                seL4_Fault handling
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

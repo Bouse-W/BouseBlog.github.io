@@ -1,0 +1,668 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Events_in_CAmkES | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1742972353564">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Events_in_CAmkES | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Author: Bouse-w
+引用内容若无明确标注，则直接或间接来自 seL4 Docs/Tutorials/Events in CAmkES
+部分文段做了微小增删使句子通顺。
+Specify an events interface
+
+A..." />
+    <meta name="keywords" content="seL4" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1742972353564" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Events_in_CAmkES
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-25
+              </span>
+              <span>
+                14 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6eXd77a8Oo/" class="post-tag">
+                  # seL4
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>Author: Bouse-w</p>
+<p>引用内容若无明确标注，则直接或间接来自 <a href="https://docs.sel4.systems/Tutorials/hello-camkes-2"><code>seL4</code> Docs/Tutorials/Events in CAmkES</a><br>
+部分文段做了微小增删使句子通顺。</p>
+<h3 id="specify-an-events-interface">Specify an events interface</h3>
+<blockquote>
+<p>An event is a signal is sent over a Notification connection.</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-events</p>
+<p>Events are the CAmkES interface type for modelling asynchronous communication between components.</p>
+</blockquote>
+</blockquote>
+<p><code>event</code> 是一个通过 <code>notfication</code> 连接发送的信号。</p>
+<p><code>Events</code> 是一种接口，用于模块化组件间的非同步交流。</p>
+<blockquote>
+<p>Events, unlike procedures, do not need to be defined in a separate IDL file.</p>
+<p>You can simply refer to the event type in your component ADL files and CAmkES will infer an event type.</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-events</p>
+<p>seL4Notification is a seL4 specific connector for transmitting asynchronous signals.</p>
+</blockquote>
+</blockquote>
+<p>不同于 <code>procedure interface</code>，<code>Events</code> 不需要用一个独立的 <code>IDL</code> 文件进行定义，因而也就不需要特定的类型关键字，用户可在定义组件的 <code>ADL</code> 文件中直接声明组件所需的 <code>event</code>，只需保证收发双方的目标 <code>event</code> 类型一致即可。</p>
+<p>可以使用 <code>seL4Notification</code> 作为组件间收发非同步信号的连接器。</p>
+<p>我们像这样在 <code>Client</code> 和 <code>Echo</code> 组件中定义 <code>event</code>，并在顶层 <code>ADL</code> 文件中建立 <code>event</code> 收发连接（信道）：</p>
+<pre><code class="language-c">/* file:  hello-camkes-2/components/Client/Client.camkes */
+component Client
+{
+    include &quot;str_buf.h&quot;;
+    
+    control;
+    
+    /* Sending event */
+    emits EventClient event_emit_0;
+    /* Receiving event */
+    consumes EventEcho event_consume_0;
+}
+</code></pre>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Echo/Echo.camkes */
+component Echo
+{
+    include &quot;str_buf.h&quot;;
+    
+    emits EventEcho event_emit_0;
+    consumes EventClient event_consume_0;
+}
+</code></pre>
+<pre><code class="language-c">/* file: hello-camkes-2/hello-2.camkes */
+import &lt;std_connector.cmakes&gt;;
+
+...
+    
+assembly
+{
+    composition
+    {
+        component Client client;
+        component Echo echo;
+        
+        /* Use seL4Notification as the connector */
+        connection seL4Notification event_channel_0(from echo.event_emit_0, to client.event_consume_0);
+        connection seL4Notification event_channel_1(from client.event_emit_0, to echo.event_consume_0);
+        
+        ...
+    }
+}
+</code></pre>
+<h3 id="data">Data</h3>
+<blockquote>
+<p>In the case of a connection over which events are sent, there is no API, but rather CAmkES will generate _emit() and _wait() functions to enable the application to transparently interact with these events.</p>
+</blockquote>
+<p><code>CAmkES</code> 为 <code>event</code> 对象创建信号发送函数 <code>emit()</code> 和信号接收函数 <code>wait()</code>，函数使用方法和 <code>procedure interface</code> 中的函数一致：以 <code>interface</code> 名为前缀，构成调用符号 <code>&lt;event_instance-name&gt;_&lt;fuction-name&gt;</code>。</p>
+<h3 id="handle-notifications">Handle notifications</h3>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-events</p>
+<p>There are several ways for a component to receive an event. The consumer can register a callback function to be invoked when the event is received, they can call a blocking function that will return when the event is received or they can call a polling function that returns whether an event has arrived or not.</p>
+</blockquote>
+<p>接收 <code>event</code> 的组件需要注册一个接收回调函数，在 <code>event</code> 到达时触发调用并作相应处理。</p>
+<p>接收组件可以调用阻塞式的接收函数 <code>wait()</code> 或非阻塞的接收函数 <code>poll()</code> 来接收  <code>event</code>。下面是一个注册回调函数并调用接收函数的使用示例：</p>
+<pre><code class="language-c">/* 
+ * extarcted from:
+ * https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-events
+ * */
+/* Receiving callback */
+static void handler(void)
+{
+  static int fired = 0;
+  printf(&quot;Callback fired!\n&quot;);
+  if (!fired)
+  {
+    fired = 1;
+    s_reg_callback(&amp;handler);
+  }
+}
+
+int run(void)
+{
+  printf(&quot;Registering callback...\n&quot;);
+  s_reg_callback(&amp;handler);
+
+  printf(&quot;Polling...\n&quot;);
+
+  /* Non-blocking API */
+  if (s_poll())
+  {
+    printf(&quot;We found an event!\n&quot;);
+  }
+  else
+  {
+    printf(&quot;We didn't find an event\n&quot;);
+  }
+
+  printf(&quot;Waiting...\n&quot;);
+  /* Blocking API */
+  s_wait();
+  printf(&quot;Unblocked by an event!\n&quot;);
+
+  return 0;
+}
+</code></pre>
+<blockquote>
+<p>We re-register the callback during the first execution of the handler. Callbacks are deregistered when invoked, so if you want the callback to fire again when another event arrives you need to explicitly re-register it.</p>
+</blockquote>
+<p>上面的例子中，在回调函数  <code>handler</code> 中二次注册了回调函数本身。这是因为回调函数的注册都是“一次性的”，每次 <code>handler</code> 完成处理后都会自动解除注册。</p>
+<p>值得注意的是，注册的这种“一次性”特性使得接收组件可一个 <code>event</code> 上注册多个不同的 <code>handler</code>，当然这是说串行注册。</p>
+<h3 id="dataports">Dataports</h3>
+<blockquote>
+<p>Dataports are typed shared memory mappings.</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-dataports</p>
+<p>Dataports are CAmkES's abstraction of shared memory.</p>
+</blockquote>
+</blockquote>
+<p><code>Dataports</code> 是 <code>CAmkES</code> 对共享内存的抽象。</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-dataports</p>
+<p>All components participating in a connection involving dataports get read/write access to the dataport by default.</p>
+</blockquote>
+<p>进程间的共享内存（<code>dataport</code>）同 <code>procedure interface</code> 和 <code>event</code> 一样，通过一个 <code>connection</code> 连接若干相关进程。连接到一个 <code>dataport connection</code> 的进程都默认拥有对 <code>dataport</code> 的读写权限。</p>
+<blockquote>
+<p>extracted from: https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-dataports</p>
+<p>The default dataport type is <code>Buf</code>, which is implemented as a byte array in C of size <code>PAGE_SIZE</code>. Alternatively you can specify a user-defined type for the shared memory region.</p>
+</blockquote>
+<p><code>dataport</code> 实例的默认类型是 <code>Buf</code>——一个用 <code>C</code> 语言实现的字节数组，大小和一个页等大。</p>
+<p>用户也可以声明自定义类型的 <code>dataport</code>，下面是一个自定义的示例：</p>
+<pre><code class="language-c">/*
+ * extracted from:
+ * https://github.com/seL4/camkes-tool/blob/master/docs/index.md#an-example-of-dataports
+ * */
+#ifndef _PORTTYPE_H_
+#define _PORTTYPE_H_
+
+typedef struct MyData
+{
+    char data[10];
+    bool ready;
+} MyData_t;
+
+#endif
+</code></pre>
+<blockquote>
+<p>The really neat part is more that CAmkES provides access control for accessing these shared memory mappings: if a shared mem mapping is such that one party writes and the other reads and never writes, we can tell CAmkES about this access constraint in ADL.</p>
+</blockquote>
+<p><code>CAmkES</code> 提供对共享内存（映射）的访问控制，比如若两个进程共享一块内存，进程0 只写不读，进程1 只读不写，姐u可以在 <code>ADL</code> 文件中规定这些读写限制。</p>
+<h3 id="dataport-connections">Dataport connections</h3>
+<p>在 <code>ADL</code> 文件中调用 <code>seL4SharedDatas</code> 定义一个基于 <code>dataport</code> 的连接。</p>
+<h3 id="access-and-manipulate-share-memory-mapping-dataport-of-the-client">Access and manipulate share memory mapping (Dataport) of the client</h3>
+<p>这一小节以展示源代码为主</p>
+<ul>
+<li>
+<p>在组件 <code>ADL</code> 文件中声明 <code>dataport</code> 等必要资源：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Client/Client.camkes */
+component Client
+{
+    /* include definitions of typedefs for the dataports */
+    include &quot;str_buf.h&quot;;
+    
+    /* This component has a control thread */
+    control;
+    
+    /* Specify 2 event interfaces */
+    emits EventClient event_emit_0;
+    consumes EventEcho event_consume_0;
+    
+    /* Specify 3 dataport interfaces */
+    dataport Buf dataport_buf_0;
+    dataport str_buf_t dataport_str_0;
+    dataport ptr_buf_t dataport_ptr_0;
+}
+</code></pre>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Echo/Echo.camkes */
+component Echo
+{
+    /* Include definitions of typedefs for the dataports */
+    include &quot;str_buf.h&quot;;
+    
+    /* Echo's interfaces should be corresponding to their counterparts in Client */
+    emits EventEcho event_emit_0;
+    consumes EventClient event_consume_0;
+    
+    dataport Buf dataport_buf_0;
+    dataport str_buf_t dataport_str_0;
+    dataport ptr_buf_t dataport_ptr_0;
+}
+</code></pre>
+</li>
+<li>
+<p>在顶层 <code>ADL</code> 文件中定义系统结构和建立一些连接：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/hello-2.camkes */
+assembly
+{
+    composition
+    {
+        /* Component instances */
+        component Client client;
+        component Echo echo;
+
+        /* Event connections */
+        connection seL4Notification event_conn_0(from echo.event_emit_0, to client.event_consume_0);
+        connection seL4Notification event_conn_1(from client.event_emit_0, to echo.event_consume_0);
+
+        /* Dataport connections */
+        connection seL4SharedData dataport_buf_conn_0(from client.dataport_buf_0, to echo.dataport_buf_0);
+        connection seL4SharedData dataport_str_conn_0(from client.dataport_str_0, to echo.dataport_str_0);
+        connection seL4SharedData dataport_ptr_conn_0(from client.dataport_ptr_0, to echo.dataport_ptr_0);
+
+    }
+    configuration
+    {
+        ...
+    }
+}
+</code></pre>
+</li>
+</ul>
+<h4 id="copy-strings-to-an-untyped-dataport">Copy strings to an untyped dataport</h4>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Client/src/client.c */
+/* Generated header for our component */
+#include &lt;camkes.h&gt;
+
+/* Strings to send across to the other component */
+char * s_arr[NUM_STRINGS] = { &quot;hello&quot;, &quot;world&quot;, &quot;how&quot;, &quot;are&quot;, &quot;you?&quot; };
+
+/* Run the control thread */
+int run(void)
+{
+    printf(&quot;%s: Starting the client\n&quot;, get_instance_name());
+
+    /* Copy strings to an untyped dataport */
+    int * str_num = (int *)dataport_buf_0;
+    *str_num = NUM_STRINGS;
+    
+    char * str = (char *)(str_num + 1); 
+    for(int i = 0; i &lt; NUM_STRINGS; i++)
+    {   
+        strcpy(str, s_arr[i]);
+        str += strlen(str) + 1;
+    }
+</code></pre>
+<p>对 <code>dataport</code> 的使用看起来很“随意”：直接使用 <code>ADL</code> 中定义的实例名字进行调用，随时进行强制类型转换，调用标准库 <code>API</code> 向其中写入内容。上述示例中，在 <code>dataport_buf_0</code> 的首元素中写入字符串的个数，在后续元素中写入字符串。</p>
+<h4 id="read-the-reply-data-from-a-typed-dataport">Read the reply data from a typed dataport</h4>
+<p><code>Buf</code> 类型使用 <code>C</code> 语言的结构体语法进行定义。以 <code>dataport Buf dataport_buf_0;</code> 为例：<code>dataport_buf_0-&gt;n</code> 获取共享内存区的元素数量，<code>dataport_buf_0-&gt;str[i]</code> 获取共享区中第 <code>i</code> 个元素。以下是 <code>Task 12</code> 中的示例：</p>
+<ul>
+<li>
+<p>自定义两种类型的 <code>dataport</code></p>
+<pre><code class="language-c">/* file: hello-camkes-2/include/str_buf.h */
+#include &lt;camkes/dataport.h&gt;
+
+#define NUM_STRINGS 5
+#define STR_LEN 256
+
+/* for a typed dataport containing strings */
+typedef struct
+{
+    int n;
+    char str[NUM_STRINGS][STR_LEN];
+} str_buf_t;
+
+#define MAX_PTRS 20
+
+/* for a typed dataport containing dataport pointers */
+typedef struct
+{
+    int n;
+    dataport_ptr_t ptr[MAX_PTRS];
+} ptr_buf_t;
+</code></pre>
+</li>
+<li>
+<p>使用名字符号调用 <code>dataport</code> 并获取成员变量值：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Client/src/client.c */
+#include &lt;camkes/dataport.h&gt;
+/* generated header for our component */
+#include &lt;camkes.h&gt;
+...
+
+for(int i = 0; i &lt; dataport_str_0-&gt;n; i++)                                           
+{
+    printf(&quot;%s: string %d (%p): \&quot;%s\&quot;\n&quot;,
+           get_instance_name(),
+           i,
+           dataport_str-&gt;str[i],
+           dataport_str-&gt;str[i]);
+}
+</code></pre>
+</li>
+</ul>
+<h4 id="send-data-using-dataports">Send data using dataports</h4>
+<p>调用 <code>dataport_ptr_t dataport_wrap_ptr(void * ptr);</code> 获取写入共享内存区的对象的指针，这个指针独立于 <code>component</code>。</p>
+<blockquote>
+<p>Unwrapping will fail if the underlying pointer is not into a dataport that is shared with the receiver. <code>dataport_unwrap_ptr</code> returns <code>NULL</code> on failure.</p>
+</blockquote>
+<p>调用 <code>void * dataport_unwrap_ptr(dataport_ptr_t)</code> 解引用一个 <code>dataport_ptr_t</code> 类型指针时，若该指针无效或所指内容并不存在于调用者进程的共享内存中，则解引用失败。以下是 <code>Task 13</code> 中的示例：</p>
+<ul>
+<li>
+<p>封装写入共享区的元素并写入元素：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Client/src/client.c */
+char * s_arr[NUM_STRINGS] = { &quot;hello&quot;, &quot;world&quot;, &quot;how&quot;, &quot;are&quot;, &quot;you?&quot; };
+
+...
+
+dataport_ptr_0-&gt;n = NUM_STRINGS;
+str = (char *)(dataport_ptr_0 + 1);
+
+for(int i = 0; i &lt; NUM_STRINGS; i++)
+{
+    strcpy(str, s_arr[i]);
+    dataport_ptr_0-&gt;ptr[i] = dataport_wrap_ptr(str);
+    str += strlen(str) + 1;
+}
+</code></pre>
+</li>
+</ul>
+<h3 id="access-and-manipulate-share-memory-mapping-dataport-of-the-server">Access and manipulate share memory mapping (Dataport) of the server</h3>
+<p>这一小节以展示源代码为主</p>
+<h4 id="read-data-from-an-untyped-dataport">Read data from an untyped dataport</h4>
+<ul>
+<li>
+<p>在 <code>notification handler 1</code>  中读取共享区内容：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/components/Echo/src/echo.c */
+#include &lt;camkes/dataport.h&gt;
+/* generated header for our component */
+#include &lt;camkes.h&gt;
+
+void callback_handler_1(void * a)                                                   {
+    int * str_num_ptr = (int *)dataport_buf_0;
+    char * str = (char *)(str_num_ptr + 1);
+    
+    for(int i = 0; i &lt; *str_num_ptr; i++)
+    {
+        printf(&quot;%s: saying (%p): \&quot;%s\&quot;\n&quot;, get_instance_name(), str, str);         
+    }
+    
+    ...
+}
+</code></pre>
+</li>
+</ul>
+<h4 id="put-data-into-a-typed-dataport">Put data into a typed dataport</h4>
+<ul>
+<li>
+<p>将 <code>Buf</code> 型共享区中读到的内容拷贝进自定义的 <code>str</code> 型共享区：</p>
+<pre><code class="language-c">void callback_handler_1(void * a)
+{
+    ...
+        
+    str_num_ptr = (int *)dataport_buf_0;
+    str = (char *)(str_num_ptr + 1);                                                   
+    for(int i = 0, j = *str_num_ptr - 1;
+        i &lt; *str_num_ptr;
+        i++, j--)
+    {
+        strncpy(dataport_str_0-&gt;str[j], str, STR_LEN);
+        uppercases(dataport_str_0-&gt;str[j]);
+        str += strlen(str) + 1;
+    }
+    dataport_str_0-&gt;n = *str_num_ptr;
+}
+</code></pre>
+</li>
+</ul>
+<h4 id="read-data-from-a-typed-dataport">Read data from a typed dataport</h4>
+<ul>
+<li>
+<p>根据自定义的 <code>ptr</code> 型共享区中的指针读取 <code>str</code> 型共享区内容：</p>
+<pre><code class="language-c">void callback_handler_2(void * a)
+{
+    char * str;
+
+    for(int i = 0; i &lt; dataport_ptr_0-&gt;n; i++)
+    {
+        str = dataport_unwrap_ptr(dataport_ptr_0-&gt;ptr[i]);
+        printf(&quot;%s: dataport_ptr saying (%p): \&quot;%s\&quot;\n&quot;,
+               get_instance_name(),
+               str,
+               str);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+<h3 id="camkes-attributes">CAmkES attributes</h3>
+<h4 id="set-component-priorities">Set component priorities</h4>
+<blockquote>
+<p>Component priority is specified as an attribute with the name <component name>.priority</p>
+<p>The highest priority is represented by 255, the lowest by 0.</p>
+</blockquote>
+<p>在顶层 <code>ADL</code> 的 <code>configuration</code> 中规定 <code>component</code> 的优先级。优先级变量的命名格式为 <code>&lt;component name&gt;.priority</code>。最高优先级为 <code>255</code>，最低优先级为 <code>0</code>。下面是一个示例：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/hello-2.camkes */
+assembly
+{
+    composition
+    {
+        /* component instances */
+        component Client client;
+        component Echo echo;
+        ...
+    }
+    configuration
+    {
+        /* component priorities */
+        client.priority = 255;
+        echo.priority = 254;
+        ...
+    }
+}
+</code></pre>
+<h3 id="specify-the-data-access-constraints-for-dataports">Specify the data access constraints for Dataports</h3>
+<h4 id="restrict-access-to-dataports">Restrict access to dataports</h4>
+<blockquote>
+<p>Use attribute <component>.&lt;interface_name&gt;_access for each component and interface</p>
+<p>Appropriate values for the to_access and from_access attributes are: &quot;R&quot; or &quot;W&quot;</p>
+</blockquote>
+<p>在顶层 <code>ADL</code> 文件中，使用格式为 <code>&lt;component&gt;.&lt;interface_name&gt;_access</code>  的语句规定 <code>component</code> 中的 <code>interface instance</code> 的读写权限。读写权限用 &quot;R&quot; 和 &quot;W&quot; 指代。</p>
+<p>下面是一个示例：</p>
+<pre><code class="language-c">/* file: hello-camkes-2/hello-2.camkes */
+assembly
+{
+    composition
+    {
+        /* component instances */
+        component Client client;
+        component Echo echo;
+        ...
+    }
+    configuration
+    {
+        ...
+        /* restrict access to dataports */
+        echo.dataport_buf_0_access = &quot;R&quot;;
+        echo.dataport_str_0_access = &quot;W&quot;;
+        client.dataport_buf_0_access = &quot;W&quot;;
+        echo.dataport_str_0_access = &quot;R&quot;;
+    }
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#specify-an-events-interface">Specify an events interface</a></li>
+<li><a href="#data">Data</a></li>
+<li><a href="#handle-notifications">Handle notifications</a></li>
+<li><a href="#dataports">Dataports</a></li>
+<li><a href="#dataport-connections">Dataport connections</a></li>
+<li><a href="#access-and-manipulate-share-memory-mapping-dataport-of-the-client">Access and manipulate share memory mapping (Dataport) of the client</a>
+<ul>
+<li><a href="#copy-strings-to-an-untyped-dataport">Copy strings to an untyped dataport</a></li>
+<li><a href="#read-the-reply-data-from-a-typed-dataport">Read the reply data from a typed dataport</a></li>
+<li><a href="#send-data-using-dataports">Send data using dataports</a></li>
+</ul>
+</li>
+<li><a href="#access-and-manipulate-share-memory-mapping-dataport-of-the-server">Access and manipulate share memory mapping (Dataport) of the server</a>
+<ul>
+<li><a href="#read-data-from-an-untyped-dataport">Read data from an untyped dataport</a></li>
+<li><a href="#put-data-into-a-typed-dataport">Put data into a typed dataport</a></li>
+<li><a href="#read-data-from-a-typed-dataport">Read data from a typed dataport</a></li>
+</ul>
+</li>
+<li><a href="#camkes-attributes">CAmkES attributes</a>
+<ul>
+<li><a href="#set-component-priorities">Set component priorities</a></li>
+</ul>
+</li>
+<li><a href="#specify-the-data-access-constraints-for-dataports">Specify the data access constraints for Dataports</a>
+<ul>
+<li><a href="#restrict-access-to-dataports">Restrict access to dataports</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/introdution_to_camkes/">
+              <h3 class="post-title">
+                Introdution_to_CAmkES
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
