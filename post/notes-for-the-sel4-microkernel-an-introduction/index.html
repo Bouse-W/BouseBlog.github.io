@@ -1,0 +1,519 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notes for The seL4 Microkernel - An Introduction | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1776284558166">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Notes for The seL4 Microkernel - An Introduction | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="引用内容均来自 seL4 overview，部分文段小修了语序使句子通顺，引用文本为居中斜体。
+开源万岁。
+Chapter 2 seL4 Is a Microkernel and a Hypervisor, It Is Not an OS
+..." />
+    <meta name="keywords" content="System_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1776284558166" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Notes for The seL4 Microkernel - An Introduction
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                29 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6in0akQ6Fb/" class="post-tag">
+                  # System_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>引用内容均来自 <a href="https://sel4.systems/About/seL4-whitepaper.pdf"><code>seL4 overview</code></a>，部分文段小修了语序使句子通顺，引用文本为居中斜体。<br>
+开源万岁。</p>
+<h5>Chapter 2 seL4 Is a Microkernel and a Hypervisor, It Is Not an OS</h5>
+<h6>Monolithic kernels vs Microkernels</h6>
+<blockquote>
+<p><em>The monolithic OS kernel offers services such as file storage and networking to applications. All the code that implements those services executes in the privileged mode of the hardware, also called kernel mode or supervisor mode – the execution mode that has unfettered access and control of all resources in the system</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>The microkernel provides almost no services: it is just a thin wrapper around hardware, just enough to securely multiplex hardware resources</em>.</p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/Operating-system-structure.png" alt="Operating-system-structure." style="zoom:60%">
+	<figcaption>
+	<font size=2>Different operating system structure.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 2.1</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>Linux has a large trusted computing base (TCB), which is defined as the subset of the overall system that must be trusted to operate correctly for the system to be secure</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>The idea behind a microkernel design is to drastically reduce the TCB and thus the attack surface</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>What the microkernel mostly provides is isolation, sandboxes in which programs can execute without interference from other programs. And, critically, it provides a protected procedure call mechanism, for historic reasons called IPC</em>.</p>
+</blockquote>
+<h6>seL4 Is a microkernel, not an OS
+</h6>
+<blockquote>
+<p><em>seL4 is a microkernel, and designed for generality while minimising the TCB</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>Being a microkernel, seL4 contains none of the usual OS services; such services are provided by programs running in user mode</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>An important enabler is a component framework; it allows developers to focus on the code that implements the services, and automates much of the system integration. There are presently two main component frameworks for seL4, both open source: CAmkES and Genode</em>.</p>
+</blockquote>
+<h6>seL4 is also a hypervisor</h6>
+<blockquote>
+<p><em>It is possible to run virtual machines on seL4, and inside the virtual machine (VM) a mainstream OS, such as Linux</em>.</p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/Using-virtualisation.png" alt="Using-virtualisation." style="zoom:60%">
+	<figcaption>
+	<font size=2>seL4 as a hypervisor.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 2.3</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>When used as a hypervisor, seL4 runs in the appropriate hypervisor mode (EL2 on Arm, Root Ring-0 on x86, HS on RISC-V), which is a higher privilege level than the guest operating system</em>.</p>
+</blockquote>
+<h6>seL4 is not seLinux</h6>
+<blockquote>
+<p><em>In other words, seLinux is an add-on to a fundamentally insecure operating system and thus remains fundamentally insecure. In contrast, seL4 provides bullet-proof isolation from the ground up</em>.</p>
+</blockquote>
+<h5>Chapter 3 seL4’s Verification Story</h5>
+<h6>Functional correctness</h6>
+<blockquote>
+<p><em>The core of seL4’s verification is the functional correctness proof, which says that the C implementation is free of implementation defects</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>There is a formal specification of the kernel’s functionality, expressed in a mathematical language called higher-order logic</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>Everything we want to know about the kernel’s behaviour (other than timing) is expressed by the abstract spec, and the kernel cannot behave in ways that are not allowed by the spec. Among others, this rules out the usual attacks against operating systems, such as stack smashing, null-pointer dereference, any code injection or control-flow highjacking etc</em>.</p>
+</blockquote>
+<h6>Translation validation</h6>
+<blockquote>
+<p><em>Those compilers (we use GCC) are themselves large, complex programs that have bugs. So we could have a bug-free kernel that gets compiled into a buggy binary</em>.</p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/translationValidationProofChain.png" alt="Translation validation proof chain." style="zoom:60%">
+	<figcaption>
+	<font size=2>Translation validation proof chain.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 3.2</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>The C program that is proved to refine the abstract spec, and the C program that we prove to be equivalent to the binary, are the same Isabelle/HOL formalisations</em>.</p>
+</blockquote>
+<h6>Secutiry properties</h6>
+<blockquote>
+<p><em>Specifically, seL4 enforces:<br>
+<strong>confidentiality</strong>: seL4 will not allow an entity to read (or otherwise infer) data without having been explicitly given read access to the data;<br>
+<strong>integrity</strong>: seL4 will not allow an entity to modify data without having been explicitly given write access to the data;<br>
+<strong>availability</strong>: seL4 will not allow an entity to prevent another entity’s authorised use of resources</em>.</p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/seL4ProofChain.png" alt="seL4’s proof chain." style="zoom:60%">
+	<figcaption>
+	<font size=2>seL4’s proof chain.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 3.1</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>These proofs presently do not capture properties associated with time</em>.</p>
+</blockquote>
+<h6>Proofs assumptions</h6>
+<blockquote>
+<p><em>All reasoning about correctness is based on assumptions, whether the reasoning is formal or informal</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>The verification of seL4 makes three assumptions:<br>
+<strong>Hardware behaves as expected</strong>.<br>
+<strong>The spec matches expectations</strong>. If the spec is informal or non-existent, then it is obviously impossible to precisely reason about correct behaviour. One can reduce this risk by proving properties about the spec. That then shifts the problem to the specification of those properties. They are much simpler than the kernel spec, reducing the risk of misunderstanding.<br>
+<strong>The theorem prover is correct</strong>.</em></p>
+</blockquote>
+<h6>The CAmkES component framework</h6>
+<blockquote>
+<p><em>CAmkES is a component framework that allows you to reason about a system architecturally, i.e. as a collection of sandboxed components with defined communication channels</em>.</p>
+</blockquote>
+<p><code>CAmkES</code> 是一个组件框架，帮助用户从架构层面构建系统。使用 <code>CAmkES</code>，可以将系统组件视作带有通信信道的沙盒，通过定义不同的组件、接口、连接器（建立组件间的连接）来构建系统。</p>
+<blockquote>
+<p><em><strong>Components</strong> are represented as square boxes. They represent programs, code and data, encapsulated by seL4.<br>
+<strong>Interfaces</strong> are shown as decorations on the components. They define how a component can be invoked, or can invoke others. An interface is either imported (invoking an interface of another component) or exported (able to be invoked by another component’s imported interface), except for the shared-memory interface, which is symmetric.<br>
+<strong>Connectors</strong> connect like interfaces by linking an importing with an exporting interface. Connectors in CAmkES are always one-to-one, but broadcast or multicast functionality can be implemented on top of this model by building components that copy inputs to multiple outputs</em>.</p>
+</blockquote>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/CAmkES-components-and-connectors.png" alt="CAmkES components and connectors." style="zoom:60%">
+	<figcaption>
+	<font size=2>CAmkES components and connectors.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 3.3</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>The CAmkES system is specified in a formal architecture description language (the CAmkES ADL), which contains a precise description of the components, their interfaces and the connectors that link them up</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>The CAmkES framework contains a compiler which automatically translates CAmkES ADL into CapDL(Capability distribution language, a formal seL4-level descrtiption language)</em>. The CapDL spec is a precise representation of access rights in the system, and it is what seL4 enforces*.</p>
+</blockquote>
+<p>在用户层，<code>CAmkES</code> 提供了 <code>the CAmkES ADL</code> 语言来描述组件、接口、连接等，<code>CAmkES</code> 框架中自带一个编译器将用户级的 <code>ADL(Architecture Description Language)</code> 语言文件转换为系统级的 <code>CapDL(Capabilities Description Language)</code> 语言文件。</p>
+<blockquote>
+<p><em>So we need assurance that the system boots up into the state described by the CapDL spec. We achieve this with a second automated step: We generate from CapDL the startup code(init.c) that, as soon as seL4 itself has booted, takes control and generates all the seL4 objects referenced by the spec, including the ones describing active components, and distributes the capabilities (see Chapter 4) that grant access to those objects according to the spec.</em></p>
+</blockquote>
+<p><code>seL4</code> 强制要求系统按照 <code>CapDL</code> 文件所描述的构建和运行。在 <code>seL4</code> 启动后立即根据 <code>CapDL</code> 文件生成 <code>init.c</code> 和 <code>glue.c</code> 等初始化用的源代码文件，基于此运行生成内存对象、分发权限、建立系统。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/Verified-architecture-mapping-and-system-generation.png" alt="Verified architecture mapping and system generation." style="zoom:60%">
+	<figcaption>
+	<font size=2>Verified architecture mapping and system generation.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 3.4</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>Sending data through a connector requires invocation of seL4 system calls, the exact details of which are hidden by the CAmkES abstraction. The glue code is setting up these system calls</em>.</p>
+</blockquote>
+<h5>Chapter 4 About Capabilities</h5>
+<h6>What are capabilities</h6>
+<blockquote>
+<p><em>The capability is an encapsulation of an object reference and the rights it conveys to that object</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>In a capability-based system, such as seL4, invoking a capability is the one and only way of performing an operation on a system object.</em></p>
+</blockquote>
+<p><code>capability</code> 是对象引用和访问权限的封装，在具体的实现中常被当作一个“大号指针”（<code>fat pointer</code>）。在 <code>seL4</code> 中，对系统对象执行某些操作的唯一方式就是调用相关的 <code>capability</code>。</p>
+<blockquote>
+<p><em>The rights given to a component can be restricted to the absolute minimum it needs to do its job, as required by the principle of least privilege(also called principle of least authority, short POLA)</em>.</p>
+</blockquote>
+<p>遵循“最小权限原则”（<code>POLA</code>）是 <code>seL4</code> 保证系统安全的基础之一。</p>
+<blockquote>
+<p><em>There are ten types of seL4 objects, all referenced by capabilities:<br>
+<strong>Endpoints</strong> are used to perform protected function calls;<br>
+<strong>Reply Objects</strong> represent a return path from a protected procedure call;<br>
+<strong>Address Spaces</strong> provide the sandboxes around components (thin wrappers abstracting hardware page tables);<br>
+<strong>Cnodes</strong> store capabilities representing a component’s access rights;<br>
+<strong>Thread Control Blocks</strong> represent threads of execution;<br>
+<strong>Scheduling Contexts</strong> represent the right to access a certain fraction of execution time on a core;<br>
+<strong>Notifications</strong> are synchronisation objects (similar to semaphores);<br>
+<strong>Frames</strong> represent physical memory that can be mapped into address spaces;<br>
+<strong>Interrupt Objects</strong> provide access to interrupt handling;<br>
+<strong>Untypeds</strong> unused (free) physical memory that can be converted (“retyped”) into any of the other types</em>.</p>
+</blockquote>
+<h6>Why capabilities</h6>
+<blockquote>
+<p><em>Capabilities provide fine-grained access control, in line with the security principle of least privilege (also called principle of least authority, short POLA). This is in contrast to the more traditional access-control model of access-control lists (ACLs)</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>With capabilities, the kernel will allow an operation to go ahead if and only if the subject that requests the operation presents a capability that empowers it to perform the operation</em>.</p>
+</blockquote>
+<p><code>Linux</code> 操作系统中使用 <code>Access control Lists(ACLs)</code> 进行访问控制，是一种面向系统资源（<code>subject-oriented</code>）的粗粒度控制方式。<code>seL4</code> 中使用的 <code>capability</code> 机制遵循最小权限原则（<code>Principle Of Least Authority</code>），面向资源访问者（<code>object-oriented</code>），可进行细粒度的访问控制，在“限制场景”（<code>confined scenario</code>）中有比 <code>ACLs</code> 更好的效用。</p>
+<blockquote>
+<p><em>Capabilities have  the ability to interpose access, which is a consequence of the fact that they are opaque object references</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>Interposition has applications beyond enforcing security policies; the approach can be used for packet filtering, information-flow tracing and many more. A debugger can transparently interpose and virtualise object invokations. It can even be used to create objects lazily</em>.</p>
+</blockquote>
+<p><code>capabilities</code> 是不透明（对用户）的对象引用，因此 <code>capability</code> 机制具有访问介入的能力，可以用来强制维护系统安全、对内核对象进行访问代理、监视系统调用、追踪和过滤数据包和数据流、懒加载内存对象等。其实和中间人攻击的原理类似，像是添加了一层代理，只不过这里是为了保证安全性。</p>
+<blockquote>
+<p><em>Another advantage of capabilities is that they support safe and efficient delegation of privilege, the new capability can <strong>have diminished rights</strong> and be used <strong>without referring back to the distributer</strong>.</em></p>
+</blockquote>
+<p><code>capability</code> 机制可以安全高效地分发 <code>capabilities</code>，接收者通常是获得削弱过的 <code>capabilities</code>，使用过程中可以不回调原始的分发者，这样提高了效率。</p>
+<blockquote>
+<p><em>A typical case of delegation's use is setting up sub-systems that manage resources autonomously</em>.</p>
+</blockquote>
+<blockquote>
+<p><em>ACLs have an unsolvable problem, generally called the confused deputy, the fundamental problem here is that ACL-based systems use ambient authority for determining access rights: The validity of an operation is determined by the security state of the agent (compiler), which in this case is a deputy operating on behalf of an original agent (Alice).</em></p>
+</blockquote>
+<blockquote>
+<p><em>For proper security, denomination (the reference to the file) and authority (the right to perform operations on the file) must be coupled, a principle called no designation without authority.</em></p>
+</blockquote>
+<blockquote>
+<p><em>Next time someone is trying to sell you a “secure” OS, not only ask whether they have a correctness proof for the OS, but also whether it uses capability-based access control. If the answer to either questions is “no”, then you’re being offered snake oil.</em></p>
+</blockquote>
+<h5>Chapter 5 Support for Hard Real-Time Systems</h5>
+<h6>General real-time Support</h6>
+<blockquote>
+<p>*seL4 has **a simple, priority-based scheduling policy *<em>that is easy to understand and analyse, a core requirement for hard real-time systems. <strong>The kernel will, on its own, never adjust priorities, so the user is in control</strong>.</em></p>
+</blockquote>
+<blockquote>
+<p><em>Another requirement are <strong>bounded interrupt latencies</strong>.</em></p>
+</blockquote>
+<p>硬实时系统有两项基本要求：基于优先级的调度策略、有限的中断延迟，二者都在 <code>seL4</code> 中得到了满足。</p>
+<blockquote>
+<p><em>seL4, like most members of the L4 microkernel family, <strong>executes with interrupts disabled while in kernel mode</strong>. This design decision greatly simplifies the kernel design and implementation, as the kernel (on a unicore processor) requires no concurrency control. seL4’s formal verification would otherwise be infeasible, but <strong>the design is also an enabler for excellent average-case performance</strong>.</em></p>
+</blockquote>
+<p><code>seL4</code> 在内核态运行时会禁止一切中断，这样的设计提升了一般情况下的系统性能。而 <code>seL4</code> 通常都运行在单核处理器上不需要做并发控制，如此设计还简化了系统实现。</p>
+<blockquote>
+<p><em>There is a widespread belief that a real-time OS must be preemptible, except for short critical sections, in order to keep interrupt latencies low. While true for traditional unprotected RTOSes running on simple microcontrollers, this belief is mistaken for a protected-mode system, such as seL4. The reason is that when running on a powerful microprocessor with memory protection enabled, the time for entering the kernel, switching context, and exiting the kernel, is significant, and not much less than a seL4 system call. In terms of interrupt latencies, little could be gained by a preemptible design, but the cost in terms of complexity would be very high, making a preemptible design unjustified</em></p>
+</blockquote>
+<p>一般的 <code>RTOS</code> 设计中有一个不成文的规定，即 <code>RTOS</code> 应当支持抢占式调度，以此降低中断响应的延迟。但这对支持保护模式（<code>protected mode</code>）的 <code>RTOS</code> 如 <code>seL4</code> 来说并不一定合适，因为当系统运行在提供内存保护（<code>memory proetction</code>）的微处理器上时，为了实现抢占式调度而执行的进入内核态、切换上下文、退出内核态等操作都有很大的时间开销，故而抢占式设计对降低中断延迟收效甚微，反倒提高了系统复杂性。</p>
+<blockquote>
+<p><em>This works as long as all system calls are short.</em></p>
+</blockquote>
+<p><code>seL4</code> 不支持抢占式调度却还能保证中断延迟较低得益于它的系统调用（<code>system call</code>）都比较短小（<code>short</code>）。</p>
+<blockquote>
+<p><em>Revoking a capability can be a long-running operation. seL4 deals with this situation by breaking such operations into short sub-operations, and making it possible to abort and restart the complete operation after each sub-operation, should there be a pending interrupt.</em></p>
+</blockquote>
+<p>其实并非所有 <code>seL4</code> 系统调用都是短小精悍的，比如回收 <code>capability</code>（<code>Revoking capability</code>），<code>seL4</code> 的处理方式是把大而长的系统调用分解成一系列短小的子操作（<code>sub-operations</code>），在每一个子操作执行完毕后，系统会检查是否有挂起待处理的中断（<code>pending interrputs</code>），如果有，整个系统调用将被终止并伺机重启来为中断处理让出 <code>CPU</code>。<br>
+<code>seL4</code> 使用了一种名为“增量一致性”（<code>Increment Consistency</code>）的方法，使得系统调用的分割和子操作的执行都是结构化的，整个系统调用可以在不重复已经完成的子操作的前提下重启</p>
+<blockquote>
+<p><em>We performed a complete and sound worst-case execution time (WCET) analysis of seL4, which is the only one documented for a protected-mode OS [Blackham et al., 2011, Sewell et al., 2016]. It means that we had obtained provable, hard upper bounds for all system-call latencies and, by implication, worst-case interrupt latencies.</em></p>
+</blockquote>
+<p>开发者为 <code>seL4</code> 做了完整而可靠的最坏情况下执行时间分析（<code>Worst Case Execution Time analysis</code>），据此获得了所有系统调用延迟的可证硬上限（<code>provable, hard upper bounds</code>），并推导出了最坏情况下的中断延迟。</p>
+<blockquote>
+<p><em>We did the WCET analysis of seL4 for Arm v6 processors. It has since fallen into abeyance, as Arm has stopped providing the required information on the worst-case latencies of instructions, and Intel never provided those for their architecture.</em></p>
+</blockquote>
+<p>在愉快进行 <code>WCET</code> 的过程中，<code>Arm</code> 突然变卦，我觉得与其这样不如学 <code>Intel</code> 一路闭源到底（，没什么，添一笑尔。</p>
+<h6>Mixed-criticality systems</h6>
+<blockquote>
+<p><em>Criticality is a term from the safety domain relating to the seriousness of a failure of a component. The more critical a component, the more extensive (and expensive) is the required assurance, so there is a strong incentive for keeping criticalities low.</em></p>
+</blockquote>
+<p>“关键性”是安全领域中和组件错误严重性相关的一个术语。组件的关键性越高，对其可靠性的要求就越宽泛，（出错代价）也越昂贵，所以系统设计中降低组件关键性的动机是很强烈的。（原谅我这可恶的直译水平💩）</p>
+<blockquote>
+<p><em>A mixed-criticality system (MCS) is made up of (interacting) components of different<br>
+criticalities.</em></p>
+</blockquote>
+<p>混合关键系统（<code>MSC</code>）是由关键性不同的交互组件构成的。就像下面所示的一个自动驾驶系统的简单示意图，它有主控系统、网络驱动两个关键组件，两个组件间会进行交互以共享数据。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/Simplified-example-of-a-mixed-criticality-system.png" alt="Simplified example of a mixed criticality system" style="zoom:70%">
+	<figcaption>
+	<font size=2>Simplified example of a mixed criticality system.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 5.1</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>MCS's core safety requirement is that failure of a component must not affect<br>
+any more critical components, so the critical components can be assured independent<br>
+of the less critical ones.</em></p>
+</blockquote>
+<p><code>MSC</code> 安全性的核心要求是：一个组件的错误不能影响其他关键性更高的组件，因此关键组件应当独立于比它关键性低的组件。</p>
+<blockquote>
+<p><em><strong>The trend to MCS results from the desire to consolidate</strong>: Traditionally, critical systems would use a dedicated microcontroller for each function, i.e. isolation by air-gapping. With growing functionality, this approach leads to a proliferation of processors (and their packaging and wiring), which causes space, weight and power (SWaP) problems, which MCS aim to overcome. <strong>This is similar to the security notion of having trusted and untrusted components in the same system, and the core requirement on the OS is in both cases strong isolation</strong>.</em></p>
+</blockquote>
+<p><code>MSC</code> 系统的兴起源于对传统关键性系统进行架构整合的需要，传统的关键性系统会为每个功能模块提供专用的微控制器，随着系统功能的增加，处理器数量也不断增加，随之而来的是空间占用、重量和功耗持续增加的问题(<code>SWaP Problem</code>)，<code>MCS</code> 就是为克服这些问题而提出的。这和安全领域中要把受信和不受信的组件维持在一个系统中的问题是相似的，二者的核心需求都是 <code>OS</code> 要提供很强的隔离性。</p>
+<blockquote>
+<p><em><strong>Traditional MCS OSes completely isolate components temporally and spatially</strong>, an approach called strict time and space partitioning (TSP).</em></p>
+</blockquote>
+<p>传统的 <code>MCS</code> 操作系统会将不同组件在时间和空间上完全隔离，这被称作“严格时空间划分”（<code>TSP</code>）。</p>
+<blockquote>
+<p><em>The TSP approach guarantees isolation, but has severe drawbacks. The most obvious one is poor resource utilisation. Another big drawback of TSP is that interrupt latencies are inherently high.</em></p>
+</blockquote>
+<p><code>TSP</code> 方法保证了隔离性，但有严重的不足，最明显的就是资源利用率很低和中断延迟过高。</p>
+<blockquote>
+<p><em>In terms of space resources, seL4 already has a flexible, powerful and provably secure model: object capabilities. MCS support extends this to time: access to the processor is now also controlled by capabilities.</em></p>
+</blockquote>
+<p>说起空间资源的划分和利用，<code>seL4</code> 已经有了一个灵活、强大并且安全性可证的模型：<code>object capailities</code>。支持 <code>MCS</code> 的 <code>seL4</code> 将 <code>capability</code> 机制扩展到了时间域上：组件对处理器的占用也由 <code>capabilities</code> 控制。</p>
+<blockquote>
+<p><em>seL4’s capabilities for processor time are called scheduling-context capabilities. A component can only obtain processor time if it holds such a capability, and the amount of processor time it can use is encoded in the capability.</em></p>
+</blockquote>
+<p><code>seL4</code> 用以控制处理器时间的 <code>capabilities</code> 叫做上下文调度 <code>capabilities</code>（<code>scheduling-context capabilities</code>）。组件仅在持有相关 <code>capability</code> 的时候才能获取一定的处理器使用时间，具体的时间多少被封装在 <code>capability</code> 中。</p>
+<blockquote>
+<p><em>In traditional seL4 (as in most L4 kernels before it) a thread had <strong>two main scheduling parameters: a priority and a time slice</strong>, which determine access to the processor.</em></p>
+</blockquote>
+<p>传统的 <code>seL4</code> 依据两个参数进行线程调度：优先级（<code>priority</code>）和时间片（<code>time slice</code>）。</p>
+<blockquote>
+<p><em><strong>The MCS version of seL4 replaces the time slice by a capability to a scheduling context object</strong>, which performs a similar function, but in a more precise way that is the key to isolation: A scheduling context contains two main attributes. <strong>(1) a time budget, which is similar to the old time slice</strong>, and limits the time for which a thread can execute until preempted. <strong>(2) a time period, which determines how often the budget can be used</strong>: the thread will not get more time than one budget per period, preventing it from monopolising the CPU irrespective of its priority.</em></p>
+</blockquote>
+<p>支持 <code>MCS</code> 的 <code>seL4</code> 用上下文调度对象（<code>scheduling context object</code>） 替换了时间片，实现了更为精细的调度，而这也是保证隔离性（<code>isolation</code>）的关键。一个上下文调度对象有两个属性：时间预算（<code>time budget</code>），其作用和时间片一致、时间频率（<code>time period</code>），决定了线程可以获得时间预算的频率，防止高优先级的线程一直占用 <code>CPU</code>。</p>
+<blockquote>
+<p><em><strong>Scheduling contexts support reasoning about the amount of time a thread can consume</strong>, and therefore, how much time is left.</em></p>
+</blockquote>
+<p>上下文调度对象支持对线程实际可以消耗的 <code>CPU</code> 时间进行推算，因此也较易推知线程实际剩余的 <code>CPU</code> 时间。</p>
+<blockquote>
+<p><em>Applied to the above example, this means that we can give the (less critical) device driver a higher priority than the (critical) control component. This allows the driver to preempt the control, leading to high responsiveness. But the budget limit will stop the driver from monopolising the CPU</em>.</p>
+</blockquote>
+<p>上面那个自动驾驶系统中，可以赋予重要性更低的设备驱动以更高的优先级（高于控制组件），这样必要的时候设备驱动就可以抢占 <code>CPU</code> 保证及时响应（相当于降低中断延迟），但时间预算（<code>time budget</code>）和时间频率（<code>time period</code>）的限制会阻止驱动一直占用 <code>CPU</code>。</p>
+<blockquote>
+<p><em>By guaranteeing the critical deadline irrespective of the behaviour of the driver, we isolate the control from the untrusted driver, according to the core requirement of MCS</em>.</p>
+</blockquote>
+<p>还是上图那个自动驾驶系统的例子，使用上下文调度对象严格限制设备驱动（<code>driver</code>）对 <code>CPU</code> 的占用（不受驱动组件优先级的影响），可以将控制组件和驱动组件很好地隔离开来，满足了 <code>MCS</code> 的核心需求。</p>
+<h5>Chapter 6 Security is No Excuse for Poor Perfomance</h5>
+<blockquote>
+<p><em>seL4 beats the performance of any other microkernel. This is a claim that is difficult to prove, as the competition generally holds their performance data close to their chest (for very good reason!) However, we make this performance claim, publicly, at every opportunity. If anyone disagrees they need to present evidence.</em></p>
+</blockquote>
+<p>自证是表达者的宿命。</p>
+<h5>Chpter 7 Real-World Deployment and Incremental Cyber Retrofit</h5>
+<h6>General considerations</h6>
+<blockquote>
+<p><em>When planning to protect the security or safety of your system with seL4, the first step should be to identify the critical assets you need to protect. The aim should be to minimise this part of your trusted computing base, and make it as modular as feasible, with each module becoming an seL4-protected CAmkES component.</em></p>
+</blockquote>
+<blockquote>
+<p><em>The other important preparation is to check availability and verification status of seL4 on your platform.</em></p>
+</blockquote>
+<blockquote>
+<p><em>You furthermore will need to assess whether the available user-level infrastructure is<br>
+sufficient for your purpose. If not, then this is where the community may help you.</em></p>
+</blockquote>
+<p>当尝试使用 <code>seL4</code> 维护系统安全时，应提前做好三点准备：明确需要保护的关键资源，最小化可信计算基（<code>TCB</code>）并尽可能地将其模块化以便转换为 <code>CAmkES</code> 组件、确认所使用的硬件平台对 <code>seL4</code> 的验证和支持情况、评估现有的用户级框架和应用能否满足实际需求，若不能，可以向社区寻求帮助。</p>
+<h6>Retrofitting existing systems</h6>
+<blockquote>
+<p><em>Most real-world deployments of seL4 will not run everything native. Typically, there are significant legacy components that would be expensive to port, because they are too big or rely on too many system services that are not presently supported by seL4. Also, frequently there would be little security or safety gain from running such legacy stacks natively.<strong>Using seL4’s virtualisation capabilities is frequently the pragmatic way to proceed</strong>.</em></p>
+</blockquote>
+<p>当下多数已经部署的 <code>seL4</code> 不会选择在原生环境（<code>native enviroment</code>）中运行一切内容（设备驱动、系统级应用、用户级应用等），或是因为组件本身过于复杂庞大难以移植，或是因为 <code>seL4</code> 不能支持组件所依赖的一些系统调用，或是因为这些组件代码自身的安全性难以保证所以不适合 <code>running natively</code>。使用 <code>seL4</code> 的虚拟化功能（<code>vitrualisation capablities</code>）是解决这些问题的实用办法。</p>
+<blockquote>
+<p><em>The typical approach is what we call incremental cyber-retrofit, a term coined by then DARPA program director John Launchbury.</em></p>
+</blockquote>
+<p>使用 <code>seL4</code> 改装现有系统构造安全的运行环境时，通常的方法是进行“增量网络改造”（<code>incremental cyber-retrofit</code>）。下图所示是 <code>HACMS</code> 项目成员使用 <code>seL4</code> 对波音 <code>ULB</code> 自主直升机项目进行增量网络改造的大致过程。</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2024/2/Incremental-cyber-retrofit.png" alt="Incremental cyber-retrofit" style="zoom:70%">
+	<figcaption>
+	<font size=2>Incremental cyber-retrofit.<cite><a href="https://sel4.systems/About/seL4-whitepaper.pdf">seL4-whitepaper.Figure 7.1</a></cite></font>
+  </figcaption>
+</div>
+<blockquote>
+<p><em>The incremental cyber-retrofit typically <strong>starts out</strong> by simply putting the whole existing software stack into a virtual machine running on seL4, this step provides a baseline from where to start modularising.<br>
+<strong>The next step</strong> broke out two components: The particularly untrusted camera software was moved to a second VM, also running Linux, with the two Linux VMs communicating via CAmkES channels. At the same time, the network stack was pulled out of the VM and converted to a native CAmkES component, also communicating with the main VM.<br>
+<strong>The final</strong> step pulled all other critical modules, as well as the (untrusted) GPS software, into separate CAmkES components, removing the original main VM. The final system consisted of a number of CAmkES components running seL4-native code, and a single VM running just Linux and the camera software.</em></p>
+</blockquote>
+<p>结合上面的图示，这个项目中进行 <code>incremental cyber-retrofit</code> 的大致过程是：<br>
+<strong>首先</strong>将整个已存在的软件运行栈放到一个在 <code>seL4</code> 上运行的虚拟机中，和 <code>seL4</code> 一起作为初始的 <code>TCB</code>。<br>
+<strong>其次</strong>将一些不可信的、依赖主流操作系统而无法转化为 <code>CAmkES</code> 组件的用户级应用从 <code>TCB</code> 中拆出放到其他虚拟机中运行（虚拟机之间通过 <code>CAmkES</code> 提供的信道（<code>channels</code>）通信），同时将可以转化为 <code>CAmkES</code> 组件的驱动程序转换为运行在 <code>seL4</code> 原生环境上的 <code>CAmkES</code> 组件。<br>
+<strong>最后</strong>将一些可转换的重要模块（如本例中的 <code>GPS module</code>）转换为独立的 <code>CAmkES</code> 组件并从 <code>TCB</code> 中拆出放到 <code>seL4</code> 原生环境上运行，之后就可以删除 <code>TCB</code> 中的虚拟机和原本为一干应用提供系统服务的 <code>Linux</code></p>
+<h5>Chapter 8 Conclusions</h5>
+<blockquote>
+<p><em>Our ongoing research aims to ensure that seL4 will retain its position as the clear leader among security- and safety-oriented OSes, for example by pioneering systematic and principled prevention of information leakage through timing channels.</em></p>
+</blockquote>
+<p><code>seL4</code> 未来的研究方向会包括开创一种系统性、原则性的方法用于防止信息从时间通道？（<code>timing channels</code>）泄露。</p>
+<blockquote>
+<p><em>Besides this technological leadership, seL4 is in practical terms still far ahead of its successors: While we designed seL4 for real-world use from the beginning, almost all other verified OS kernels are academic toys, and far from real-world capable.</em></p>
+</blockquote>
+<p>看得出来 <code>seL4</code> 的老哥们对他们的作品是相当骄傲了🤣</p>
+<blockquote>
+<p><em>seL4’s real-world readiness is a result of two aspects that drove the design: uncompromising performance focus, as highlighted in Chapter 6, and mechanisms that are designed to support the widest range of application scenarios and security policies, the latter enabled by capability-based access control.</em></p>
+</blockquote>
+<p><code>seL4</code> 在生产实践中良好的适用性（而不是成为一个 <code>academic toy</code>）得益于两个方面的设计理念，一是对系统性能的坚持，二是为了支持最广泛的应用场景和安全策略而制定的运行机制，也就是基于 <code>capability</code> 的访问控制。</p>
+<p>到这里这个版本的 <code>seL4 white paper</code> 算是结束了，希望有朝一日看到老哥们更新关于提升 <code>timing channels</code> 安全性的内容。</p>
+
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/notes-for-makefile-in-nvboard-examples/">
+              <h3 class="post-title">
+                Notes for Makefile in nvboard examples
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
