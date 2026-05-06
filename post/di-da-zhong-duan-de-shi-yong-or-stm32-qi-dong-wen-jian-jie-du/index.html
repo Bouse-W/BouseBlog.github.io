@@ -1,0 +1,498 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>滴答中断的使用 | STM32启动文件解读 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1778052669712">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="滴答中断的使用 | STM32启动文件解读 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="滴答中断的使用
+简要说明
+滴答计时器 SysTick 是 STM32 系列处理器的一种片上外设，内嵌在 NVIC 中，其时钟信号来自于系统时钟，具体可查看对应处理器的时钟树。
+使用 SysTick 的重点无非是：初始化时设置时钟分频以控制中..." />
+    <meta name="keywords" content="Embeded_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1778052669712" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              滴答中断的使用 | STM32启动文件解读
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-26
+              </span>
+              <span>
+                10 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/DLt8laeDKR/" class="post-tag">
+                  # Embeded_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="滴答中断的使用">滴答中断的使用</h4>
+<h5 id="简要说明">简要说明</h5>
+<p>滴答计时器 <code>SysTick</code> 是 <code>STM32</code> 系列处理器的一种片上外设，内嵌在 <code>NVIC</code> 中，其时钟信号来自于系统时钟，具体可查看对应处理器的时钟树。</p>
+<p>使用 <code>SysTick</code> 的重点无非是：初始化时设置时钟分频以控制中断频率、中断处理函数的书写。在裸机上寄存器编程时还要注意计时器的打开和关闭。然后就没了。</p>
+<h5 id="代码与分析">代码与分析</h5>
+<h6 id="基于-stm32f103ve-的-systick-初始化">基于 <code>STM32F103VE</code> 的 <code>SysTick</code> 初始化</h6>
+<pre><code class="language-c">// STM32F103VE 主频 72MHZ
+uint32_t SystemCoreClock = SYSCLK_FREQ_72MHz;
+
+/**
+  * @brief  初始化系统滴答定时器 SysTick
+  * @param  无
+  * @retval 无
+  */
+void SysTick_Init(void)
+{
+    /*
+	   SystemFrequency / 1000    1ms中断一次
+	   SystemFrequency / 100000	 10us中断一次
+	   SystemFrequency / 1000000 1us中断一次
+	*/
+    
+	//	if (SysTick_Config(SystemFrequency / 100000))	// ST3.0.0库版本
+    
+    // 设置为 1ms 触发一次滴答中断
+	if (SysTick_Config(SystemCoreClock/1000))	// ST3.5.0库版本 SystemCoreClock / 10 不能超过 16777216 = 2^24
+	{ 
+		/* Capture error */ 
+		while (1);
+	}
+	// 关闭滴答定时器  
+	SysTick-&gt;CTRL &amp;= ~ SysTick_CTRL_ENABLE_Msk;
+	  
+	// 使能滴答定时器，在此处直接开启或在主函数中初始化完成后开启均可
+	//	SysTick-&gt;CTRL |=  SysTick_CTRL_ENABLE_Msk;
+}
+</code></pre>
+<h6 id="滴答中断的处理函数">滴答中断的处理函数</h6>
+<p><font color=red><code>file name: stm32f10x_it.c</code></font></p>
+<pre><code class="language-c">unsigned int Task_Delay[NumOfTask]={0};
+
+#define TASK_DELAY_0    1000    //任务0延时 1000*1 毫秒后执行
+#define TASK_DELAY_1    500     //任务1延时 500*1 毫秒后执行
+// 还可以写更多，不过要考虑任务过多对 CPU 资源的占用
+
+/**
+  * @brief  滴答中断处理函数，时延处理多任务
+  * @param  None
+  * @retval None
+  */
+void SysTick_Handler(void)
+{
+	int i;
+    for(i=0; i &lt; NumOfTask; i++)
+    {
+        Task_Delay[i] ++;                   //任务计时，时间到后执行
+    }
+  
+  	// 处理任务 0
+  	if(Task_Delay[0] &gt;= TASK_DELAY_0)     //判断是否执行任务0
+  	{
+    	Task_Delay[0] = 0;                  //置0重新计时
+      
+    	// 任务体 0
+  	}
+  
+  	// 处理任务 1
+  	if(Task_Delay[1] &gt;= TASK_DELAY_1)     //判断是否执行任务1
+  	{
+    	Task_Delay[1] = 0;                  //置0重新计时
+      
+    	// 任务体 1
+  	}
+  	// 处理任务 2
+}
+</code></pre>
+<p>然后就没有了，比较简单，非常无聊</p>
+<p>接下来要搞点有趣的</p>
+<h4 id="stm32-启动文件解读"><code>STM32</code> 启动文件解读</h4>
+<h5 id="简要说明-2">简要说明</h5>
+<p>无论使用裸机还是嵌入式操作系统，都需要启动文件。启动文件通常由和处理器型号匹配的汇编语言书写，如野火-指南者开发板，使用 <code>STM32F103VE</code> 处理器，内置 <code>ARM</code> 的 <code>Cortex-M3</code> 内核，其启动文件自然就用 <code>ARM</code> 的汇编指令书写。ARM V 几我没查（</p>
+<p>我主要看了 <code>STM32F10x</code> 系列使用标准库和使用 <code>HAL</code> 库时的启动文件，基本内容大致相同：<strong>设置系统堆栈</strong>、<strong>设置中断向量表</strong>、<strong>设置代码段</strong>、<strong>（设置数据段）</strong>、<strong>设置用户堆栈</strong>。下面以使用 <code>HAL</code> 库时 ST 官方提供的启动文件 <code>&quot;startup_stm32f103xe.s&quot;</code> 作为样例进行代码分析</p>
+<h5 id="代码分析">代码分析</h5>
+<h6 id="设置系统堆栈">设置系统堆栈</h6>
+<pre><code class="language-assembly">; Amount of memory (in bytes) allocated for Stack
+; Tailor this value to your application needs
+; Stack Configuration
+; Stack Size (in Bytes) &lt;0x0-0xFFFFFFFF:8&gt;
+Stack_Size      EQU     0x00000400
+
+                AREA    STACK, NOINIT, READWRITE, ALIGN=3
+Stack_Mem       SPACE   Stack_Size
+__initial_sp
+
+; Heap Configuration
+; Heap Size (in Bytes) &lt;0x0-0xFFFFFFFF:8&gt;
+
+Heap_Size       EQU     0x00000000
+
+                AREA    HEAP, NOINIT, READWRITE, ALIGN=3
+__heap_base
+Heap_Mem        SPACE   Heap_Size
+__heap_limit
+
+                PRESERVE8
+                THUMB
+</code></pre>
+<p>两段代码相似度很高，这里只解释配置堆区的部分</p>
+<ul>
+<li><code>EQU</code> 命令定义了表示堆区大小的变量，此处堆区大小为 0</li>
+<li><code>AREA</code> 定义一个代码段或数据段或一块不指明用途的空间（如本例，空间名为 <code>HEAP</code>，没有说明是代码还是数据），以后续参数说明其特性
+<ul>
+<li><code>NOINIT</code> 不初始化</li>
+<li><code>READWRITE</code> 可读可写</li>
+<li><code>ALIGN=3</code> 指示当前位置按 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mn>2</mn><mn>3</mn></msup><mo>=</mo><mn>8</mn></mrow><annotation encoding="application/x-tex">2^3 = 8</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">8</span></span></span></span> 字节对齐</li>
+</ul>
+</li>
+<li><code>__heap_base</code> 声明一个标签，表示堆内存的起始地址</li>
+<li><code>SPACE</code> 命令分配一块大小为 <code>Heap_Size</code> 的空间，接续上一条声明标签的指令，使堆内存从起始地址处扩展 <code>Heap_Size</code></li>
+<li><code>__heap_limit</code> 声明一个标签，表示堆内存的结束地址</li>
+</ul>
+<p>堆栈配置至此结束，下面两条是传递给汇编器的指令（应该可以看作编译参数吧🤡）</p>
+<ul>
+<li>
+<p><code>PRESERVE8</code> 向汇编器申明，本文件对内存空间的操作始终保持 8 字节对齐，使汇编器可以标识文件的 <code>PRES8</code> 属性，以保证链接时不会报错</p>
+<ul>
+<li><code>PRESERVE8</code> 作为伪指令不会对内存空间作任何修改</li>
+<li>如此重视<strong>对齐</strong>问题是因为要遵循 ARM 的 [AAPCS 栈使用规约](<a href="https://developer.arm.com/documentation/107656/0101/Getting-started-with-Armv8-M-based-systems/Procedure-Call-Standard-for-Arm-Architecture--AAPCS-?lang=en">Introduction to the Armv8-M Architecture and its Programmers Model User Guide</a>)</li>
+</ul>
+<blockquote>
+<p>6.2.1.1 Universal stack constraints<br>
+At all times the following basic constraints must hold:</p>
+<ul>
+<li>Stack-limit ≤ SP ≤ stack-base. The stack pointer must lie within the extent of the stack</li>
+<li>SP mod 4 = 0. The stack must at all times <strong>be aligned to a word boundary</strong>.</li>
+<li>A process may only store data in the closed interval of the entire stack delimited by [SP, stack base - 1] (where SP is the value of register r13).</li>
+</ul>
+<p>6.2.1.2 Stack constraints at a public interface<br>
+The stack must also conform to the following constraint at a public interface:</p>
+<ul>
+<li>SP mod 8 = 0. The stack must be <strong>double-word aligned</strong></li>
+</ul>
+</blockquote>
+<p>简单解释就是：一般的栈空间必须保证 4 字节对齐，在外部函数的调用接口处必须保证 8 字节对齐。<br>
+如果写成 <code>PRESERVE8 {FALSE}</code>，<strong>部分</strong>编译<strong>告警信息</strong>如下：</p>
+<pre><code class="language-bash">linking...
+.\build\keil\Obj\rt-thread.axf: Warning: L6306W: '~PRES8 (The user did not require code to preserve 8-byte data objects)' section startup_stm32f103xe.o(RESET) should not use the address of 'REQ8 (Code was permitted to depend on the 8-byte aligment of 8-byte data items)' function HardFault_Handler.
+
+.\build\keil\Obj\rt-thread.axf: Warning: L6306W: '~PRES8 (The user did not require code to preserve 8-byte data objects)' section startup_stm32f103xe.o(RESET) should not use the address of 'REQ8 (Code was permitted to depend on the 8-byte aligment of 8-byte data items)' function PendSV_Handler.
+</code></pre>
+<p>编译器告警提示，在启动文件中规定了 <code>PRESERVE8 {FALSE}</code> 后就不应该再调用要求  8 字节对齐的函数，此处主要是一些中断处理函数。</p>
+<p>注意，在下文的中断向量表中<strong>弱定义</strong>了非常多中断处理函数，但此处只会对在 C 语言文件中有定义的那部分函数告警，很好地回应了在外部函数地调用接口处调用栈必须保持 8 字节对齐的要求。</p>
+</li>
+<li>
+<p><code>THUMB</code> 向编译器申明基于 <code>Thumb</code> 指令集进行编译</p>
+</li>
+</ul>
+<h6 id="设置中断向量表">设置中断向量表</h6>
+<pre><code class="language-assembly">; Vector Table Mapped to Address 0 at Reset
+                AREA    RESET, DATA, READONLY
+                EXPORT  __Vectors
+                EXPORT  __Vectors_End
+                EXPORT  __Vectors_Size
+
+__Vectors       DCD     __initial_sp               ; Top of Stack
+                DCD     Reset_Handler              ; Reset Handler
+                DCD     NMI_Handler                ; NMI Handler
+                DCD     HardFault_Handler          ; Hard Fault Handler
+                DCD     MemManage_Handler          ; MPU Fault Handler
+                DCD     BusFault_Handler           ; Bus Fault Handler
+                DCD     UsageFault_Handler         ; Usage Fault Handler
+                DCD     0                          ; Reserved
+                DCD     0                          ; Reserved
+                DCD     0                          ; Reserved
+                DCD     0                          ; Reserved
+                DCD     SVC_Handler                ; SVCall Handler
+                DCD     DebugMon_Handler           ; Debug Monitor Handler
+                DCD     0                          ; Reserved
+                DCD     PendSV_Handler             ; PendSV Handler
+                DCD     SysTick_Handler            ; SysTick Handler
+
+                ; External Interrupts
+                DCD     WWDG_IRQHandler            ; Window Watchdog
+                DCD     PVD_IRQHandler             ; PVD through EXTI Line detect
+                DCD     TAMPER_IRQHandler          ; Tamper
+                DCD     RTC_IRQHandler             ; RTC
+                DCD     FLASH_IRQHandler           ; Flash
+                DCD     RCC_IRQHandler             ; RCC
+                DCD     EXTI0_IRQHandler           ; EXTI Line 0
+                DCD     EXTI1_IRQHandler           ; EXTI Line 1
+                DCD     EXTI2_IRQHandler           ; EXTI Line 2
+                /*................................................*/
+__Vectors_End
+__Vectors_Size  EQU  __Vectors_End - __Vectors
+</code></pre>
+<p>看着吓人，实际上结构很清晰，相当于声明了一些默认的中断服务函数，并向中断向量表中填充函数地址。这里只说明几条新冒出来的指令</p>
+<ul>
+<li><code>AREA RESET, DATA, READONLY</code>，申请名为 <code>RESET</code> 的空间，作为 <code>DATA</code> 段（数据段），访问权限为只读</li>
+<li><code>EXPORT</code> 声明一个全局的标志，使该标志可以被其他文件引用</li>
+<li><code>DCD</code> 申请一个 Byte 的内存空间，并用其后的表达式初始化这片内存</li>
+</ul>
+<p>在 ARM 汇编文件中，占据一片连续内存空间的变量，变量中只是显式地存储连续空间的首地址，这一点和 C 语言相同</p>
+<p>在本例中，由 <code>DCD</code> 命令申请 1 Byte 内存空间，其地址存储到中断向量表变量 <code>__VECTORS</code>，空间中存储的初始化值是栈的结束地址 <code>__initial_sp</code></p>
+<h6 id="设置代码段">设置代码段</h6>
+<pre><code class="language-assembly">				AREA    |.text|, CODE, READONLY
+                
+; Reset handler
+Reset_Handler   PROC
+                EXPORT  Reset_Handler             [WEAK]
+                IMPORT  __main
+                IMPORT  SystemInit
+                LDR     R0, =SystemInit
+                BLX     R0               
+                LDR     R0, =__main
+                BX      R0
+                ENDP
+                
+; Dummy Exception Handlers (infinite loops which can be modified)
+NMI_Handler     PROC
+                EXPORT  NMI_Handler                [WEAK]
+                B       .
+                ENDP
+HardFault_Handler\
+                PROC
+                EXPORT  HardFault_Handler          [WEAK]
+                B       .
+                ENDP
+MemManage_Handler\
+                PROC
+                EXPORT  MemManage_Handler          [WEAK]
+                B       .
+                ENDP
+/*................................................*/
+Default_Handler PROC
+                EXPORT  WWDG_IRQHandler            [WEAK]
+                EXPORT  PVD_IRQHandler             [WEAK]
+                EXPORT  TAMPER_IRQHandler          [WEAK]
+                EXPORT  RTC_IRQHandler             [WEAK]
+                EXPORT  FLASH_IRQHandler           [WEAK]
+                EXPORT  RCC_IRQHandler             [WEAK]
+                EXPORT  EXTI0_IRQHandler           [WEAK]
+                /*................................................*/
+WWDG_IRQHandler
+PVD_IRQHandler
+TAMPER_IRQHandler
+RTC_IRQHandler
+FLASH_IRQHandler
+RCC_IRQHandler
+EXTI0_IRQHandler
+/*................................................*/
+                B       .
+                ENDP
+                ALIGN
+</code></pre>
+<ul>
+<li><code>AREA</code> 指令申请数据段后，后续代码就要填充数据，申请代码段后，后续就要填充代码</li>
+<li><code>PROC</code> 指令标明一段子程序的开始，<code>ENDP</code> 标明一段子程序的结束，二者必须成对出现</li>
+<li><code>ALIGN</code> 参数缺省，默认为 4 字节对齐</li>
+</ul>
+<p>这一段相当于定义了一些默认的中断服务函数，全部用 <code>[WEAK]</code> 标识为弱定义，表示可在其他文件中重写，并以 <code>EXPORT</code> 申明为可引用。上文拿中断函数地址填充中断向量表也依赖于此处的函数定义。</p>
+<h6 id="设置用户堆栈">设置用户堆栈</h6>
+<pre><code class="language-assembly">                 IF      :DEF:__MICROLIB
+                
+                 EXPORT  __initial_sp
+                 EXPORT  __heap_base
+                 EXPORT  __heap_limit
+    
+                 ELSE
+    
+                 IMPORT  __use_two_region_memory
+                 EXPORT  __user_initial_stackheap
+                 
+__user_initial_stackheap
+
+                 LDR     R0, =  Heap_Mem
+                 LDR     R1, = (Stack_Mem + Stack_Size)
+                 LDR     R2, = (Heap_Mem +  Heap_Size)
+                 LDR     R3, = Stack_Mem
+                 BX      LR
+
+                 ALIGN
+                 ENDIF
+                 END
+</code></pre>
+<ul>
+<li>若定义了宏 <code>__MICROLIB</code>，则使用 <code>Microlib</code> 标准库编译 C 文件，并将三个标签 <code>__initial_sp</code>、<code>__heap_base</code>、<code>__heap_limit</code> 声明为外部可引用。后续会由 C 库函数 <code>__main</code> 自动完成用户栈初始化</li>
+<li>若没有定义 <code>__MICROLIB</code>，则引用外部程序 <code>__use_two_region_memory</code>，即使用双段存储模式，并声明全局可引用程序<code>__user_initial_stackheap</code>，接下来定义此子程序，定义也没有什么特殊的，就是保存堆栈地址和大小到寄存器 <code>R0~R3</code>，最后设置返回地址到 <code>LR (R14)</code></li>
+</ul>
+<p>现在是下午五点😶。困死了，先到这。</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E6%BB%B4%E7%AD%94%E4%B8%AD%E6%96%AD%E7%9A%84%E4%BD%BF%E7%94%A8">滴答中断的使用</a>
+<ul>
+<li><a href="#%E7%AE%80%E8%A6%81%E8%AF%B4%E6%98%8E">简要说明</a></li>
+<li><a href="#%E4%BB%A3%E7%A0%81%E4%B8%8E%E5%88%86%E6%9E%90">代码与分析</a>
+<ul>
+<li><a href="#%E5%9F%BA%E4%BA%8E-stm32f103ve-%E7%9A%84-systick-%E5%88%9D%E5%A7%8B%E5%8C%96">基于 <code>STM32F103VE</code> 的 <code>SysTick</code> 初始化</a></li>
+<li><a href="#%E6%BB%B4%E7%AD%94%E4%B8%AD%E6%96%AD%E7%9A%84%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0">滴答中断的处理函数</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#stm32-%E5%90%AF%E5%8A%A8%E6%96%87%E4%BB%B6%E8%A7%A3%E8%AF%BB"><code>STM32</code> 启动文件解读</a>
+<ul>
+<li><a href="#%E7%AE%80%E8%A6%81%E8%AF%B4%E6%98%8E-2">简要说明</a></li>
+<li><a href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90">代码分析</a>
+<ul>
+<li><a href="#%E8%AE%BE%E7%BD%AE%E7%B3%BB%E7%BB%9F%E5%A0%86%E6%A0%88">设置系统堆栈</a></li>
+<li><a href="#%E8%AE%BE%E7%BD%AE%E4%B8%AD%E6%96%AD%E5%90%91%E9%87%8F%E8%A1%A8">设置中断向量表</a></li>
+<li><a href="#%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%A0%81%E6%AE%B5">设置代码段</a></li>
+<li><a href="#%E8%AE%BE%E7%BD%AE%E7%94%A8%E6%88%B7%E5%A0%86%E6%A0%88">设置用户堆栈</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/events_in_camkes/">
+              <h3 class="post-title">
+                Events_in_CAmkES
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

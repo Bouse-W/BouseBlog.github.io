@@ -1,0 +1,233 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>C++_0 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1778052669712">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="C++_0 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="我的 OOP 就用 C++ 了😎。
+OOP 和 OPP
+C 语言中使用结构体封装数据就相当于 OOP 中封装类属性。虽然可以通过封装函数指针来模拟 OOP 中的类方法，但由于缺少一个类似 this 的概念，无法做到对结构体变量自身状态的封..." />
+    <meta name="keywords" content="C-C++" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1778052669712" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              C++_0
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/cI4HnL3vJA/" class="post-tag">
+                  # C-C++
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>我的 <code>OOP</code> 就用 <code>C++</code> 了😎。</p>
+<h5 id="oop-和-opp">OOP 和 OPP</h5>
+<p>C 语言中使用结构体封装数据就相当于 <code>OOP</code> 中封装类属性。虽然可以通过封装函数指针来模拟 <code>OOP</code> 中的类方法，但由于缺少一个类似 <code>this</code> 的概念，无法做到对结构体变量自身状态的封装和操作。</p>
+<blockquote>
+<p><em>Strictly, when postfixed to a variable, the ++ operator means increment the variable, but return the variable's value before it was incremented. So the C statements int c = 1; int d = c++ ; will result in variable d having a value of 1 and variable c having a value of 2. <strong>This does not quite express the idea that C++ is an increment on C</strong>.</em>	——《C++ 编程入门手册》</p>
+</blockquote>
+<p><code>OPP</code> 的两大原则：结构化编程、自顶向下划分问题。<code>OOP</code> 与之有很大不同</p>
+<blockquote>
+<p><em>与强调算法的过程性编程不同的是，<code>OOP</code> 强调的是数据......其理念是设计与问题的本质特性相对应的数据格式。</em>——《C++ Primer Plus》中文第六版</p>
+</blockquote>
+<blockquote>
+<p><em><code>OOP</code> 程序设计方法手心设计类......从低级组织（如类）到高级组织（如程序）的处理过程叫自下向上（bottom-up）的编程。</em>——《C++ Primer Plus》中文第六版</p>
+</blockquote>
+<h5 id="c-的编译器">C++ 的编译器</h5>
+<p>不同的编译选项（优化等级、链接参数等）可以用于生成不同版本的可执行文件（稳定版、测试版等）。</p>
+<p>一些编译器甚至支持对运行时内存的格式和大小的设置，以及对函数传参顺序的指定。（如 <code>MSBuild</code>），只要设置好编译参数就行。编译器真的很厉害。</p>
+<p>编译器有时也很笨，请见下示代码</p>
+<pre><code class="language-cpp">int k = 1 / 0;
+</code></pre>
+<p>编译告警 <code>warning: division by zero [-Wdiv-by-zero]</code>。</p>
+<pre><code class="language-cpp">int i  = 0;
+int j = 1 / i;
+</code></pre>
+<p>编译正常通过。使用变量 <code>j</code> 时报告 <code>浮点数 exception（核心已转储）</code> 错误。</p>
+<h5 id="cc-程序的返回值">C/C++ 程序的返回值</h5>
+<blockquote>
+<p><em>The rule in C++ is that, if the function declares that it returns a value, then it must return a value. However, there is a single exception to this rule: if <strong>the main function</strong> does not return a value, then a value of 0 will be assumed.</em>——《C++ 编程入门手册》</p>
+</blockquote>
+<p><code>c/c++</code>程序都必然的有 <code>main</code> 函数，其生成的可执行文件则必然地有执行返回值。在命令行窗口直接运行可执行文件后，会改变当前窗口的某个环境变量来存储返回值，<code>Linux</code> 和 <code>Windows</code> 中的这个环境变量各不相同。<br>
+<code>Windows</code> 可查看 <code>%erroelevel%</code>，<code>Linux</code> 可查看 <code>?</code>。</p>
+<h5 id="源文件中的编译参数编译制导语句">源文件中的编译参数（编译制导语句）</h5>
+<h6 id="pragmagcc-和-g-都承认的编译制导语句">pragma：<code>gcc</code> 和 <code>g++</code> 都承认的编译制导语句</h6>
+<p><a href="https://gcc.gnu.org/onlinedocs/cpp/Pragmas.html">Pragmas (The C Preprocessor)|GCC|gcc.gnu.org</a></p>
+<p><a href="https://www.geeksforgeeks.org/pragma-directive-in-c-c/">#pragma Directive in C/C++|GeeksforGeeks|geeksforgeeks.org</a></p>
+<ul>
+<li><code>gcc</code> 等编译器在较新版本中都支持了 <code>openmp</code>，在源代码中使用 <code>pragma</code> 制导语句，在编译参数中使用 <code>-fopenmp</code>，二者结合即可使用 <code>openmp</code> 并行编程技术。</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#oop-%E5%92%8C-opp">OOP 和 OPP</a></li>
+<li><a href="#c-%E7%9A%84%E7%BC%96%E8%AF%91%E5%99%A8">C++ 的编译器</a></li>
+<li><a href="#cc-%E7%A8%8B%E5%BA%8F%E7%9A%84%E8%BF%94%E5%9B%9E%E5%80%BC">C/C++ 程序的返回值</a></li>
+<li><a href="#%E6%BA%90%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E7%BC%96%E8%AF%91%E5%8F%82%E6%95%B0%E7%BC%96%E8%AF%91%E5%88%B6%E5%AF%BC%E8%AF%AD%E5%8F%A5">源文件中的编译参数（编译制导语句）</a>
+<ul>
+<li><a href="#pragmagcc-%E5%92%8C-g-%E9%83%BD%E6%89%BF%E8%AE%A4%E7%9A%84%E7%BC%96%E8%AF%91%E5%88%B6%E5%AF%BC%E8%AF%AD%E5%8F%A5">pragma：<code>gcc</code> 和 <code>g++</code> 都承认的编译制导语句</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/c-yu-yan-yi-wei-yun-suan-he-ge-shi-hua-shu-chu-and-yi-wei-yun-suan-he-fu-zhi-yun-suan/">
+              <h3 class="post-title">
+                C 语言：移位运算和格式化输出 &amp; 移位运算和赋值运算
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

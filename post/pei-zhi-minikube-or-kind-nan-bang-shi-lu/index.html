@@ -1,0 +1,209 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>配置 MiniKube | KIND 难蚌实录 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1778052669712">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="配置 MiniKube | KIND 难蚌实录 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="系统配置
+Intel x86-64，Ubuntu18.04（清朝老兵说是），Docker24.0.2
+难蚌实录
+最初选用 MiniKube，--driver=docker
+组件太小，系统太老（
+从各种报错信息中怀疑了 iptables 版本..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1778052669712" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              配置 MiniKube | KIND 难蚌实录
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-05-02
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="系统配置">系统配置</h4>
+<p><code>Intel x86-64</code>，<code>Ubuntu18.04</code>（清朝老兵说是），<code>Docker24.0.2</code></p>
+<h4 id="难蚌实录">难蚌实录</h4>
+<p>最初选用 <code>MiniKube</code>，<code>--driver=docker</code></p>
+<p>组件太小，系统太老（</p>
+<p>从各种报错信息中怀疑了 <code>iptables</code> 版本太低（v1.6.1）、<code>AppArmor</code> 拦截太严格、运行内存不足、<code>cgroup</code> 驱动冲突（宿主机和 <code>Docker</code> 都使用 <code>systemd</code> ）等原因</p>
+<p>最终没能得逞，遂放弃</p>
+<p>现在想来应该就是宿主机 <code>iptables</code> 版本过低，和 <code>kubernetes</code> 镜像中的 <code>iptables</code> 不匹配的原因。之后换用 <code>kind</code> 遭遇了同样的问题</p>
+<p>通过 <code>go install sigs.k8s.io/kind@latest</code> 安装了最新版 <code>kind</code>，执行 <code>kind create cluster</code> 默认拉取最新的 <code>kubernetes</code> 镜像来构建集群</p>
+<p>构建集群时 <code>kind</code> 会执行一系列 <code>docker exec</code> 操作，调用镜像中自带的环境配置脚本</p>
+<p>环境配置将涉及：向宿主机的 <code>iptables</code> 写入一些特定规则，再从宿主机导出 <code>netfilter</code> 规则表，再导入镜像，以确保镜像内的 <code>DNS</code> 请求能被正确转发到宿主机的 <code>IP</code>。当镜像和宿主机的 <code>iptables</code> 版本不一致时，一些 <code>netfilter</code> 规则互不兼容，导出的规则表将用 <code>Unsupported</code> 填充不兼容的条目，导致镜像无法正确解析规则表，最终配置环境失败</p>
+<h5 id="ps">PS</h5>
+<p><code>kind</code> 自动拉取镜像大概率是失败的，因为 <code>Docker Hub</code> 很早就被 <code>BAN</code> 了。可以根据 <code>kind</code> 报错信息从国内备份站点手动拉取，或者在 <code>daemon.json</code> 配置使用国内镜像站</p>
+<h4 id="解决办法">解决办法</h4>
+<p>合适的就很好</p>
+<p>在 <code>Intel x86-64</code>，<code>Ubuntu18.04</code>，<code>Docker24.0.2</code> 的系统上使用 <code>kind@latest</code>，<code>kindest/node v1.26.6</code> 即可</p>
+<p>构建集群命令：</p>
+<pre><code class="language-shell">kind create cluster --image=kindest/node v1.26.6
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%B3%BB%E7%BB%9F%E9%85%8D%E7%BD%AE">系统配置</a></li>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E5%AE%9E%E5%BD%95">难蚌实录</a>
+<ul>
+<li><a href="#ps">PS</a></li>
+</ul>
+</li>
+<li><a href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95">解决办法</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/k3sonrespberrypi4-licheepi4a-nan-beng-shi-lu/">
+              <h3 class="post-title">
+                K3S On RespberryPi4 | LicheePi4A 难蚌实录
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

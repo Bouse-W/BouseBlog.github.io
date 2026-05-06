@@ -1,0 +1,334 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>K3S On RespberryPi4 | LicheePi4A 难蚌实录 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1778052669712">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="K3S On RespberryPi4 | LicheePi4A 难蚌实录 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="相关文档
+K3S-official-documents
+LicheePi4A 上的典型应用之 K3S
+难蚌实录一 | 实验平台
+实验平台：可以开启热点的 Windows10 PC，Ubuntu22.04 On RaspberryPi4B-A..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1778052669712" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              K3S On RespberryPi4 | LicheePi4A 难蚌实录
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-05-02
+              </span>
+              <span>
+                9 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="相关文档">相关文档</h4>
+<p><a href="https://docs.k3s.io/zh/">K3S-official-documents</a><br>
+<a href="https://wiki.sipeed.com/hardware/zh/lichee/th1520/lpi4a/8_application.html#K3s-RISCV">LicheePi4A 上的典型应用之 <code>K3S</code></a></p>
+<h4 id="难蚌实录一-实验平台">难蚌实录一 | 实验平台</h4>
+<p>实验平台：可以开启热点的 <code>Windows10 PC</code>，<code>Ubuntu22.04 On RaspberryPi4B-AArh64</code>，<code>RevyOS On LicheePi4A-RiscV</code>（<a href="https://wiki.sipeed.com/hardware/zh/lichee/th1520/lpi4a/1_intro.html">板卡介绍</a>，<a href="https://docs.revyos.dev/docs/intro/"><code>RevyOS</code> 介绍</a>）</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/distributionComputingNotes/img/kubernetes/三个异构平台.jpg" alt="automatic-scalability" width=60%>
+	<font size=2><figcaption>树莓派 4B，荔枝派 4A，全志 D1 哪吒，凌乱的桌面</figcaption></font>
+    <font size=2><figcaption size=1>丐中丐，王中王，火腿肠</figcaption></font>
+</div>
+<p><code>PC</code> 开启热点，几台计算设备连接到同一局域网段并<u>自动分配动态 <code>IP</code></u>，设备间可以通过 <code>IP</code> 互访</p>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/distributionComputingNotes/img/kubernetes/热点局域网.PNG" alt="automatic-scalability" width=40%>
+	<font size=2><figcaption>热点共享网络</figcaption></font>
+</div>
+<p>值得注意的是：全志 <code>D1</code> 官方分享的的 <a href="https://docs.aw-ol.com/d1/strong/strong_6debianbysipeed/"><code>Sipeed Debian</code></a> 镜像似乎没有无线网卡驱动，貌似可以自行打补丁，尚未研究，所以当前 <code>D1</code> 只能通过以太网共享网络，而当前 <code>Windows 10</code> 每次只能选择一种网络共享方式——走热点或走以太网</p>
+<p>可能要研究一下在 <code>Windows 10</code> 上同时开启无线热点共享和以太网共享（做个桥接？），但研究一下在 <code>Windows 10</code> 上同时开启无线热点共享和以太网共享不太可能（</p>
+<h4 id="难蚌实录二-使用-k3s-构建集群">难蚌实录二 | 使用 <code>K3S</code> 构建集群</h4>
+<blockquote>
+<p><i>单节点 <code>Server</code> 安装是一个功能齐全的 <code>Kubernetes</code> 集群，它包括了托管工作负载 <code>pod</code> 所需的所有数据存储、<code>control plane</code>、<code>kubelet</code> 和容器运行时组件——<code>K3S</code> 官方文档</i></p>
+</blockquote>
+<p><code>K3S</code> 主要分 <code>Server</code> 安装和 <code>Agent</code> 安装，粗糙理解就是主-从模式：<code>Server</code> 节点为主——负责部署集群、监测状态、任务调度等，<code>Agent</code> 节点为从——接收主节点指令执行计算任务等</p>
+<p>树莓派 <code>4B</code> 外设相对少，但软件支持更好，<code>Ubuntu 22.04 AArch64 Server</code> 功能完整，适合用作 <code>Server</code> 节点</p>
+<p>荔枝派 <code>4A</code> 外设丰富（甚至有 <code>GPU</code> 和 <code>NPU</code>），但软件支持较弱，操作系统和系统软件都需深度定制，勉强能跑 <code>K3S</code>（还有点小 <code>BUG</code>，详可参见“难蚌实录三”），适合用作 <code>Agent</code> 节点</p>
+<p>安装 <code>K3S</code> 的具体操作：</p>
+<ol>
+<li>在树莓派 <code>4B</code> 上 <code>Server</code> 安装
+<ol>
+<li>如果树莓派上有防火墙服务，则需要至少开放端口 <code>6443</code> 和 <code>10250</code></li>
+<li>参考 <a href="https://wiki.sipeed.com/hardware/zh/lichee/th1520/lpi4a/8_application.html#K3s-RISCV">K3S-RiscV</a> 即可</li>
+<li>可以执行 <code>systemctl enable k3s</code> 允许 <code>K3S</code> 服务自启动，在 <code>Agent</code> 平台也有类似操作</li>
+</ol>
+</li>
+<li>在荔枝派 <code>4A</code> 上 <code>Agent</code> 安装
+<ol>
+<li>先安装 <code>K3S</code> 二进制程序，以及获取安装脚本 <code>k3s-install.sh</code>。依旧参考 <a href="https://wiki.sipeed.com/hardware/zh/lichee/th1520/lpi4a/8_application.html#K3s-RISCV">K3S-RiscV</a>即可</li>
+<li>在 <code>Server</code> 上执行 <code>cat /var/lib/rancher/k3s/server/node-token</code> 获取加入集群需要的校验 <code>token</code></li>
+<li>在 <code>Agent</code> 平台执行 <code>K3S-Agent</code> 安装命令<pre><code class="language-shell">#/bin/bash
+K3S_URL=https://&lt;server-hostname | server-ip&gt;:&lt;port (default-6443)&gt; \
+K3S_TOKEN=&lt;token&gt; \
+INSTALL_K3S_EXEC=&quot;agent&quot; \
+INSTALL_K3S_SKIP_DOWNLOAD=&quot;true&quot; \
+bash -x ./k3s-install.sh
+</code></pre>
+<ul>
+<li>环境变量 <code>K3S_URL=https://&lt;server hostname | server ip&gt;:&lt;port (default-6443)&gt;</code> 使 <code>Agent</code> 可以找到 <code>Server</code>
+<ul>
+<li>不论使用 <code>server hostname</code> 还是 <code>server ip</code>，都要确保 <code>Agent</code> 能通过该字段连接到 <code>Server</code>，可以执行 <code>ping &lt;server hostname | server ip&gt;</code> 测试连通性。不能保证设备可以获取固定静态 <code>IP</code> 的场景中建议使用 <code>server hostname</code>，不要写死 <code>IP</code></li>
+<li>关于使用 <code>mDNS</code> 支持通过 <code>hostname</code> 解析到设备见“难蚌实录三”</li>
+</ul>
+</li>
+<li>环境变量 <code> K3S_TOKEN=&lt;token&gt;</code> 使 <code>Agent</code> 可以加入 <code>Server</code> 开启的集群</li>
+<li>环境变量 <code>INSTALL_K3S_EXEC=&quot;agent&quot;</code> 指定以 <code>Agent</code> 模式安装，该模式下 <code>K3S</code> 服务名称是 <code>k3s-agent.service</code>  <div align=center>
+  <img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/distributionComputingNotes/img/kubernetes/双节点集群构建效果.PNG" alt="automatic-scalability" width=100%>
+  <font size=2><figcaption>双节点集群</figcaption></font>
+  </div>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h4 id="难蚌实录三-hello-服务部署与-pod-调度测试">难蚌实录三 | <code>Hello</code> 服务部署与 <code>Pod</code> 调度测试</h4>
+<blockquote>
+<p><i>使用 <code>carvicsforth/hello-kubernetes</code> 镜像（支持 <code>ARM64</code> 和 <code>RISC-V</code> 双架构），部署 <code>2</code> 个副本，<code>K3s</code> 会自动调度到两个节点——伟大的豆包</i></p>
+</blockquote>
+<p>豆包给写的配置文件 <code>hello-het.yaml</code></p>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-het
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-het
+  template:
+    metadata:
+      labels:
+        app: hello-het
+    spec:
+      containers:
+      - name: hello-kubernetes
+        image: carvicsforth/hello-kubernetes:1.10.1
+        ports:
+        - containerPort: 8080
+</code></pre>
+<p>在 <code>Server</code> 上执行 <code>kubectl apply -f hello-het.yaml</code> 即可部署，执行 <code>kubectl delete -f hello-het.yaml</code> 可定点清除部署的内容</p>
+<h5 id="难蚌时刻之-docker-hub-被-ban-难以直接拉取镜像">难蚌时刻之 <code>docker hub</code> 被 <code>BAN</code> 难以直接拉取镜像</h5>
+<p>首先，<code>K3S</code> 自带基于 <code>containerd</code> 的容器运行时组件，安装 <code>K3S</code> 的平台无需额外安装 <code>docker</code>。另外， <code>docker</code> 和 <code>containerd</code> 都默认从 <code>docker hub</code> 拉镜像</p>
+<p>有两个好用的国内代理站：<code>dockerproxy.net</code>，<code>docker.xuanyuan.me</code>，<code>docker</code> 和 <code>containerd</code> 的配置：</p>
+<pre><code class="language-json">/* file name: daemon.json，不论是 apt 安装还是 snap 安装都是这个文件（路径小有不同），没有就创建 */
+{
+    &quot;registry-mirrors&quot;: [
+        &quot;https://dockerproxy.net/&quot;,
+        &quot;https://docker.xuanyuan.me/&quot;
+    ],
+}
+</code></pre>
+<pre><code class="language-shell"># file name: /etc/containerd/config.toml，也是没有就创建
+[plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry]
+    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors]
+        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;docker.io&quot;]
+            endpoint = [&quot;https://dockerproxy.net&quot;, &quot;https://docker.xuanyuan.me&quot;]
+</code></pre>
+<h5 id="难蚌时刻之-licheepi-4a-作为-agent-加入-cluster-后不能自动生成网络配置文件">难蚌时刻之 <code>LicheePi 4A</code> 作为 <code>Agent</code> 加入 <code>cluster</code> 后不能自动生成网络配置文件</h5>
+<p>基于上面的 <code>hello-het.yaml</code> 进行部署后，执行  <code>kubectl get pod -o wide</code> 查看 <code>pod</code> 创建运行情况，出事情了（意味深）：</p>
+<div align=center>
+<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/distributionComputingNotes/img/kubernetes/apply失败pod情况.PNG" alt="automatic-scalability" width=100%>
+<font size=2><figcaption>pod 状态监测</figcaption></font>
+</div>
+<p>在 <code>lpi4a</code> 节点上的 <code>pod</code> 处于非 <code>READY</code> 状态，看得人浑身刺挠</p>
+<p>可以执行 <code>kubectl describe pod pod &lt;pod-name&gt;</code> 查看部署该 <code>pod</code> 时的日志。本例中报告的错误是：</p>
+<pre><code class="language-shell">Failed to create pod sandbox: rpc error: \
+code = Unknown desc = failed to setup network for sandbox &quot;76...&quot;: \
+plugin type=&quot;flannel&quot; failed (add): \
+open /run/flannel/subnet.env: no such file or directory
+</code></pre>
+<p>我查了一天 <code>AI</code>（的确是一天🌚，也的确是 <code>AI</code>🌚），都在说 <code>/run/flannel/subnet.env</code> 应该是 <code>k3s-agent</code> 安装启动并加入集群时自动从 <code>Server</code> 节点上扒到本地的，如果没有那就是安装或者启动时出了问题建议重装或重启，我尝试了重装重启，没效果</p>
+<p>其实直到现在我还是不知道为什么（</p>
+<p>豆包大人说，可能是 <code>RiscV</code> 的 <code>LicheePi 4A</code> 对 <code>K3S</code> 的移植不完善，勉强能运行 <code>K3S</code> 就已经很不错了（意味深），无力创建 <code>subnet.env</code> 属实可以理解</p>
+<p>是啊，理解万岁（</p>
+<p>那么最简单且目前看来唯一有效的办法就是在 <code>Agent</code> 上手工制作一份 <code>subnet.env</code>，可以手写，也可以用 <code>scp</code> 什么的直接从 <code>Server</code> 上获取。有了 <code>subnet.env</code>，再重启一下 <code>k3s-agent</code>，刚才失败的部署会自动重试，然后就 <code>OK</code> 了</p>
+<p>值得注意的是，<code>/run</code> 通常是由 <code>tmpfs</code> 挂载的，这是一个内存中的临时文件系统，每次系统重启挂载都会失效，<code>/run</code> 会被清空。对于可以自动创建 <code>/run/flannel/subnet.v</code> 的节点来说这无所谓，但对于本例中的 <code>LicheePi 4A</code>，如果没有更好的方法一劳永逸地解决问题，那么每次重启都要手动重复一遍上面的操作，哎哟我</p>
+<p>下面的难蚌时刻都是为了解决这个问题附带产生的</p>
+<h5 id="难蚌时刻之-server-节点和-agent-节点需要同步时间">难蚌时刻之 <code>Server</code> 节点和 <code>Agent</code> 节点需要同步时间</h5>
+<blockquote>
+<p><i>所有节点的系统时间需同步（timedatectl），证书/Token 过期也会导致通信失败——伟大的 DeepSeek</i></p>
+</blockquote>
+<p><code>DeepSeek</code> 大人说的有道理啊，于是在两块板子上都做了一下时间同步，同步到国内的一些 <code>NTP</code> 服务器，具体操作可以询问伟大的 <code>DeepSeek</code>。<code>Anyway</code>，时间同步没有解决上面的问题</p>
+<h5 id="难蚌时刻之使用-mdns-支持外部设备从-hostname-解析主机-ip">难蚌时刻之使用 <code>mDNS</code> 支持外部设备从 <code>hostname</code> 解析主机 <code>IP</code></h5>
+<p>这个操作产生于对设备连接热点网络后 <code>IP</code> 动态分配无法固定的考虑。具体地，在 <code>Server</code> 和 <code>Agent</code> 上都安装并启动 <code>avahi-daemon</code> 即可</p>
+<h5 id="最难蚌时刻之在-ubuntu-2204-on-raspberrypi4-使用-netplan-配置静态-ip-搞崩热点连接导致-ssh-会话关闭进而失去对开发板的控制">最难蚌时刻之在 <code>Ubuntu 22.04 On RaspberryPi4</code> 使用 <code>netplan</code> 配置静态 <code>IP</code> 搞崩热点连接导致 <code>ssh</code> 会话关闭进而失去对开发板的控制</h5>
+<p>如果每次启动后本机 <code>IP</code> 都不一样（开了 <code>DHCP</code> 动态 <code>IP</code> 申请），<code>k3s server</code> 配置大概率会崩，所以得想办法搞出静态 <code>IP</code></p>
+<p><code>ubuntu</code>  官方发行版使用 <code>netplan</code> 工具而不是 <code>dhcpcd.conf</code> 文件配置本机 <code>IP</code>，具体配置方法可自行查询网络。<b><font color=red size=4>在改动配置之前，一定要确保除了 <code>ssh</code> 无线连接 <code>IPV4</code> 地址之外，还有其它可靠手段连接板子！！！！！</font></b></p>
+<div align=center>
+<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/ggbondsad.jpg" alt="automatic-scalability" width=10%>
+<font size=2><figcaption></figcaption></font>
+</div>
+<p>还好树莓派相关的 <code>server</code> 类 <code>ubuntu</code> 发行版都配置了串口连接：<a href="https://blog.csdn.net/u011685090/article/details/149175602">树莓派4B——串口通信配置与使用指南</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E7%9B%B8%E5%85%B3%E6%96%87%E6%A1%A3">相关文档</a></li>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E5%AE%9E%E5%BD%95%E4%B8%80-%E5%AE%9E%E9%AA%8C%E5%B9%B3%E5%8F%B0">难蚌实录一 | 实验平台</a></li>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E5%AE%9E%E5%BD%95%E4%BA%8C-%E4%BD%BF%E7%94%A8-k3s-%E6%9E%84%E5%BB%BA%E9%9B%86%E7%BE%A4">难蚌实录二 | 使用 <code>K3S</code> 构建集群</a></li>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E5%AE%9E%E5%BD%95%E4%B8%89-hello-%E6%9C%8D%E5%8A%A1%E9%83%A8%E7%BD%B2%E4%B8%8E-pod-%E8%B0%83%E5%BA%A6%E6%B5%8B%E8%AF%95">难蚌实录三 | <code>Hello</code> 服务部署与 <code>Pod</code> 调度测试</a>
+<ul>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E6%97%B6%E5%88%BB%E4%B9%8B-docker-hub-%E8%A2%AB-ban-%E9%9A%BE%E4%BB%A5%E7%9B%B4%E6%8E%A5%E6%8B%89%E5%8F%96%E9%95%9C%E5%83%8F">难蚌时刻之 <code>docker hub</code> 被 <code>BAN</code> 难以直接拉取镜像</a></li>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E6%97%B6%E5%88%BB%E4%B9%8B-licheepi-4a-%E4%BD%9C%E4%B8%BA-agent-%E5%8A%A0%E5%85%A5-cluster-%E5%90%8E%E4%B8%8D%E8%83%BD%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">难蚌时刻之 <code>LicheePi 4A</code> 作为 <code>Agent</code> 加入 <code>cluster</code> 后不能自动生成网络配置文件</a></li>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E6%97%B6%E5%88%BB%E4%B9%8B-server-%E8%8A%82%E7%82%B9%E5%92%8C-agent-%E8%8A%82%E7%82%B9%E9%9C%80%E8%A6%81%E5%90%8C%E6%AD%A5%E6%97%B6%E9%97%B4">难蚌时刻之 <code>Server</code> 节点和 <code>Agent</code> 节点需要同步时间</a></li>
+<li><a href="#%E9%9A%BE%E8%9A%8C%E6%97%B6%E5%88%BB%E4%B9%8B%E4%BD%BF%E7%94%A8-mdns-%E6%94%AF%E6%8C%81%E5%A4%96%E9%83%A8%E8%AE%BE%E5%A4%87%E4%BB%8E-hostname-%E8%A7%A3%E6%9E%90%E4%B8%BB%E6%9C%BA-ip">难蚌时刻之使用 <code>mDNS</code> 支持外部设备从 <code>hostname</code> 解析主机 <code>IP</code></a></li>
+<li><a href="#%E6%9C%80%E9%9A%BE%E8%9A%8C%E6%97%B6%E5%88%BB%E4%B9%8B%E5%9C%A8-ubuntu-2204-on-raspberrypi4-%E4%BD%BF%E7%94%A8-netplan-%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81-ip-%E6%90%9E%E5%B4%A9%E7%83%AD%E7%82%B9%E8%BF%9E%E6%8E%A5%E5%AF%BC%E8%87%B4-ssh-%E4%BC%9A%E8%AF%9D%E5%85%B3%E9%97%AD%E8%BF%9B%E8%80%8C%E5%A4%B1%E5%8E%BB%E5%AF%B9%E5%BC%80%E5%8F%91%E6%9D%BF%E7%9A%84%E6%8E%A7%E5%88%B6">最难蚌时刻之在 <code>Ubuntu 22.04 On RaspberryPi4</code> 使用 <code>netplan</code> 配置静态 <code>IP</code> 搞崩热点连接导致 <code>ssh</code> 会话关闭进而失去对开发板的控制</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/di-da-zhong-duan-de-shi-yong-or-stm32-qi-dong-wen-jian-jie-du/">
+              <h3 class="post-title">
+                滴答中断的使用 | STM32启动文件解读
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

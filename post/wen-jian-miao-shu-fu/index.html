@@ -1,0 +1,363 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>文件描述符 | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1778052669712">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="文件描述符 | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="肾摸是文件描述符
+一切皆文件
+将普通文件，链接文件，Socket 以及设备通过目录统一在一个递归的树形结构中，形成了一个统一的命名空间 ——《The Unix TimeSharing System》
+PS：在 UNIX 系统中，‘一切皆文件..." />
+    <meta name="keywords" content="System_programming" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1778052669712" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              文件描述符
+            </h2>
+            <div class="post-info">
+              <span>
+                2025-03-18
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://bouse-w.github.io/BouseBlog.github.io/tag/6in0akQ6Fb/" class="post-tag">
+                  # System_programming
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h4 id="肾摸是文件描述符">肾摸是文件描述符</h4>
+<p>一切皆文件</p>
+<p>将普通文件，链接文件，Socket 以及设备通过目录统一在一个递归的树形结构中，形成了一个统一的命名空间 ——《The Unix TimeSharing System》</p>
+<p>PS：在 UNIX 系统中，‘一切皆文件’的贯彻程度并不高，一些机制的存在使 UNIX 中的‘一切皆文件’退化成了‘一切皆文件描述符’。祖师爷里奇在后来的 Plan 9 分布式操作系统中再次对这一朴素思想进行了尝试，并最终由 Linus 在 Linux 系统中实现了‘一切皆文件’的美好愿景</p>
+<p>Linux 中，文件描述符是内核为了高效管理已被打开的文件所创建的索引，用以指代被打开的文件。所有对文件的 I/O 操作都需要使用文件描述符</p>
+<h4 id="文件描述符的实现和应用">文件描述符的实现和应用</h4>
+<ul>
+<li>总地来说，进程与文件的关系是这样的（i-node 结构体不在此图）：</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/进程使用文件的流程-1.jpeg" alt="automatic-scalability" width=90%>
+	<figcaption >
+        <font size=2>进程使用文件的流程</font>
+    </figcaption>
+</div>
+<ul>
+<li>文件描述符与系统运行的关系：</li>
+</ul>
+<div align=center>
+	<img src="https://raw.githubusercontent.com/Bouse-W/blog_images/main/BouseBlog/imgs/2023/11/文件描述符与系统调用的关系.jpg" alt="automatic-scalability" width=70%>
+	<figcaption >
+        <font size=2>文件描述符与系统调用的关系</font>
+    </figcaption>
+</div>
+<ul>
+<li>
+<p>文件描述符表 (struct fdtable)<br>
+内核会为每个进程维护一个文件描述符表，看看文件描述符表结构体的源码：</p>
+<pre><code class="language-cpp">struct fdtable
+{
+    unsigned int max_fds;
+    struct file __rcu **fd;      /* current fd_array*/
+    unsigned long * close_on_exec;
+    unsigned long * open_fds;
+    unsigned long * full_fds_bits;
+    struct rcu_head rcu;
+};
+</code></pre>
+<ul>
+<li><strong>max_fds</strong>：此文件描述符表结构体中能容纳 fd 的最大数量</li>
+<li><strong>struct file 的二重指针</strong>：指向一个数组，数组里的元素是 文件描述结构 (struct file) 的指针</li>
+<li>open_fds：long 型数组，数组中每个元素的每一个 bit 代表一个文件，如果此文件已 open，则此 bit 置 1；</li>
+<li>close_on_exec：同 open_fds 原理相同，含义不同；</li>
+<li>full_fds_bits：long 型数组，若 open_fds 里某元素所有 bit 都为 1，此数组中对应的元素的一个 bit 置 1，只要有一个不为 1，这个 bit 置 0；</li>
+</ul>
+<p><strong>注：上述代码并未说明文件描述符也即 fd 到底是个肾摸样子的变量，也没有表明如何创建和使用 fd，为此，下面看一段直接使用 fd 进行文件操作的源码：</strong></p>
+<pre><code class="language-cpp">// close 的系统调用，调用了 __close_fd 函数
+SYSCALL_DEFINE1 (close, unsigned int, fd)
+{
+    int retval = __close_fd (current-&gt;files, fd);
+
+    /* can't restart close syscall because file table entry was cleared */
+    if (unlikely (retval == -ERESTARTSYS ||
+                retval == -ERESTARTNOINTR ||
+                retval == -ERESTARTNOHAND ||
+                retval == -ERESTART_RESTARTBLOCK))
+    retval = -EINTR;
+
+    return retval;
+}
+</code></pre>
+<pre><code class="language-cpp">// __close_fd 函数实现，通过 fd 关闭 open 打开的文件
+int __close_fd(struct files_struct * files, unsigned fd)
+{
+    struct file * file;
+    struct fdtable * fdt;
+
+    spin_lock (&amp;files-&gt;file_lock);
+    fdt = files_fdtable (files);      // 获得打开文件的文件描述符表
+    if (fd &gt;= fdt -&gt; max_fds)
+    goto out_unlock;
+    file = fdt -&gt; fd[fd];       // 通过文件描述符获取文件描述结构的指针
+    if (!file)
+    goto out_unlock;
+    rcu_assign_pointer (fdt -&gt; fd[fd], NULL);
+    __put_unused_fd (files, fd);      // 回收文件描述符
+    spin_unlock (&amp;files -&gt; file_lock);
+    return filp_close (file, files);
+
+out_unlock:
+    spin_unlock (&amp;files -&gt; file_lock);
+    return -EBADF;
+}
+EXPORT_SYMBOL (__close_fd); /* for ksys_close() */
+</code></pre>
+<ul>
+<li>__close<em>fd</em> 函数根据描述符 fd，在文件描述符表的<strong>文件描述结构的指针数组，即 struct file _rcu</strong>  fd** 中找到要操作的文件描述指针，然后操作文件。</li>
+<li>至此，我们看出：文件描述符 fd 是文件描述符表中，文件描述结构指针数组的索引值，因此它非负，从 0 起。</li>
+<li><strong>系统级别的打开文件表 (files_struct)</strong>：内核对所有打开文件维护的，一个所有进程共享的打开文件的描述表，我们看看源码 🤡</li>
+</ul>
+<pre><code class="language-cpp">/*
+* Open file table structure
+*/
+struct files_struct
+{
+    /*
+    * read mostly part
+    */
+    atomic_t count;         // 打开的文件数
+    bool resize_in_progress;
+    wait_queue_head_t resize_wait;
+    // fdtable 维护着所有的文件描述符
+    struct fdtable __rcu * fdt;
+    struct fdtable fdtab;
+    /*
+    * written part on a separate cache line in SMP
+    */
+    spinlock_t file_lock ____cacheline_aligned_in_smp;
+    unsigned int next_fd;           // 下一个可用文件描述符
+    unsigned long close_on_exec_init[1];
+    unsigned long open_fds_init[1];
+    unsigned long full_fds_bits_init[1];
+    struct file __rcu * fd_array[NR_OPEN_DEFAULT];
+};
+</code></pre>
+<ul>
+<li>系统级别的 i-node 表：i-node 结构体记录了文件相关的信息</li>
+<li><strong>文件描述结构 (struct file)</strong>：其中记录了一个打开文件的各种信息，如 <strong>文件的i-node，文件当前的读写位置，文件的打开模式等</strong>，它是这样的：</li>
+</ul>
+<pre><code class="language-cpp">struct file
+{
+    union
+    {
+        struct llist_node   fu_llist;
+        struct rcu_head     fu_rcuhead;
+    } f_u;
+    struct path       f_path;
+    struct inode      *f_inode;   /* cached value */
+    const struct file_operations  *f_op;
+
+    /*
+    * Protects f_ep_links, f_flags.
+    * Must not be taken from IRQ context.
+    */
+    spinlock_t        f_lock;
+    enum rw_hint      f_write_hint;
+    atomic_long_t     f_count;
+    unsigned int      f_flags;
+    fmode_t           f_mode;
+    struct mutex      f_pos_lock;
+    loff_t            f_pos;
+    struct fown_struct    f_owner;
+    const struct cred *f_cred;
+    struct file_ra_state  f_ra;
+
+    u64           f_version;
+#ifdef CONFIG_SECURITY
+    void          *f_security;
+#endif
+    /* needed for tty driver, and maybe others */
+    void          *private_data;
+#ifdef CONFIG_EPOLL
+    /* Used by fs/eventpoll.c to link all the hooks to this file */
+    struct list_head  f_ep_links;
+    struct list_head  f_tfile_llink;
+#endif /* #ifdef CONFIG_EPOLL */
+    struct address_space  *f_mapping;
+    errseq_t      f_wb_err;
+} __randomize_layout
+__attribute__((aligned(4)));    /* lest something weird decides that 2 is OK */
+</code></pre>
+<ul>
+<li>很明显，我没有写<strong>进程结构体 (struct task_struct)</strong> 🤡</li>
+</ul>
+</li>
+</ul>
+<h4 id="和文件描述符相关的终端命令">和文件描述符相关的终端命令</h4>
+<ul>
+<li><strong>cat /proc/sys/fs/file-max</strong>：查看所有进程允许持有的最大 fd 数量</li>
+<li><strong>ulimit -n</strong>：查看单个进程允许的最大 fd 数量</li>
+<li><strong>cat /proc/sys/fs/file-nr</strong>：查看所有进程已经打开的 fd 数量以及允许的最大数量</li>
+<li><strong>lsof -p pid</strong>：通过进程号，查看进程打开的文件及其 fd</li>
+<li>已经打开的进程都以目录形式存放在 /proc 目录中，可以通过 /proc/{pid}/fd 查看进程打开的文件及其 fd</li>
+<li><strong>pgrep {可执行文件名}</strong>：查看正在执行的文件的进程号</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#%E8%82%BE%E6%91%B8%E6%98%AF%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6">肾摸是文件描述符</a></li>
+<li><a href="#%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%92%8C%E5%BA%94%E7%94%A8">文件描述符的实现和应用</a></li>
+<li><a href="#%E5%92%8C%E6%96%87%E4%BB%B6%E6%8F%8F%E8%BF%B0%E7%AC%A6%E7%9B%B8%E5%85%B3%E7%9A%84%E7%BB%88%E7%AB%AF%E5%91%BD%E4%BB%A4">和文件描述符相关的终端命令</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/shu-ju-jian-yan-yu-jiu-cuo-crcchecksumhan-ming-ma-qi-ou-xiao-yan-wei/">
+              <h3 class="post-title">
+                数据检验与纠错——CRC、Checksum、汉明码、奇偶校验位
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

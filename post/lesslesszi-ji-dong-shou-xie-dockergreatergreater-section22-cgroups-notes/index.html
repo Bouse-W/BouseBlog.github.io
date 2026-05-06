@@ -1,0 +1,411 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>《自己动手写Docker》-Section2.2-Cgroups notes | BouseBlog</title>
+<link rel="shortcut icon" href="https://bouse-w.github.io/BouseBlog.github.io//favicon.ico?v=1778052669712">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://bouse-w.github.io/BouseBlog.github.io//styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="《自己动手写Docker》-Section2.2-Cgroups notes | BouseBlog - Atom Feed" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="读书笔记这一块 | 我要开始构镜了 | 😅
+2.2.1 什么是 Linux Cgroups
+kernel 接口
+＃ 挂载一个 hierarchy
+sudo mount -t cgroup - o none ,name=cgroup-tes..." />
+    <meta name="keywords" content="" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://bouse-w.github.io/BouseBlog.github.io/">
+  <img class="avatar" src="https://bouse-w.github.io/BouseBlog.github.io//images/avatar.png?v=1778052669712" alt="">
+  </a>
+  <h1 class="site-title">
+    BouseBlog
+  </h1>
+  <p class="site-description">
+    让我们重新开始
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="https://bouse-w.github.io/BouseBlog.github.io/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              《自己动手写Docker》-Section2.2-Cgroups notes
+            </h2>
+            <div class="post-info">
+              <span>
+                2026-05-06
+              </span>
+              <span>
+                7 min read
+              </span>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <p>读书笔记这一块 | 我要开始构镜了 | 😅</p>
+<h3 id="221-什么是-linux-cgroups">2.2.1 什么是 <code>Linux Cgroups</code></h3>
+<h4 id="kernel-接口"><code>kernel</code> 接口</h4>
+<pre><code class="language-shell">＃ 挂载一个 hierarchy
+sudo mount -t cgroup - o none ,name=cgroup-test cgroup-test ./cgroup-test
+</code></pre>
+<p><code>Linux</code> 挂载命令通用格式：<code>mount -t</code> 文件系统类型  <code>-o</code> 挂载选项 挂载源 目标挂载点</p>
+<p><code>mount</code>：挂载命令，将「文件系统 / 虚拟设备」关联到系统的一个目录下</p>
+<p><code>-t cgroup</code>：<code>-t = type</code>，指定要挂载的文件系统类型为 <code>cgroup</code>。<code>Cgroup</code> 是 <code>Linux</code> 内核提供的虚拟文件系统（不占用真实磁盘，只存在于内存中，用于内核和用户态交互）</p>
+<p><code>-o none,name=cgroup-test</code>：<code>-o = options</code>，挂载参数（多个参数用逗号分隔）：</p>
+<ul>
+<li><code>none</code> 表示这个 <code>Cgroup</code> 层级不绑定任何具体资源子系统（子系统 = <code>CPU</code> / 内存 / 磁盘 <code>IO</code> 等控制器，先创建一个空层级，不限制任何资源）</li>
+<li><code>name=cgroup-test</code> 给这个 <code>Cgroup</code> 层级起一个唯一名字 <code>cgroup-test</code>，方便内核识别管理</li>
+<li><code>cgroup-test</code> 挂载源。<b>对 <code>Cgroup</code> 虚拟文件系统来说，源就是层级的名字（和上面 <code>name=</code> 对应），不是真实磁盘设备</b></li>
+</ul>
+<p><code>./cgroup-test</code>：目标挂载点</p>
+<pre><code class="language-shell">mount | grep memory
+# cgroup on /sys/fs/cgroup/memory type cgroup (rw , nosuid,nodev , noexec ,relatime ,memory , nsroot=/)
+</code></pre>
+<p><code>mount</code> 列出系统中所有已挂载的文件系统（包括真实磁盘、虚拟文件系统，比如 <code>Cgroup</code>）</p>
+<table>
+<thead>
+<tr>
+<th>输出片段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cgroup</code></td>
+<td>挂载的<strong>文件系统类型</strong>：<code>Cgroup</code> 虚拟文件系统</td>
+</tr>
+<tr>
+<td><code>on /sys/fs/cgroup/memory</code></td>
+<td><strong>挂载点</strong>：系统默认的 <code>Cgroup</code> 内存控制器路径（<code>Linux</code> 自动创建，不是手动建的）</td>
+</tr>
+<tr>
+<td><code>type cgroup</code></td>
+<td>再次确认：这是 <code>Cgroup</code> 虚拟文件系统</td>
+</tr>
+<tr>
+<td><code>(rw,...)</code></td>
+<td>挂载参数</td>
+</tr>
+</tbody>
+</table>
+<p>挂载参数详解</p>
+<p><code>rw</code>：读写权限（必须可读写，才能配置内存限制）</p>
+<p><code>nosuid、nodev、noexec</code>：安全参数：禁止提权、禁止设备文件、禁止执行程序（<code>Cgroup</code> 目录只用于配置，不需要这些功能）<br>
+<code>relatime</code>：性能优化：文件时间戳更新机制<br>
+<code>memory</code>：这个 <code>Cgroup</code> 层级专门绑定了内存子系统，专门管理进程内存（限制内存用量、统计内存使用）<br>
+<code>nsroot=/</code>：内核命名空间参数，普通使用无需关注</p>
+<h5 id="cgroup-v2-与-v1-的关键区别"><code>cgroup V2 </code> 与  <code>V1</code>  的关键区别</h5>
+<p><code>cgroup V1</code> 的独立子系统目录如 <code>/sys/fs/cgroup/memory</code>，但在 <code>cgroup V2</code> 中：</p>
+<ul>
+<li>所有控制器统一挂载在<code>/sys/fs/cgroup</code>，<strong>无独立子系统目录</strong></li>
+<li>内存限制通过 <code>memory.max</code>、<code>memory.high</code>等文件设置，而非 <code>V1</code> 的 <code>memory.limit_in_bytes</code></li>
+<li>启用控制器需通过<code>cgroup.subtree_control</code>配置，而非自动挂载子系统</li>
+</ul>
+<h5 id="基于-memory-subsystem-的进程内存限制">基于 <code>memory subsystem</code> 的进程内存限制</h5>
+<pre><code class="language-shell"># 首先，在不做限制的情况下，启动一个占用内存的 stress 进程
+[memory] stress --vm-bytes 200m --vm-keep -m 1
+
+# 创建一个 cgroup
+[memory] sudo mkdir test-limit-memory &amp;&amp; cd test-limit-memory
+
+# 设置最大 cgroup 的最大内存占用为 lOOMB
+[test-limit-memory] sudo sh -c &quot; echo  100m &gt; memory.limit_in_bytes&quot;
+
+# 将当前进程移动到这个 cgroup 中
+[test-limit-memory] sudo sh -c &quot;echo $$ &gt; tasks&quot;
+
+# 再次运行占用内存 200MB 的 stress j进程
+[test-limit-memory] stress --vm-bytes 200m --vm-keep -m 1
+</code></pre>
+<p>上述是基于 <code>cgroup V1</code> 的版本，等价改造为 <code>cgroup V2</code> 版本：</p>
+<pre><code class="language-shell"># 进入cgroup根目录
+cd /sys/fs/cgroup
+
+# 根目录仅启用 1 次 memory 控制器（永久生效）
+echo &quot;+memory&quot; | sudo tee cgroup.subtree_control
+
+# 创建测试目录
+sudo mkdir test-limit-memory &amp;&amp; cd test-limit-memory
+
+# 设置内存上限 100MB
+echo 100m | sudo tee memory.max
+
+# 当前进程加入 test-limit-memory 层级。只有叶子 cgroup 才能添加进程
+echo $$ | sudo tee cgroup.procs
+
+# 测试：启动 200MB 内存进程（会被限制）
+stress --vm-bytes 200m --vm-keep -m 1
+
+# 测试结束：Ctrl + C 终止 stress 进程，当前进程移回 cgroup 根层级
+echo $$ | sudo tee /sys/fs/cgroup/cgroup.procs
+
+# 回到根目录
+cd ..
+
+# 删除测试目录
+sudo rmdir test-limit-memory
+</code></pre>
+<h3 id="222-docker-是如何使用-cgroups-的">2.2.2 <code>Docker</code> 是如何使用 <code>Cgroups</code> 的</h3>
+<p><code>docker run -m</code> 设置内存限制：</p>
+<pre><code class="language-shell"># 启动内存限制 128M 的容器
+sudo docker run -itd m 128m ubuntu
+# &lt;container-id&gt;: 957459145e9092618837cf94alcb356e206f2f0da560b40cb31035e442d3dfll
+
+# docker 会为每个容器在系统的 hierarchy 中创建 cgroup
+cd /sys/fs/cgroup/memory/docker/&lt;container-id&gt;
+
+# 查看内存限制
+cat memory.limit_in_bytes
+# 134217728
+
+# 查看当前内存占用
+cat memory.usage_in-bytes
+# 430080
+</code></pre>
+<p>上述是基于 <code>cgroup V1</code> 的版本，等价改造为 <code>cgroup V2</code> 版本：</p>
+<pre><code class="language-shell"># 启动内存限制 128M 的容器
+sudo docker run -itd --rm -m 128m ubuntu
+
+# 获取容器 ID
+docker ps --no-trunc
+# &lt;container-id&gt;
+
+# 进入 cgroup V2 对应目录
+cd /sys/fs/cgroup/system.slice/docker-&lt;container-id&gt;.scope/
+
+# 查看内存限制（验证 128M）
+cat memory.max
+
+# 查看当前内存
+cat memory.current
+</code></pre>
+<h3 id="223-用-go-语言实现通过-cgroup-限制容器的资源">2.2.3  用 <code>Go</code> 语言实现通过 <code>cgroup</code> 限制容器的资源</h3>
+<p>把 <code>demo</code> 从 <code>cgroup V1</code> 版改成 <code>cgroup V2</code> 版：</p>
+<pre><code class="language-go">package main
+
+import (
+	&quot;os/exec&quot;
+	&quot;path&quot;
+	&quot;os&quot;
+	&quot;fmt&quot;
+	&quot;io/ioutil&quot;
+	&quot;syscall&quot;
+	&quot;strconv&quot;
+)
+
+const cgroupV2HirearchyMount = &quot;/sys/fs/cgroup&quot;
+const myCgroupName = &quot;test-memory-limit&quot;
+
+func main() {
+	if os.Args[0] == &quot;/proc/self/exe&quot; {
+		/* 子进程 */
+		fmt.Printf(&quot;current pid %d\n&quot;, syscall.Getpid())
+
+		cmd := exec.Command(&quot;stress&quot;, &quot;--vm-bytes&quot;, &quot;200m&quot;, &quot;--vm-keep&quot;, &quot;-m&quot;, &quot;1&quot;)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		if err := cmd.Run(); err != nil {
+			fmt.Println(&quot;[sub-process ERROR]&quot;, err)
+			os.Exit(1)
+		}
+	}
+
+	/* 父进程启动子进程 */
+	cmd := exec.Command(&quot;/proc/self/exe&quot;)
+	cmd.SysProcAttr = &amp;syscall.SysProcAttr {
+		Cloneflags : syscall.CLONE_NEWUTS |
+						syscall.CLONE_NEWPID |
+						syscall.CLONE_NEWNS |
+						syscall.CLONE_NEWUSER,
+	}
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	/* 新建 cgroup 的路径 */
+	testCgroupPath := path.Join(cgroupV2HirearchyMount, myCgroupName)
+
+	if err := cmd.Start(); err != nil {
+		fmt.Println(&quot;ERROR&quot;, err)
+		os.Exit(1)
+	} else {
+		/* 得到子进程映射在外部命名空间的 PID */
+		fmt.Printf(&quot;forked process's PID: %v\n&quot;, cmd.Process.Pid)
+
+		/* 在 cgroup V2 的 hierarchy 中创建测试 cgroup: test-memory-limit */
+		if err := os.Mkdir(testCgroupPath, 0755); err != nil {
+			fmt.Printf(&quot;Create cgroups failed: %v\n&quot;, err)
+			os.Exit(1)
+		}
+
+		/* 将容器进程加载到新建的 cgroup */
+		if err := ioutil.WriteFile(path.Join(testCgroupPath, &quot;cgroup.procs&quot;),
+									[]byte(strconv.Itoa(cmd.Process.Pid)),
+									0644); err != nil {
+			fmt.Printf(&quot;Move sub-process failed: %v\n&quot;, err)
+			os.Exit(1)
+		}
+		
+		/* 对新建的 cgroup 进行内存限制 */
+		if err := ioutil.WriteFile(path.Join(testCgroupPath, &quot;memory.max&quot;),
+									[]byte(&quot;100m&quot;),
+									0644); err != nil {
+			fmt.Printf(&quot;Set memory limit failed: %v\n&quot;, err)
+			os.Exit(1)
+		}
+	}
+
+	/* 等待子进程退出 */
+	cmd.Process.Wait()
+
+	os.Remove(testCgroupPath)
+}
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li>
+<ul>
+<li><a href="#221-%E4%BB%80%E4%B9%88%E6%98%AF-linux-cgroups">2.2.1 什么是 <code>Linux Cgroups</code></a>
+<ul>
+<li><a href="#kernel-%E6%8E%A5%E5%8F%A3"><code>kernel</code> 接口</a>
+<ul>
+<li><a href="#cgroup-v2-%E4%B8%8E-v1-%E7%9A%84%E5%85%B3%E9%94%AE%E5%8C%BA%E5%88%AB"><code>cgroup V2 </code> 与  <code>V1</code>  的关键区别</a></li>
+<li><a href="#%E5%9F%BA%E4%BA%8E-memory-subsystem-%E7%9A%84%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98%E9%99%90%E5%88%B6">基于 <code>memory subsystem</code> 的进程内存限制</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#222-docker-%E6%98%AF%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8-cgroups-%E7%9A%84">2.2.2 <code>Docker</code> 是如何使用 <code>Cgroups</code> 的</a></li>
+<li><a href="#223-%E7%94%A8-go-%E8%AF%AD%E8%A8%80%E5%AE%9E%E7%8E%B0%E9%80%9A%E8%BF%87-cgroup-%E9%99%90%E5%88%B6%E5%AE%B9%E5%99%A8%E7%9A%84%E8%B5%84%E6%BA%90">2.2.3  用 <code>Go</code> 语言实现通过 <code>cgroup</code> 限制容器的资源</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://bouse-w.github.io/BouseBlog.github.io/post/pei-zhi-minikube-or-kind-nan-bang-shi-lu/">
+              <h3 class="post-title">
+                配置 MiniKube | KIND 难蚌实录
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  <p><font size=1>原博客网站 rerevolution.cn（服务器过期了）的重建</font></p>
+  <a class="rss" href="https://bouse-w.github.io/BouseBlog.github.io//atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
